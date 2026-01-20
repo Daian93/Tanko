@@ -26,4 +26,3 @@ struct CustomSearchDTO: Codable {
         case contains = "searchContains"
     }
 }
-

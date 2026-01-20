@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 struct Author: Identifiable, Hashable, Codable {
     let id: UUID
     let fullName: String
@@ -30,7 +29,7 @@ extension AuthorRole {
         case .none: return "Desconocido"
         }
     }
-    
+
     var icon: String {
         switch self {
         case .art: return "paintbrush.fill"

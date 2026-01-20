@@ -17,4 +17,3 @@ struct PageMetadataDTO: Codable {
     let per: Int
     let page: Int
 }
-

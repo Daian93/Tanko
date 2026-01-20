@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8497599E2F2000A40049E62F /* URL+List.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8497599D2F2000960049E62F /* URL+List.swift */; };
+		849759A02F20011E0049E62F /* NetworkConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8497599F2F2001180049E62F /* NetworkConstants.swift */; };
+		849759A22F20056C0049E62F /* URL+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849759A12F2005650049E62F /* URL+Search.swift */; };
+		849759A42F20092C0049E62F /* URL+Users.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849759A32F2009220049E62F /* URL+Users.swift */; };
+		849759A62F200BA80049E62F /* URL+Collection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849759A52F200BA40049E62F /* URL+Collection.swift */; };
+		849759A82F203AAD0049E62F /* URLRequest+Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849759A72F203AA20049E62F /* URLRequest+Auth.swift */; };
 		84EF4A2F2EFAE00400EE4B89 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 84EF4A2B2EFAE00400EE4B89 /* Assets.xcassets */; };
 		84EF4A302EFAE00400EE4B89 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EF4A2C2EFAE00400EE4B89 /* ContentView.swift */; };
 		84EF4A312EFAE00400EE4B89 /* TankoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EF4A2D2EFAE00400EE4B89 /* TankoApp.swift */; };
@@ -38,6 +44,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8497599D2F2000960049E62F /* URL+List.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+List.swift"; sourceTree = "<group>"; };
+		8497599F2F2001180049E62F /* NetworkConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkConstants.swift; sourceTree = "<group>"; };
+		849759A12F2005650049E62F /* URL+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Search.swift"; sourceTree = "<group>"; };
+		849759A32F2009220049E62F /* URL+Users.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Users.swift"; sourceTree = "<group>"; };
+		849759A52F200BA40049E62F /* URL+Collection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Collection.swift"; sourceTree = "<group>"; };
+		849759A72F203AA20049E62F /* URLRequest+Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLRequest+Auth.swift"; sourceTree = "<group>"; };
 		84EF4A1D2EFAC07C00EE4B89 /* Tanko.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tanko.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84EF4A2B2EFAE00400EE4B89 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		84EF4A2C2EFAE00400EE4B89 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -168,10 +180,16 @@
 			isa = PBXGroup;
 			children = (
 				84EF9E0C2F1FADFD00EC2491 /* URL.swift */,
+				8497599D2F2000960049E62F /* URL+List.swift */,
+				849759A12F2005650049E62F /* URL+Search.swift */,
+				849759A32F2009220049E62F /* URL+Users.swift */,
+				849759A52F200BA40049E62F /* URL+Collection.swift */,
 				84EF9E0E2F1FAE1200EC2491 /* URLRequest.swift */,
+				849759A72F203AA20049E62F /* URLRequest+Auth.swift */,
 				84EF9E102F1FAE1900EC2491 /* URLSession.swift */,
 				84EF9E122F1FAE2000EC2491 /* NetworkError.swift */,
 				84EF9E142F1FAE2B00EC2491 /* NetworkInteractor.swift */,
+				8497599F2F2001180049E62F /* NetworkConstants.swift */,
 			);
 			path = Interface;
 			sourceTree = "<group>";
@@ -259,11 +277,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				849759A02F20011E0049E62F /* NetworkConstants.swift in Sources */,
 				84EF9E072F1FA2F900EC2491 /* PreviewData.swift in Sources */,
 				84EF9DE22F1EEF9400EC2491 /* PageDTO.swift in Sources */,
 				84EF9DFC2F1EFC5500EC2491 /* UserMangaCollection.swift in Sources */,
+				849759A82F203AAD0049E62F /* URLRequest+Auth.swift in Sources */,
 				84EF9DEC2F1EF2C800EC2491 /* GenreDTO.swift in Sources */,
 				84EF9DE02F1EEACC00EC2491 /* MangaDTO.swift in Sources */,
+				849759A42F20092C0049E62F /* URL+Users.swift in Sources */,
 				84EF9DF02F1EF2FF00EC2491 /* DemographicDTO.swift in Sources */,
 				84EF9DF82F1EFA0C00EC2491 /* User.swift in Sources */,
 				84EF9DFA2F1EFA9200EC2491 /* Page.swift in Sources */,
@@ -273,13 +294,16 @@
 				84EF9E0D2F1FAE0800EC2491 /* URL.swift in Sources */,
 				84EF4A302EFAE00400EE4B89 /* ContentView.swift in Sources */,
 				84EF9DE82F1EF25B00EC2491 /* UserMangaCollectionDTO.swift in Sources */,
+				849759A22F20056C0049E62F /* URL+Search.swift in Sources */,
 				84EF9E092F1FA30400EC2491 /* PreviewContainer.swift in Sources */,
 				84EF9DF62F1EF50100EC2491 /* Enums.swift in Sources */,
 				84EF9E0F2F1FAE1700EC2491 /* URLRequest.swift in Sources */,
 				84EF9DE62F1EF24600EC2491 /* AuthorDTO.swift in Sources */,
 				84EF9E112F1FAE1C00EC2491 /* URLSession.swift in Sources */,
+				8497599E2F2000A40049E62F /* URL+List.swift in Sources */,
 				84EF9DF42F1EF41500EC2491 /* Author.swift in Sources */,
 				84EF9DEA2F1EF2AB00EC2491 /* CustomSearchDTO.swift in Sources */,
+				849759A62F200BA80049E62F /* URL+Collection.swift in Sources */,
 				84EF4A312EFAE00400EE4B89 /* TankoApp.swift in Sources */,
 				84EF9E032F1FA2DD00EC2491 /* Model.swift in Sources */,
 				84EF9E0B2F1FA30D00EC2491 /* DataContainer.swift in Sources */,

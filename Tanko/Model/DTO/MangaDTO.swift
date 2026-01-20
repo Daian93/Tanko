@@ -47,7 +47,7 @@ extension MangaDTO {
             url: url.flatMap { URL(string: $0.cleanedURL) },
             genres: genres.compactMap { $0.genreType },
             themes: themes.compactMap { $0.themeType },
-            demographics: demographics.compactMap { $0.demographicType},
+            demographics: demographics.compactMap { $0.demographicType },
             authors: authors.map { $0.toAuthor }
         )
     }
