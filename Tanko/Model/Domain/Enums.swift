@@ -33,7 +33,7 @@ enum Genre: String, Codable, CaseIterable {
 
 extension Genre: Identifiable {
     var id: String { rawValue }
-    
+
     var displayName: String {
         switch self {
         case .action: return "Acción"
@@ -71,7 +71,7 @@ enum Demographic: String, Codable, CaseIterable {
 
 extension Demographic: Identifiable {
     var id: String { rawValue }
-    
+
     var displayName: String {
         switch self {
         case .seinen: return "Seinen"
@@ -140,7 +140,7 @@ enum Theme: String, Codable, CaseIterable {
 
 extension Theme: Identifiable {
     var id: String { rawValue }
-    
+
     var displayName: String {
         switch self {
         case .gore: return "Gore"

@@ -13,11 +13,11 @@ extension String {
             .trimmingCharacters(in: .init(charactersIn: "\""))
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
-    
+
     var asURL: URL? {
         URL(string: cleanedURL)
     }
-    
+
     func toDate() -> Date? {
         let formatter = ISO8601DateFormatter()
         return formatter.date(from: self)

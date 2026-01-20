@@ -33,29 +33,31 @@ extension Manga {
     var formattedScore: String {
         String(format: "%.2f", score)
     }
-    
+
     var publicationYear: String {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy"
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy"
 
-            let start = startDate.map { formatter.string(from: $0) } ?? "?"
-            let end = endDate.map { formatter.string(from: $0) } ?? (status == .finished ? "?" : "Presente")
+        let start = startDate.map { formatter.string(from: $0) } ?? "?"
+        let end =
+            endDate.map { formatter.string(from: $0) }
+            ?? (status == .finished ? "?" : "Presente")
 
-            return "\(start) - \(end)"
-        }
-    
+        return "\(start) - \(end)"
+    }
+
     var authorNames: String {
         authors.map { $0.fullName }.joined(separator: ", ")
     }
-    
+
     var genreNames: String {
         genres.map { $0.rawValue }.joined(separator: ", ")
     }
-    
+
     var demographicsNames: String {
         demographics.map { $0.rawValue }.joined(separator: ", ")
     }
-    
+
     var themeNames: String {
         themes.map { $0.rawValue }.joined(separator: ", ")
     }
@@ -79,7 +81,7 @@ extension MangaStatus {
         case .none: return "Desconocido"
         }
     }
-    
+
     var color: Color {
         switch self {
         case .currentlyPublishing: return .green
