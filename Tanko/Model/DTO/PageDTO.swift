@@ -17,3 +17,31 @@ struct PageMetadataDTO: Codable {
     let per: Int
     let page: Int
 }
+
+extension MangaPageDTO where T == MangaDTO {
+    var toMangaPage: Page<Manga> {
+        Page(
+            metadata: metadata.toPageMetadata,
+            items: items.map(\.toManga) 
+        )
+    }
+}
+
+extension MangaPageDTO where T == AuthorDTO {
+    var toAuthorPage: Page<Author> {
+        Page(
+            metadata: metadata.toPageMetadata,
+            items: items.map(\.toAuthor)
+        )
+    }
+}
+
+extension PageMetadataDTO {
+    var toPageMetadata: PageMetadata {
+        PageMetadata(
+            total: total,
+            page: page,
+            per: per
+        )
+    }
+}

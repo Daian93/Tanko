@@ -25,6 +25,19 @@ extension URLRequest {
         request.setValue("Bearer \(bearerToken)", forHTTPHeaderField: "Authorization")
         return request
     }
+    
+    static func post(
+        url: URL,
+        bearerToken: String,
+        method: String = "POST"
+    ) -> URLRequest {
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        request.timeoutInterval = 60
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("Bearer \(bearerToken)", forHTTPHeaderField: "Authorization")
+        return request
+    }
 
     static func delete(url: URL, bearerToken: String) -> URLRequest {
         var request = URLRequest(url: url)

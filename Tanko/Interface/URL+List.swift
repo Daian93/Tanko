@@ -54,7 +54,7 @@ extension URL {
         )
     }
 
-    static func mangaByAuthor(id: Int) -> URL {
+    static func mangaByAuthor(id: String, page: Int, perPage: Int) -> URL {
         api.appending(path: "list/mangaByAuthor").appending(path: "\(id)")
     }
 
