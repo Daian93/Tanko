@@ -8,8 +8,8 @@
 import Foundation
 
 struct Page<T> {
-    let items: [T]
     let metadata: PageMetadata
+    let items: [T]
 
     var isEmpty: Bool { items.isEmpty }
 
