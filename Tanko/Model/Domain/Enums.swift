@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import SwiftUI
 
-enum Genre: String, Codable, CaseIterable {
+enum Genre: String, Codable, CaseIterable, Identifiable {
     case action = "Action"
     case adventure = "Adventure"
     case awardWinning = "Award Winning"
@@ -29,61 +30,37 @@ enum Genre: String, Codable, CaseIterable {
     case erotica = "Erotica"
     case hentai = "Hentai"
     case avantGarde = "Avant Garde"
-}
 
-extension Genre: Identifiable {
     var id: String { rawValue }
 
-    var displayName: String {
-        switch self {
-        case .action: return "Acción"
-        case .adventure: return "Aventura"
-        case .awardWinning: return "Premiado"
-        case .drama: return "Drama"
-        case .fantasy: return "Fantasía"
-        case .horror: return "Terror"
-        case .supernatural: return "Sobrenatural"
-        case .mystery: return "Misterio"
-        case .sliceOfLife: return "Recuentos de la vida"
-        case .comedy: return "Comedia"
-        case .sciFi: return "Ciencia ficción"
-        case .suspense: return "Suspenso"
-        case .sports: return "Deportes"
-        case .ecchi: return "Ecchi"
-        case .romance: return "Romance"
-        case .girlsLove: return "Amor entre chicas"
-        case .boysLove: return "Amor entre chicos"
-        case .gourmet: return "Gastronomía"
-        case .erotica: return "Erótico"
-        case .hentai: return "Hentai"
-        case .avantGarde: return "Vanguardia"
-        }
+    var localizedKey: String {
+        "genre.\(rawValue)"
+    }
+
+    var localized: LocalizedStringKey {
+        LocalizedStringKey(localizedKey)
     }
 }
 
-enum Demographic: String, Codable, CaseIterable {
+enum Demographic: String, Codable, CaseIterable, Identifiable {
     case seinen = "Seinen"
     case shounen = "Shounen"
     case shoujo = "Shoujo"
     case josei = "Josei"
     case kids = "Kids"
-}
 
-extension Demographic: Identifiable {
     var id: String { rawValue }
 
-    var displayName: String {
-        switch self {
-        case .seinen: return "Seinen"
-        case .shounen: return "Shōnen"
-        case .shoujo: return "Shōjo"
-        case .josei: return "Josei"
-        case .kids: return "Infantil"
-        }
+    var localizedKey: String {
+        "demographic.\(rawValue)"
+    }
+
+    var localized: LocalizedStringKey {
+        LocalizedStringKey(localizedKey)
     }
 }
 
-enum Theme: String, Codable, CaseIterable {
+enum Theme: String, Codable, CaseIterable, Identifiable {
     case gore = "Gore"
     case military = "Military"
     case mythology = "Mythology"
@@ -136,65 +113,14 @@ enum Theme: String, Codable, CaseIterable {
     case educational = "Educational"
     case idolsFemale = "Idols (Female)"
     case idolsMale = "Idols (Male)"
-}
 
-extension Theme: Identifiable {
     var id: String { rawValue }
 
-    var displayName: String {
-        switch self {
-        case .gore: return "Gore"
-        case .military: return "Militar"
-        case .mythology: return "Mitología"
-        case .psychological: return "Psicológico"
-        case .historical: return "Histórico"
-        case .samurai: return "Samurái"
-        case .romanticSubtext: return "Subtexto romántico"
-        case .school: return "Escolar"
-        case .adultCast: return "Reparto adulto"
-        case .parody: return "Parodia"
-        case .superPower: return "Superpoderes"
-        case .teamSports: return "Deportes de equipo"
-        case .delinquents: return "Delincuentes"
-        case .workplace: return "Entorno laboral"
-        case .survival: return "Supervivencia"
-        case .childcare: return "Crianza"
-        case .iyashikei: return "Iyashikei"
-        case .reincarnation: return "Reencarnación"
-        case .showbiz: return "Espectáculo"
-        case .anthropomorphic: return "Antropomórfico"
-        case .lovePolygon: return "Polígono amoroso"
-        case .music: return "Música"
-        case .mecha: return "Mecha"
-        case .combatSports: return "Deportes de combate"
-        case .isekai: return "Isekai"
-        case .gagHumor: return "Humor absurdo"
-        case .crossdressing: return "Travestismo"
-        case .reverseHarem: return "Harem inverso"
-        case .martialArts: return "Artes marciales"
-        case .visualArts: return "Artes visuales"
-        case .harem: return "Harem"
-        case .otakuCulture: return "Cultura otaku"
-        case .timeTravel: return "Viajes en el tiempo"
-        case .videoGame: return "Videojuegos"
-        case .strategyGame: return "Juegos de estrategia"
-        case .vampire: return "Vampiros"
-        case .mahouShoujo: return "Mahō Shōjo"
-        case .highStakesGame: return "Juegos de alto riesgo"
-        case .cgdct: return "CGDCT"
-        case .organizedCrime: return "Crimen organizado"
-        case .detective: return "Detectives"
-        case .performingArts: return "Artes escénicas"
-        case .medical: return "Médico"
-        case .space: return "Espacio"
-        case .memoir: return "Memorias"
-        case .villainess: return "Villana"
-        case .racing: return "Carreras"
-        case .pets: return "Mascotas"
-        case .magicalSexShift: return "Cambio mágico de sexo"
-        case .educational: return "Educativo"
-        case .idolsFemale: return "Idols (femeninas)"
-        case .idolsMale: return "Idols (masculinos)"
-        }
+    var localizedKey: String {
+        "theme.\(rawValue)"
+    }
+
+    var localized: LocalizedStringKey {
+        LocalizedStringKey(localizedKey)
     }
 }

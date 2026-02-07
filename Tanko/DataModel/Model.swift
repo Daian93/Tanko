@@ -15,6 +15,7 @@ final class UserManga {
     var mangaID: Int
     var title: String
     var coverURL: URL?
+    var totalVolumes: Int?
     var volumesOwned: [Int]
     var readingVolume: Int?
     var completeCollection: Bool
@@ -26,6 +27,7 @@ final class UserManga {
         mangaID: Int,
         title: String,
         coverURL: URL?,
+        totalVolumes: Int? = nil,
         volumesOwned: [Int] = [],
         readingVolume: Int? = nil,
         completeCollection: Bool = false
@@ -34,6 +36,7 @@ final class UserManga {
         self.mangaID = mangaID
         self.title = title
         self.coverURL = coverURL
+        self.totalVolumes = totalVolumes
         self.volumesOwned = volumesOwned
         self.readingVolume = readingVolume
         self.completeCollection = completeCollection

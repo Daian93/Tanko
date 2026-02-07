@@ -20,7 +20,17 @@ extension URL {
             ])
     }
 
-    static let bestMangas = api.appending(path: "list/bestMangas")
+    static func bestMangas(
+        page: Int = NetworkConstants.defaultPage,
+        perPage: Int = NetworkConstants.defaultPerPage
+    ) -> URL {
+        api
+            .appending(path: "list/bestMangas")
+            .appending(queryItems: [
+                URLQueryItem(name: "page", value: "\(page)"),
+                URLQueryItem(name: "per", value: "\(perPage)"),
+            ])
+    }
 
     static let genres = api.appending(path: "list/genres")
 

@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct TankoApp: App {
+    @State private var mangasVM = MangasViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
+                .environment(mangasVM)
         }
     }
 }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct Author: Identifiable, Hashable, Codable {
     let id: UUID
@@ -21,13 +22,17 @@ enum AuthorRole: String, Codable, CaseIterable {
 }
 
 extension AuthorRole {
-    var displayName: String {
+    var localizedKey: String {
         switch self {
-        case .art: return "Artista"
-        case .storyAndArt: return "Escritor y artista"
-        case .story: return "Escritor"
-        case .none: return "Desconocido"
+        case .art: return "author.role.art"
+        case .storyAndArt: return "author.role.storyAndArt"
+        case .story: return "author.role.story"
+        case .none: return "author.role.none"
         }
+    }
+
+    var localized: LocalizedStringKey {
+        LocalizedStringKey(localizedKey)
     }
 
     var icon: String {

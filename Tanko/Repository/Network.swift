@@ -12,7 +12,7 @@ struct Network: NetworkRepository {
     // MARK: - Auth
     func createUser(email: String, password: String) async throws(NetworkError) {
         let body = UsersCreate(email: email, password: password)
-        let response = try await postJSON(
+        _ = try await postJSON(
             .post(url: .createUser, body: body),
             type: UserResponse.self
         )
@@ -53,7 +53,7 @@ struct Network: NetworkRepository {
         per: Int = NetworkConstants.defaultPerPage
     ) async throws(NetworkError) -> Page<Manga> {
         try await getJSON(
-            .get(url: .bestMangas),
+            .get(url: .bestMangas(page:page, perPage: per)),
             type: MangaPageDTO<MangaDTO>.self
         ).toMangaPage
     }
