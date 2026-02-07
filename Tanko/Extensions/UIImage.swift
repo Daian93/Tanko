@@ -5,7 +5,6 @@
 //  Created by Diana Rammal Sansón on 21/1/26.
 //
 
-
 import UIKit
 
 extension UIImage {

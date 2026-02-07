@@ -39,7 +39,7 @@ struct CoverView: View {
                     Image(uiImage: image)
                         .resizable()
                         .scaledToFill()
-                        .frame(width: 130, height: 160)
+                        .frame(width: 120, height: 160)
                         .clipShape(RoundedRectangle(cornerRadius: 11))
                         .navigationTransition(.zoom(sourceID: cover?.lastPathComponent ?? UUID().uuidString, in: namespace))
                 } else {

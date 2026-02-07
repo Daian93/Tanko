@@ -74,7 +74,7 @@ struct ContentView: View {
                         .background(AppColors.background)
                     }
                     .navigationDestination(for: Manga.self) { manga in
-                        MangaDetailView(manga: manga)
+                        MangaDetailView(manga: manga, namespace: namespace)
                     }
                     .refreshable {
                         await viewModel.refresh()

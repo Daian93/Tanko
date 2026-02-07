@@ -170,7 +170,7 @@ struct SearchView: View {
         List {
             ForEach(viewModel.results) { manga in
                 NavigationLink {
-                    MangaDetailView(manga: manga)
+                    MangaDetailView(manga: manga, namespace: namespace)
                 } label: {
                     MangaRow(manga: manga, namespace: namespace)
                         .task {
