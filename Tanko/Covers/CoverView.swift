@@ -54,12 +54,18 @@ struct CoverView: View {
     }
     
     private var placeholder: some View {
-        Image(systemName: "book")
-            .font(.largeTitle)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 30)
-            .background(.gray.opacity(0.3), in: .rect(cornerRadius: 11))
+        let width = big ? 120.0 : 70.0
+        let height = big ? 160.0 : 100.0
+        
+        return Image(systemName: "book")
+            .resizable()
+            .scaledToFit()
+            .frame(width: width * 0.5, height: height * 0.5) // icono centrado, más pequeño que el cover
+            .foregroundStyle(.white.opacity(0.8))
+            .frame(width: width, height: height) // tamaño total del cover
+            .background(.gray.opacity(0.3), in: RoundedRectangle(cornerRadius: 11))
     }
+
 }
 
 #Preview {
@@ -67,7 +73,6 @@ struct CoverView: View {
     CoverView(
         cover: URL(string: "https://cdn.myanimelist.net/images/manga/3/258224l.jpg"),
         namespace: namespace,
-        big: true
     )
 }
 

@@ -36,5 +36,5 @@ struct MainTabView: View {
 
 #Preview {
     MainTabView()
-        .environment(MangasViewModel())
+        .environment(MangaViewModel())
 }

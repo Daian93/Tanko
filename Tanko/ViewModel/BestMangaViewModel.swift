@@ -1,5 +1,5 @@
 //
-//  BestMangasViewModel.swift
+//  BestMangaViewModel.swift
 //  Tanko
 //
 //  Created by Diana Rammal Sansón on 24/1/26.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum BestMangasViewState {
+enum BestMangaViewState {
     case loading
     case loaded
     case empty
@@ -15,12 +15,12 @@ enum BestMangasViewState {
 
 @Observable
 @MainActor
-final class BestMangasViewModel {
+final class BestMangaViewModel {
 
     private let repository: NetworkRepository
 
     var mangas: [Manga] = []
-    var state: BestMangasViewState = .loading
+    var state: BestMangaViewState = .loading
 
     var showError = false
     var errorMsg = ""

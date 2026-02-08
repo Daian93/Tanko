@@ -159,6 +159,20 @@ struct Network: NetworkRepository {
         ).toMangaPage
     }
 
+    func searchMangasBeginsWith(_ search: String) async throws(NetworkError) -> [Manga] {
+        try await getJSON(
+            .get(url: .mangasBeginsWith(search)),
+            type: [MangaDTO].self
+        ).map(\.toManga)
+    }
+
+    func searchMangasContains(_ search: String) async throws(NetworkError) -> [Manga] {
+        try await getJSON(
+            .get(url: .mangasContains(search)),
+            type: [MangaDTO].self
+        ).map(\.toManga)
+    }
+
     // MARK: - Collection
 
     func deleteMangaFromCollection(mangaId: String, token: String) async throws(NetworkError) {

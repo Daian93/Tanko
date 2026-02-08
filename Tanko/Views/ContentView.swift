@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(MangasViewModel.self) private var viewModel
-    @State private var bestMangasViewModel = BestMangasViewModel()
+    @Environment(MangaViewModel.self) private var viewModel
+    @State private var bestMangasViewModel = BestMangaViewModel()
     @Namespace private var namespace
     
     var body: some View {
@@ -76,6 +76,9 @@ struct ContentView: View {
                     .navigationDestination(for: Manga.self) { manga in
                         MangaDetailView(manga: manga, namespace: namespace)
                     }
+                    .navigationDestination(for: Author.self) { author in
+                        AuthorMangaView(author: author)
+                    }
                     .refreshable {
                         await viewModel.refresh()
                         await bestMangasViewModel.refresh()
@@ -127,5 +130,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .environment(MangasViewModel())
+        .environment(MangaViewModel())
 }

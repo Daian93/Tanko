@@ -40,8 +40,20 @@ struct MangaDetailView: View {
                             .frame(height: bannerHeight).opacity(0.5)
                             .clipped()
                     } placeholder: {
-                        Color.gray.opacity(0.3)
+                        ZStack {
+                            LinearGradient(
+                                colors: [.gray.opacity(0.2), .gray.opacity(0.4)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                            Image(systemName: "book.closed")
+                                .font(.system(size: 60))
+                                .foregroundStyle(.white.opacity(0.6))
+                        }
+                        .frame(height: bannerHeight)
+                        .clipped()
                     }
+
 
                     HStack(alignment: .bottom, spacing: 16) {
                         CoverView(
@@ -89,7 +101,7 @@ struct MangaDetailView: View {
                     VStack(spacing: 4) {
                         Text("section.score")
                             .font(.caption)
-                            .foregroundStyle(Color.tankoTextSecondary)
+                            .foregroundStyle(AppColors.textSecondary)
 
                         Text(manga.formattedScore)
                             .font(.title2)
@@ -100,12 +112,14 @@ struct MangaDetailView: View {
                             )
                     }
                     .frame(maxWidth: .infinity)
+                    
+                    Divider().frame(height: 45)
 
                     // 📌 Estado
                     VStack(spacing: 4) {
                         Text("section.state")
                             .font(.caption)
-                            .foregroundStyle(Color.tankoTextSecondary)
+                            .foregroundStyle(AppColors.textSecondary)
 
                         Text(manga.status.localized)
                             .font(.headline)
@@ -117,11 +131,13 @@ struct MangaDetailView: View {
                             )
                     }
                     .frame(maxWidth: .infinity)
+                    
+                    Divider().frame(height: 45)
 
                     VStack(spacing: 4) {
                         Text("section.chapters")
                             .font(.caption)
-                            .foregroundStyle(Color.tankoTextSecondary)
+                            .foregroundStyle(AppColors.textSecondary)
 
                         Text(manga.chapters.map(String.init) ?? "—")
                             .font(.headline)
@@ -130,11 +146,13 @@ struct MangaDetailView: View {
                             )
                     }
                     .frame(maxWidth: .infinity)
+                    
+                    Divider().frame(height: 45)
 
                     VStack(spacing: 4) {
                         Text("section.volumes")
                             .font(.caption)
-                            .foregroundStyle(Color.tankoTextSecondary)
+                            .foregroundStyle(AppColors.textSecondary)
 
                         Text(manga.volumes.map(String.init) ?? "—")
                             .font(.headline)
@@ -159,38 +177,65 @@ struct MangaDetailView: View {
                             .font(.subheadline)
                             .fontWeight(.semibold)
 
-                        Text(manga.authorNames)
-                            .font(.subheadline)
-                            .foregroundStyle(Color.tankoTextSecondary)
+                        FlowLayout(spacing: 8) {
+                            ForEach(manga.authors) { author in
+                                NavigationLink(value: author) {
+                                    HStack(spacing: 6) {
+                                        Text(author.fullName)
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                            .foregroundStyle(AppColors.textSecondary)
+                                        
+                            
+                                        Image(systemName: author.role.icon)
+                                            .font(.system(size: 8, weight: .bold))
+                                            .foregroundStyle(.white)
+                                            .frame(width: 18, height: 18)
+                                            .background(AppColors.primary.gradient)
+                                            .clipShape(Circle())
+                                    }
+                                    .padding(.leading, 4)
+                                    .padding(.trailing, 2)
+                                    .padding(.vertical, 4)
+                                    .background(AppColors.primary.opacity(0.1))
+                                    .clipShape(Capsule())
+                                }
+                                
+                            }
+                        }
                     }
+                    .accessibilityElement(children: .combine)
                     .accessibilityLabel(
                         "\(manga.authors.count) section.authors: \(manga.authorNames)"
                     )
 
                     sectionDivider
 
-                    // 🏷️ Géneros (píldoras)
-                    VStack(alignment: .leading, spacing: 8) {
+                    
+                    if !manga.genreNames.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(genreSectionTitle)
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+
+                            FlowLayout(spacing: pillSpacing) {
+                                ForEach(manga.genres) { genre in
+                                    TagPill(
+                                        text: genre.rawValue,
+                                        color: .blue
+                                    )
+                                }
+                            }
+                        }
+                        .accessibilityLabel(
+                            "\(manga.genres.count) section.genres: \(manga.genreNames)"
+                        )
+                    } else {
                         Text(genreSectionTitle)
                             .font(.subheadline)
                             .fontWeight(.semibold)
-
-                        LazyVGrid(
-                            columns: pillColumns,
-                            alignment: .leading,
-                            spacing: pillSpacing
-                        ) {
-                            ForEach(manga.genres) { genre in
-                                TagPill(
-                                    text: genre.rawValue,
-                                    color: .blue
-                                )
-                            }
-                        }
+                        Text("-")
                     }
-                    .accessibilityLabel(
-                        "\(manga.genres.count) section.genres: \(manga.genreNames)"
-                    )
 
                     sectionDivider
 
@@ -201,7 +246,7 @@ struct MangaDetailView: View {
 
                         Text(manga.publicationYear)
                             .font(.subheadline)
-                            .foregroundStyle(Color.tankoTextSecondary)
+                            .foregroundStyle(AppColors.textSecondary)
                     }
                     .accessibilityLabel(
                         "section.published: \(manga.publicationYear)"
@@ -219,11 +264,7 @@ struct MangaDetailView: View {
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
 
-                            LazyVGrid(
-                                columns: pillColumns,
-                                alignment: .leading,
-                                spacing: pillSpacing
-                            ) {
+                            FlowLayout(spacing: pillSpacing) {
                                 ForEach(manga.themes) { theme in
                                     TagPill(
                                         text: theme.rawValue,
@@ -250,14 +291,10 @@ struct MangaDetailView: View {
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
 
-                            LazyVGrid(
-                                columns: pillColumns,
-                                alignment: .leading,
-                                spacing: pillSpacing
-                            ) {
-                                ForEach(manga.demographics) { demo in
+                            FlowLayout(spacing: pillSpacing) {
+                                ForEach(manga.demographics) { demographic in
                                     TagPill(
-                                        text: demo.rawValue,
+                                        text: demographic.rawValue,
                                         color: .green
                                     )
                                 }
@@ -283,58 +320,61 @@ struct MangaDetailView: View {
                         .font(.title3)
                         .fontWeight(.semibold)
 
-                    ZStack(alignment: .bottom) {
+                    VStack(alignment: .leading) {
                         Text(manga.synopsis)
                             .font(.body)
                             .multilineTextAlignment(.leading)
                             .lineLimit(isSynopsisExpanded ? nil : 4)
-                            .animation(.easeInOut, value: isSynopsisExpanded)
+                            .fixedSize(horizontal: false, vertical: true)
                             .accessibilityLabel(
                                 "section.synopsis: \(manga.synopsis)"
                             )
-                            .mask {
-                                if isSynopsisExpanded {
-                                    Rectangle()
-                                } else {
-                                    LinearGradient(
-                                        colors: [
-                                            .black,
-                                            .black,
-                                            .black.opacity(0.3),
-                                            .clear,
-                                        ],
-                                        startPoint: .top,
-                                        endPoint: .bottom
-                                    )
-                                }
+                    }
+                    .overlay(alignment: .bottom) {
+                        if !isSynopsisExpanded && (manga.background?.count ?? 0) > 200 {
+                            LinearGradient(
+                                colors: [
+                                    .clear,
+                                    Color(.systemBackground),
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            .frame(height: 32)
+                            .allowsHitTesting(false)
+                        }
+                    }
+                    .animation(
+                        .easeInOut(duration: 0.25),
+                        value: isSynopsisExpanded
+                    )
+                    if let bg = manga.background, bg.count > 200 {
+                        Button {
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                isSynopsisExpanded.toggle()
                             }
-                    }
-
-                    Button {
-                        withAnimation(.easeInOut) {
-                            isSynopsisExpanded.toggle()
-                        }
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text(
-                                isSynopsisExpanded
+                        } label: {
+                            HStack(spacing: 4) {
+                                Text(
+                                    isSynopsisExpanded
                                     ? "section.showLess" : "section.showMore"
-                            )
-                            .font(.caption)
-                            .fontWeight(.semibold)
-
-                            Image(
-                                systemName: isSynopsisExpanded
+                                )
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                
+                                Image(
+                                    systemName: isSynopsisExpanded
                                     ? "chevron.up" : "chevron.down"
-                            )
-                            .font(.caption)
+                                )
+                                .font(.caption2)
+                            }
                         }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
                 .padding(.horizontal)
             }
-
+            
             Spacer(minLength: 20)
 
             // Background
@@ -343,80 +383,78 @@ struct MangaDetailView: View {
                     .font(.title3)
                     .fontWeight(.semibold)
 
-                ZStack(alignment: .bottom) {
+                VStack(alignment: .leading) {
                     Text(manga.background ?? "-")
                         .font(.body)
                         .multilineTextAlignment(.leading)
                         .lineLimit(isBackgroundExpanded ? nil : 4)
-                        .animation(.easeInOut, value: isBackgroundExpanded)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
                         .accessibilityLabel(
-                            "section.background: \(manga.background ?? "-")"
+                            "section.background: \(manga.background ?? "")"
                         )
-                        .mask {
-                            if isBackgroundExpanded {
-                                Rectangle()
-                            } else {
-                                LinearGradient(
-                                    colors: [
-                                        .black,
-                                        .black,
-                                        .black.opacity(0.3),
-                                        .clear,
-                                    ],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            }
+                }
+                .overlay(alignment: .bottom) {
+                    if !isBackgroundExpanded && (manga.background?.count ?? 0) > 200{
+                        LinearGradient(
+                            colors: [
+                                .clear,
+                                Color(.systemBackground),
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .frame(height: 32)
+                        .allowsHitTesting(false)
+                    }
+                }
+                .animation(
+                    .easeInOut(duration: 0.25),
+                    value: isBackgroundExpanded
+                )
+                if let bg = manga.background, bg.count > 200 {
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            isBackgroundExpanded.toggle()
                         }
-                }
-
-                Button {
-                    withAnimation(.easeInOut) {
-                        isBackgroundExpanded.toggle()
-                    }
-                } label: {
-                    HStack(spacing: 4) {
-                        Text(
-                            isBackgroundExpanded
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(
+                                isBackgroundExpanded
                                 ? "section.showLess" : "section.showMore"
-                        )
-                        .font(.caption)
-                        .fontWeight(.semibold)
-
-                        Image(
-                            systemName: isBackgroundExpanded
+                            )
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            
+                            Image(
+                                systemName: isBackgroundExpanded
                                 ? "chevron.up" : "chevron.down"
-                        )
-                        .font(.caption)
+                            )
+                            .font(.caption2)
+                        }
                     }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
             .padding(.horizontal)
 
             if let url = manga.url {
                 HStack {
                     Spacer()
-                    /*
-                    Text("button.open.web")  // O "Ver en MyAnimeList"
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                     */
-                    Button {
-                        UIApplication.shared.open(url)
-                    } label: {
+                    Link(destination: url) {
                         Image(systemName: "arrow.up.right.square")
                             .font(.body)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .foregroundStyle(.white)
+                            .background(AppColors.primary.gradient)
+                            .clipShape(Circle())
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .foregroundStyle(.white)
-                    .background(AppColors.primary.gradient).clipShape(Circle())
-
                 }
                 .padding(.horizontal)
-                .padding(.top, 10)
             }
+            
+            Spacer(minLength: 20)
         }
         .navigationTitle(manga.title)
         .navigationBarTitleDisplayMode(.inline)
@@ -485,22 +523,61 @@ private var sectionDivider: some View {
         .frame(height: 1)
 }
 
-struct FlowLayout<Content: View>: View {
-    let spacing: CGFloat
-    let content: Content
+struct FlowLayout: Layout {
+    var spacing: CGFloat = 8
 
-    init(spacing: CGFloat = 8, @ViewBuilder content: () -> Content) {
-        self.spacing = spacing
-        self.content = content()
+    func sizeThatFits(
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) -> CGSize {
+        let maxWidth = proposal.width ?? .infinity
+        var x: CGFloat = 0
+        var y: CGFloat = 0
+        var rowHeight: CGFloat = 0
+
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+
+            if x + size.width > maxWidth {
+                x = 0
+                y += rowHeight + spacing
+                rowHeight = 0
+            }
+
+            x += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
+        }
+
+        return CGSize(width: maxWidth, height: y + rowHeight)
     }
 
-    var body: some View {
-        LazyVGrid(
-            columns: [GridItem(.adaptive(minimum: 100), spacing: spacing)],
-            alignment: .leading,
-            spacing: spacing
-        ) {
-            content
+    func placeSubviews(
+        in bounds: CGRect,
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) {
+        var x = bounds.minX
+        var y = bounds.minY
+        var rowHeight: CGFloat = 0
+
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+
+            if x + size.width > bounds.maxX {
+                x = bounds.minX
+                y += rowHeight + spacing
+                rowHeight = 0
+            }
+
+            subview.place(
+                at: CGPoint(x: x, y: y),
+                proposal: ProposedViewSize(size)
+            )
+
+            x += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
         }
     }
 }

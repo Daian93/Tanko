@@ -64,8 +64,18 @@ extension URL {
         )
     }
 
-    static func mangaByAuthor(id: String, page: Int, perPage: Int) -> URL {
-        api.appending(path: "list/mangaByAuthor").appending(path: "\(id)")
+    static func mangaByAuthor(
+        id: String,
+        page: Int = NetworkConstants.defaultPage,
+        perPage: Int = NetworkConstants.defaultPerPage
+    ) -> URL {
+        api
+            .appending(path: "list/mangaByAuthor")
+            .appending(path: id)
+            .appending(queryItems: [
+                URLQueryItem(name: "page", value: "\(page)"),
+                URLQueryItem(name: "per", value: "\(perPage)")
+            ])
     }
 
     static let authorsByIds = api.appending(path: "list/authorsByIds")

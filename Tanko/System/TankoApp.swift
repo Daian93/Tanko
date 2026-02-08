@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct TankoApp: App {
-    @State private var mangasVM = MangasViewModel()
+    @State private var mangasVM = MangaViewModel()
     
     var body: some Scene {
         WindowGroup {
