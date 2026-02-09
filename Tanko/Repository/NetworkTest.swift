@@ -85,9 +85,24 @@ struct NetworkTest: NetworkRepository {
     ) async throws(NetworkError) -> Page<Manga> {
         try await getMangas(page: page, per: per)
     }
+    
+    func searchMangasBeginsWith(_ search: String) async throws(NetworkError) -> [Manga] {
+        let samples: [Manga] = [
+            .test,
+        ]
+        return samples.filter { $0.title.lowercased().hasPrefix(search.lowercased()) }
+    }
+
+    func searchMangasContains(_ search: String) async throws(NetworkError) -> [Manga] {
+        let samples: [Manga] = [
+            .test,
+        ]
+        return samples.filter { $0.title.lowercased().contains(search.lowercased()) }
+    }
 
     func deleteMangaFromCollection(
         mangaId: String,
         token: String
     ) async throws(NetworkError) {}
 }
+

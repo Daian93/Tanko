@@ -96,7 +96,7 @@ extension Manga {
     )
 }
 
-enum MangaStatus: String, Codable, CaseIterable {
+enum MangaStatus: String, Codable, CaseIterable{
     case discontinued = "discontinued"
     case onHiatus = "on_hiatus"
     case currentlyPublishing = "currently_publishing"
@@ -105,14 +105,18 @@ enum MangaStatus: String, Codable, CaseIterable {
 }
 
 extension MangaStatus {
-    var displayName: String {
+    var localizedKey: String {
         switch self {
-        case .currentlyPublishing: return "En publicación"
-        case .finished: return "Finalizado"
-        case .onHiatus: return "En pausa"
-        case .discontinued: return "Discontinuado"
-        case .none: return "Desconocido"
+        case .currentlyPublishing: return "status.publishing"
+        case .finished: return "status.finished"
+        case .onHiatus: return "status.hiatus"
+        case .discontinued: return "status.discontinued"
+        case .none: return "status.unknown"
         }
+    }
+    
+    var localized: LocalizedStringKey {
+        LocalizedStringKey(localizedKey)
     }
 
     var color: Color {

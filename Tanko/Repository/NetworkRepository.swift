@@ -38,6 +38,8 @@ protocol NetworkRepository: Sendable, NetworkInteractor {
     // MARK: - Search
     func advancedSearch(_ search: CustomSearchDTO, page: Int, per: Int)
         async throws(NetworkError) -> Page<Manga>
+    func searchMangasBeginsWith(_ search: String) async throws(NetworkError) -> [Manga]
+    func searchMangasContains(_ search: String) async throws(NetworkError) -> [Manga]
 
     // MARK: - Collection
     func deleteMangaFromCollection(mangaId: String, token: String) async throws(NetworkError)
