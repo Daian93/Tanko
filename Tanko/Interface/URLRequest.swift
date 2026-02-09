@@ -25,4 +25,12 @@ extension URLRequest {
         request.httpBody = try? JSONEncoder().encode(body)
         return request
     }
+    
+    static func delete(url: URL) -> URLRequest {
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.timeoutInterval = 60
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        return request
+    }
 }

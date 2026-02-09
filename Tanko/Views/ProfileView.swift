@@ -11,6 +11,7 @@ import SwiftUI
 struct ProfileView: View {
     @Query(sort: \UserManga.title) private var userMangas: [UserManga]
 
+    @Environment(SessionManager.self) private var session
     @Environment(\.modelContext) private var context
     @Namespace private var namespace
 
@@ -47,10 +48,27 @@ struct ProfileView: View {
                             namespace: namespace
                         )
                     }
+                    
+                    // Botón de logout al final de la lista
+                    logoutButton
+                        .padding(.vertical, 30)
                 }
             }
             .navigationTitle("Mi Biblioteca")
             .backgroundStyle(AppColors.primary)
+            .toolbar {
+                // Icono de logout en la barra superior
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(role: .destructive) {
+                        withAnimation {
+                            session.logout()
+                        }
+                    } label: {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                            .foregroundStyle(.red)
+                    }
+                }
+            }
         }
     }
 
@@ -59,10 +77,14 @@ struct ProfileView: View {
             Circle()
                 .fill(Color.red.opacity(0.1))
                 .frame(width: 70, height: 70)
-                .overlay(Text("DR").font(.headline).foregroundStyle(.red))
+                .overlay(
+                    Text(session.user?.email.prefix(2).uppercased() ?? "DR")
+                        .font(.headline)
+                        .foregroundStyle(.red)
+                )
 
             VStack(alignment: .leading) {
-                Text("Mi Perfil")
+                Text(session.isGuest ? "Modo Invitado" : "Mi Perfil")
                     .font(.title3.bold())
                 Text("\(userMangas.count) mangas en total")
                     .font(.caption)
@@ -104,6 +126,51 @@ struct ProfileView: View {
         .shadow(color: .black.opacity(0.05), radius: 10)
         .padding(.horizontal)
     }
+    
+    private var logoutButton: some View {
+        Button {
+            withAnimation {
+                session.logout()
+            }
+        } label: {
+            HStack {
+                Image(systemName: "power")
+                Text("Cerrar Sesión")
+            }
+            .font(.subheadline.bold())
+            .foregroundStyle(.red)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color.red.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .padding(.horizontal)
+        }
+    }
+}
+
+// MARK: - Subvistas auxiliares
+
+struct LibraryListSection: View {
+    let title: String
+    let mangas: [UserManga]
+    let namespace: Namespace.ID
+
+    var body: some View {
+        if !mangas.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(title)
+                    .font(.headline)
+                    .padding(.horizontal)
+
+                VStack(spacing: 8) {
+                    ForEach(mangas) { manga in
+                        MangaProgressRow(userManga: manga, namespace: namespace)
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
 }
 
 struct MangaProgressRow: View {
@@ -133,59 +200,48 @@ struct MangaProgressRow: View {
                         .lineLimit(1)
 
                     if let total = userManga.totalVolumes, total > 0 {
-                        let progress =
-                            Double(userManga.readingVolume ?? 0) / Double(total)
+                        let progress = Double(userManga.readingVolume ?? 0) / Double(total)
 
                         VStack(alignment: .leading, spacing: 4) {
                             ProgressView(value: progress)
                                 .tint(isFinished ? .green : .blue)
                                 .scaleEffect(y: 1.5)
 
-                            Text(
-                                "\(userManga.readingVolume ?? 0) de \(total) leídos"
-                            )
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            Text("\(userManga.readingVolume ?? 0) de \(total) leídos")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
                         }
                     } else {
-                        Label(
-                            "Tomo \(userManga.readingVolume ?? 0) leído",
-                            systemImage: "book.fill"
-                        )
-                        .font(.caption)
-                        .foregroundStyle(.blue)
+                        Label("Tomo \(userManga.readingVolume ?? 0) leído", systemImage: "book.fill")
+                            .font(.caption)
+                            .foregroundStyle(.blue)
                     }
 
                     Button {
                         showVolumeManagement.toggle()
                     } label: {
-                        Label(
-                            "\(userManga.volumesOwned.count) en estantería",
-                            systemImage: "books.vertical.fill"
-                        )
-                        .font(.caption2)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.green.opacity(0.1))
-                        .foregroundStyle(.green)
-                        .clipShape(Capsule())
+                        Label("\(userManga.volumesOwned.count) en estantería", systemImage: "books.vertical.fill")
+                            .font(.caption2)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.green.opacity(0.1))
+                            .foregroundStyle(.green)
+                            .clipShape(Capsule())
                     }
                 }
 
                 Spacer()
 
                 Button {
-                    increaseReadingProgress()
+                    updateReading(by: 1)
                 } label: {
                     actionButton(
-                        icon: isFinished
-                            ? "checkmark.seal.fill" : "plus.circle.fill",
+                        icon: isFinished ? "checkmark.seal.fill" : "plus.circle.fill",
                         text: isFinished ? "Listo" : "Leí",
                         color: isFinished ? Color.green : Color.blue
                     )
                 }
                 .disabled(isFinished)
-                .opacity(isFinished ? 0.6 : 1.0)
             }
         }
         .padding(12)
@@ -197,166 +253,21 @@ struct MangaProgressRow: View {
         }
     }
 
-    private func increaseReadingProgress() {
-        let nextVolume = (userManga.readingVolume ?? 0) + 1
+    private func updateReading(by value: Int) {
+        let current = userManga.readingVolume ?? 0
+        let newValue = current + value
+        if newValue < 0 { return }
+        if let total = userManga.totalVolumes, newValue > total { return }
 
-        if let total = userManga.totalVolumes {
-            if nextVolume <= total {
-                userManga.readingVolume = nextVolume
-            }
-
-            if nextVolume == total {
-                withAnimation(.spring()) {
-                    userManga.completeCollection = true
-                }
-            }
-        } else {
-            userManga.readingVolume = nextVolume
-        }
-    }
-
-    struct MangaProgressRow: View {
-        @Bindable var userManga: UserManga
-        let namespace: Namespace.ID
-        @State private var showVolumeManagement = false
-
-        var body: some View {
-            VStack(spacing: 12) {
-                HStack(spacing: 12) {
-                    CoverView(
-                        cover: userManga.coverURL,
-                        namespace: namespace,
-                        big: false
-                    )
-                    .frame(width: 60, height: 90)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(userManga.title)
-                            .font(.headline)
-                            .lineLimit(1)
-
-                        if let total = userManga.totalVolumes, total > 0 {
-                            let progress =
-                                Double(userManga.readingVolume ?? 0)
-                                / Double(total)
-                            VStack(alignment: .leading, spacing: 4) {
-                                ProgressView(value: progress)
-                                    .tint(
-                                        (userManga.readingVolume ?? 0) >= total
-                                            ? .green : .blue
-                                    )
-                                Text(
-                                    "\(userManga.readingVolume ?? 0) / \(total) leídos"
-                                )
-                                .font(.caption2).foregroundStyle(.secondary)
-                            }
-                        } else {
-                            Text("Tomo actual: \(userManga.readingVolume ?? 0)")
-                                .font(.caption2).foregroundStyle(.blue)
-                        }
-
-                        Button {
-                            showVolumeManagement.toggle()
-                        } label: {
-                            Label(
-                                "\(userManga.volumesOwned.count) en estantería",
-                                systemImage: "books.vertical.fill"
-                            )
-                            .font(.system(size: 10, weight: .bold))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.green.opacity(0.1))
-                            .foregroundStyle(.green)
-                            .clipShape(Capsule())
-                        }
-                    }
-
-                    Spacer()
-
-                    HStack(spacing: 8) {
-
-                        VStack(spacing: 4) {
-                            Text("LEER").font(.system(size: 7, weight: .black))
-                                .foregroundStyle(.blue)
-                            HStack(spacing: 0) {
-                                Button {
-                                    updateReading(by: -1)
-                                } label: {
-                                    Image(systemName: "minus").font(
-                                        .system(size: 10, weight: .bold)
-                                    )
-                                    .frame(width: 25, height: 30)
-                                    .background(Color.blue.opacity(0.1))
-                                }
-
-                                Divider().frame(height: 20)
-
-                                Button {
-                                    updateReading(by: 1)
-                                } label: {
-                                    Image(systemName: "plus").font(
-                                        .system(size: 10, weight: .bold)
-                                    )
-                                    .frame(width: 25, height: 30)
-                                    .background(Color.blue.opacity(0.1))
-                                }
-                            }
-                            .foregroundStyle(.blue)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                        }
-
-                        VStack(spacing: 4) {
-                            Text("TENER").font(.system(size: 7, weight: .black))
-                                .foregroundStyle(.green)
-                            Button {
-                                let nextToOwn =
-                                    (userManga.volumesOwned.max() ?? 0) + 1
-                                userManga.volumesOwned.append(nextToOwn)
-                            } label: {
-                                Image(systemName: "plus.app.fill")
-                                    .font(.system(size: 18))
-                                    .frame(width: 44, height: 30)
-                                    .background(Color.green.opacity(0.1))
-                                    .foregroundStyle(.green)
-                                    .clipShape(
-                                        RoundedRectangle(cornerRadius: 8)
-                                    )
-                            }
-                        }
-                    }
-                }
-            }
-            .padding(12)
-            .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 15))
-            .sheet(isPresented: $showVolumeManagement) {
-                VolumesManagementView(userManga: userManga)
-                    .presentationDetents([.medium])
-            }
-        }
-
-        private func updateReading(by value: Int) {
-            let current = userManga.readingVolume ?? 0
-            let newValue = current + value
-
-            if newValue < 0 { return }
-
-            if let total = userManga.totalVolumes, newValue > total { return }
-
-            withAnimation(.easeInOut) {
-                userManga.readingVolume = newValue
-
-                if let total = userManga.totalVolumes {
-                    userManga.completeCollection = (newValue == total)
-                }
+        withAnimation(.easeInOut) {
+            userManga.readingVolume = newValue
+            if let total = userManga.totalVolumes {
+                userManga.completeCollection = (newValue == total)
             }
         }
     }
 
-    private func actionButton(icon: String, text: String, color: Color)
-        -> some View
-    {
+    private func actionButton(icon: String, text: String, color: Color) -> some View {
         VStack(spacing: 2) {
             Image(systemName: icon)
                 .font(.system(size: 18))
@@ -368,29 +279,6 @@ struct MangaProgressRow: View {
         .background(color.opacity(0.1))
         .foregroundStyle(color)
         .clipShape(RoundedRectangle(cornerRadius: 10))
-    }
-}
-
-struct LibraryListSection: View {
-    let title: String
-    let mangas: [UserManga]
-    let namespace: Namespace.ID
-
-    var body: some View {
-        if !mangas.isEmpty {
-            VStack(alignment: .leading, spacing: 12) {
-                Text(title)
-                    .font(.headline)
-                    .padding(.horizontal)
-
-                VStack(spacing: 8) {
-                    ForEach(mangas) { manga in
-                        MangaProgressRow(userManga: manga, namespace: namespace)
-                    }
-                }
-                .padding(.horizontal)
-            }
-        }
     }
 }
 
@@ -420,23 +308,16 @@ struct VolumesManagementView: View {
     @Environment(\.dismiss) var dismiss
 
     var totalVolumes: Int {
-        let volumes =
-            userManga.totalVolumes ?? (userManga.volumesOwned.max() ?? 0)
+        let volumes = userManga.totalVolumes ?? (userManga.volumesOwned.max() ?? 0)
         return max(volumes, 1)
     }
 
-    private let columns = [
-        GridItem(.adaptive(minimum: 45))
-    ]
+    private let columns = [GridItem(.adaptive(minimum: 45))]
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Colección de \(userManga.title)")
-                        .font(.headline)
-                        .padding(.horizontal)
-
                     Text("Selecciona los tomos físicos que posees:")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -444,37 +325,20 @@ struct VolumesManagementView: View {
 
                     LazyVGrid(columns: columns, spacing: 10) {
                         ForEach(1...totalVolumes, id: \.self) { number in
-
-                            let isOwned = userManga.volumesOwned.contains(
-                                number
-                            )
-
+                            let isOwned = userManga.volumesOwned.contains(number)
                             Button {
                                 if isOwned {
-                                    userManga.volumesOwned.removeAll {
-                                        $0 == number
-                                    }
+                                    userManga.volumesOwned.removeAll { $0 == number }
                                 } else {
                                     userManga.volumesOwned.append(number)
                                 }
                             } label: {
                                 Text("\(number)")
-                                    .font(
-                                        .system(.subheadline, design: .rounded)
-                                            .bold()
-                                    )
+                                    .font(.system(.subheadline, design: .rounded).bold())
                                     .frame(width: 45, height: 45)
-                                    .background(
-                                        isOwned
-                                            ? Color.green
-                                            : Color(.secondarySystemBackground)
-                                    )
-                                    .foregroundStyle(
-                                        isOwned ? .white : .primary
-                                    )
-                                    .clipShape(
-                                        RoundedRectangle(cornerRadius: 8)
-                                    )
+                                    .background(isOwned ? Color.green : Color(.secondarySystemBackground))
+                                    .foregroundStyle(isOwned ? .white : .primary)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
                             }
                             .buttonStyle(.plain)
                         }
@@ -491,8 +355,4 @@ struct VolumesManagementView: View {
             }
         }
     }
-}
-
-#Preview(traits: .sampleData) {
-    ProfileView()
 }

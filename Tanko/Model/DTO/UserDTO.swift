@@ -15,9 +15,9 @@ struct UsersCreate: Codable {
 struct UserResponse: Codable, Identifiable {
     let id: UUID
     let email: String
-    let isActive: Bool
-    let isAdmin: Bool
-    let role: String
+    let isActive: Bool?
+    let isAdmin: Bool?
+    let role: String?
 }
 
 extension UserResponse {
@@ -25,7 +25,7 @@ extension UserResponse {
         User(
             id: id,
             email: email,
-            isAdmin: isAdmin
+            isAdmin: isAdmin ?? false
         )
     }
 }
@@ -36,6 +36,6 @@ struct TokenResponse: Codable {
 
 struct JWTTokenResponse: Codable {
     let token: String
-    let tokenType: String
-    let expiresIn: Int
+    let tokenType: String?
+    let expiresIn: Int?
 }

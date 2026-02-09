@@ -99,10 +99,23 @@ struct NetworkTest: NetworkRepository {
         ]
         return samples.filter { $0.title.lowercased().contains(search.lowercased()) }
     }
+    
+    func getUserCollection(token: String) async throws -> [UserMangaCollectionDTO] {
+        []
+    }
 
-    func deleteMangaFromCollection(
-        mangaId: String,
-        token: String
-    ) async throws(NetworkError) {}
+    func addUserMangaToCollection(_ manga: UserMangaCollectionRequest, token: String) async throws {}
+
+    func removeUserMangaFromCollection(mangaID: Int, token: String) async throws {}
+    
+    func getMangaFromCollection(mangaID: Int, token: String) async throws -> UserMangaCollectionDTO {
+        UserMangaCollectionDTO(
+            id: UUID(),
+            manga: .testDTO,
+            volumesOwned: [],
+            readingVolume: nil,
+            completeCollection: false
+        )
+    }
 }
 

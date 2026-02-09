@@ -21,12 +21,12 @@ struct MangaRow: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(manga.title)
                     .font(.headline)
-                    .foregroundStyle(Color.tankoTextPrimary)
+                    .foregroundStyle(AppColors.textPrimary)
                     .lineLimit(2)
 
                 Text(manga.authorNames)
                     .font(.subheadline)
-                    .foregroundStyle(Color.tankoTextSecondary)
+                    .foregroundStyle(AppColors.textSecondary)
                     .lineLimit(1)
                 
                 Spacer(minLength: 20)
@@ -38,7 +38,7 @@ struct MangaRow: View {
                             .font(.subheadline)
                         Text(manga.formattedScore)
                             .font(.subheadline)
-                            .foregroundStyle(Color.tankoTextSecondary)
+                            .foregroundStyle(AppColors.textSecondary)
                     }
 
                     Spacer()
@@ -55,7 +55,7 @@ struct MangaRow: View {
             }
         }
         .padding()
-        .background(Color.tankoCardSurface, in: .rect(cornerRadius: 8))
+        .background(AppColors.surface, in: .rect(cornerRadius: 16))
     }
 }
 

@@ -19,7 +19,6 @@ final class UserManga {
     var volumesOwned: [Int]
     var readingVolume: Int?
     var completeCollection: Bool
-
     var addedAt: Date
 
     init(

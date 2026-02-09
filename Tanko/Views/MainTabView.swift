@@ -6,10 +6,14 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @MainActor let isiPhone = UIDevice.current.userInterfaceIdiom == .phone
 
 struct MainTabView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(UserMangaCollectionViewModel.self) private var userMangaCollectionViewModel
+    
     var body: some View {
         TabView {
             Tab("tab.mangas", systemImage: "book.fill") {
@@ -37,4 +41,6 @@ struct MainTabView: View {
 #Preview {
     MainTabView()
         .environment(MangaViewModel())
+        .environment(UserMangaCollectionViewModel())
+        .modelContainer(for: [UserManga.self])
 }

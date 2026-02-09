@@ -13,6 +13,7 @@ enum NetworkError: LocalizedError {
     case json(Error)
     case dataNotValid
     case nonHTTP
+    case unauthorized
 
     var errorDescription: String? {
         switch self {
@@ -26,6 +27,8 @@ enum NetworkError: LocalizedError {
             "Invalid data received from server"
         case .nonHTTP:
             "URLSession did not return a HTTPURLResponse"
+        case .unauthorized:
+            "No valid token available for authorization"
         }
     }
 }

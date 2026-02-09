@@ -52,3 +52,27 @@ extension MangaDTO {
         )
     }
 }
+
+extension MangaDTO {
+    static let testDTO = MangaDTO(
+        id: 1,
+        title: "Monster",
+        titleEnglish: "Monster",
+        titleJapanese: "MONSTER",
+        mainPicture: "https://cdn.myanimelist.net/images/manga/3/258224l.jpg",
+        sypnosis: "Test synopsis",
+        background: nil,
+        score: 9.15,
+        status: "finished",
+        chapters: 162,
+        volumes: 18,
+        startDate: "1994-12-05",
+        endDate: "2001-12-20",
+        url: "https://myanimelist.net/manga/1/Monster",
+        genres: [.test],
+        themes: [.test],
+        demographics: [.test],
+        authors: [.test]
+    )
+
+}

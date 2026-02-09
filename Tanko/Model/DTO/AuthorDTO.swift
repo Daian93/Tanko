@@ -23,3 +23,12 @@ extension AuthorDTO {
         )
     }
 }
+
+extension AuthorDTO {
+    static let test = AuthorDTO(
+        id: UUID(uuidString: "54BE174C-2FE9-42C8-A842-85D291A6AEDD")!,
+        firstName: "Naoki",
+        lastName: "Urasawa",
+        role: .storyAndArt
+    )
+}
