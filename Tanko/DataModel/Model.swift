@@ -19,7 +19,7 @@ final class UserManga {
     var volumesOwned: [Int]
     var readingVolume: Int?
     var completeCollection: Bool
-    var addedAt: Date
+    var updatedAt: Date
 
     init(
         id: UUID = UUID(),
@@ -29,7 +29,8 @@ final class UserManga {
         totalVolumes: Int? = nil,
         volumesOwned: [Int] = [],
         readingVolume: Int? = nil,
-        completeCollection: Bool = false
+        completeCollection: Bool = false,
+        updatedAt: Date = .now
     ) {
         self.id = id
         self.mangaID = mangaID
@@ -39,6 +40,6 @@ final class UserManga {
         self.volumesOwned = volumesOwned
         self.readingVolume = readingVolume
         self.completeCollection = completeCollection
-        self.addedAt = Date()
+        self.updatedAt = updatedAt
     }
 }

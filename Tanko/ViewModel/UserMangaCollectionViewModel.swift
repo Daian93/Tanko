@@ -11,162 +11,74 @@ import SwiftData
 @Observable
 @MainActor
 final class UserMangaCollectionViewModel {
+    private let modelContext: ModelContext
+    private let repository: MangaCollectionRepository
+    private let localRepo: LocalMangaCollectionRepository
+    private let remoteRepo: RemoteMangaCollectionRepository?
 
-    private var modelContext: ModelContext?
-    private var repositoryFactory: CollectionRepositoryFactory?
+    var mangas: [UserManga] = []
 
-    var refreshTrigger: Int = 0
-
-    func setContext(_ context: ModelContext, factory: CollectionRepositoryFactory? = nil) {
+    init(context: ModelContext, repository: MangaCollectionRepository, localRepo: LocalMangaCollectionRepository, remoteRepo: RemoteMangaCollectionRepository?) {
         self.modelContext = context
-        self.repositoryFactory = factory
+        self.repository = repository
+        self.localRepo = localRepo
+        self.remoteRepo = remoteRepo
     }
 
-    // MARK: - Carga de colección
     func loadCollection() async {
-        guard let repo = repositoryFactory?.repository,
-              let context = modelContext else { return }
-
         do {
-            let userCollection = try await repo.getCollection()
-
+            let items = try await repository.getCollection()
+            // Importante: Actualizar la lista en memoria para que la UI reaccione
+            self.mangas = items
+            
+            // Sincronizar el ModelContext de SwiftData
             let fetch = FetchDescriptor<UserManga>()
-            let existing = (try? context.fetch(fetch)) ?? []
-            for item in existing { context.delete(item) }
-
-            for userManga in userCollection { context.insert(userManga) }
-            saveAndRefresh()
+            let local = try modelContext.fetch(fetch)
+            for m in local { modelContext.delete(m) }
+            for m in items { modelContext.insert(m) }
+            
+            try modelContext.save()
         } catch {
-            print("Error cargando colección inicial: \(error)")
+            print("❌ Error cargando colección:", error)
         }
     }
 
-    // MARK: - Escritura
-    func addToCollection(
-        manga: Manga,
-        volumesOwned: [Int] = [],
-        readingVolume: Int? = nil,
-        completeCollection: Bool = false
-    ) async {
-        guard let context = modelContext else { return }
-        if isInCollection(mangaID: manga.id) { return }
-
-        let userManga = UserManga(
+    // Corregido: Ahora acepta los parámetros de la vista
+    func add(manga: Manga, volumesOwned: [Int], readingVolume: Int?, completeCollection: Bool) async {
+        let newUserManga = UserManga(
             mangaID: manga.id,
             title: manga.title,
             coverURL: manga.mainPicture,
-            totalVolumes: manga.volumes,
             volumesOwned: volumesOwned,
             readingVolume: readingVolume,
-            completeCollection: completeCollection
+            completeCollection: completeCollection,
+            updatedAt: .now
         )
-
-        context.insert(userManga)
-        saveAndRefresh()
-
-        if let repo = repositoryFactory?.repository as? RemoteMangaCollectionRepository {
-            await syncAddRemote(repo: repo, manga: userManga)
-        }
+        
+        modelContext.insert(newUserManga)
+        // Insertamos en memoria inmediatamente para feedback instantáneo
+        self.mangas.append(newUserManga)
+        
+        try? modelContext.save()
+        try? await repository.add(newUserManga)
     }
 
-    func removeFromCollection(userMangaID: UUID) async {
-        guard let context = modelContext else { return }
-        let fetch = FetchDescriptor<UserManga>(predicate: #Predicate { $0.id == userMangaID })
-
-        if let userManga = (try? context.fetch(fetch))?.first {
-            context.delete(userManga)
-            saveAndRefresh()
-
-            if let repo = repositoryFactory?.repository as? RemoteMangaCollectionRepository {
-                await syncRemoveRemote(repo: repo, manga: userManga)
-            }
-        }
+    func remove(_ manga: UserManga) async {
+        let idToRemove = manga.mangaID
+        modelContext.delete(manga)
+        self.mangas.removeAll { $0.mangaID == idToRemove }
+        
+        try? modelContext.save()
+        try? await repository.remove(manga)
     }
 
-    // MARK: - Consultas
     func isInCollection(mangaID: Int) -> Bool {
-        _ = refreshTrigger
-        guard let context = modelContext else { return false }
-        let fetch = FetchDescriptor<UserManga>(predicate: #Predicate { $0.mangaID == mangaID })
-        return ((try? context.fetchCount(fetch)) ?? 0) > 0
+        mangas.contains(where: { $0.mangaID == mangaID })
     }
 
-    var mangas: [UserManga] {
-        _ = refreshTrigger
-        guard let context = modelContext else { return [] }
-        return (try? context.fetch(FetchDescriptor<UserManga>())) ?? []
-    }
-
-    // MARK: - Actualizaciones
-    func updateVolumes(userMangaID: UUID, volumesOwned: [Int]) async {
-        await modifyManga(userMangaID: userMangaID) { $0.volumesOwned = volumesOwned }
-    }
-
-    func updateReadingVolume(userMangaID: UUID, readingVolume: Int?) async {
-        await modifyManga(userMangaID: userMangaID) { $0.readingVolume = readingVolume }
-    }
-
-    func updateCompleteStatus(userMangaID: UUID, completeCollection: Bool) async {
-        await modifyManga(userMangaID: userMangaID) { $0.completeCollection = completeCollection }
-    }
-
-    // MARK: - Helpers privados
-    private func saveAndRefresh() {
-        try? modelContext?.save()
-        refreshTrigger += 1
-    }
-
-    private func modifyManga(userMangaID: UUID, action: (UserManga) -> Void) async {
-        guard let context = modelContext else { return }
-        let fetch = FetchDescriptor<UserManga>(predicate: #Predicate { $0.id == userMangaID })
-
-        if let userManga = (try? context.fetch(fetch))?.first {
-            action(userManga)
-            saveAndRefresh()
-
-            if let repo = repositoryFactory?.repository as? RemoteMangaCollectionRepository {
-                await syncAddRemote(repo: repo, manga: userManga)
-            }
+    func removeFromCollection(mangaID: Int) async {
+        if let manga = mangas.first(where: { $0.mangaID == mangaID }) {
+            await remove(manga)
         }
     }
-
-    // MARK: - Sincronización segura remota
-    private func syncAddRemote(repo: RemoteMangaCollectionRepository, manga: UserManga) async {
-        let copy = UserManga(
-            id: manga.id,
-            mangaID: manga.mangaID,
-            title: manga.title,
-            coverURL: manga.coverURL,
-            totalVolumes: manga.totalVolumes,
-            volumesOwned: manga.volumesOwned,
-            readingVolume: manga.readingVolume,
-            completeCollection: manga.completeCollection
-        )
-        
-        do {
-            try await repo.add(copy)
-        } catch {
-            print("Error sincronizando manga remoto: \(error)")
-        }
-    }
-
-    private func syncRemoveRemote(repo: RemoteMangaCollectionRepository, manga: UserManga) async {
-        let copy = UserManga(
-            id: manga.id,
-            mangaID: manga.mangaID,
-            title: manga.title,
-            coverURL: manga.coverURL,
-            totalVolumes: manga.totalVolumes,
-            volumesOwned: manga.volumesOwned,
-            readingVolume: manga.readingVolume,
-            completeCollection: manga.completeCollection
-        )
-        
-        do {
-            try await repo.remove(copy)
-        } catch {
-            print("Error eliminando manga remoto: \(error)")
-        }
-    }
-
 }

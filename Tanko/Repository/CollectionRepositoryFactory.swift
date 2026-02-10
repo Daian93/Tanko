@@ -11,24 +11,20 @@ import Foundation
 final class CollectionRepositoryFactory {
 
     private let session: SessionManager
-    private let remoteRepo: RemoteMangaCollectionRepository
-    private let localRepo: LocalMangaCollectionRepository
+    private let local: LocalMangaCollectionRepository
+    private let remote: RemoteMangaCollectionRepository
 
     init(
         session: SessionManager,
-        remoteRepo: RemoteMangaCollectionRepository,
-        localRepo: LocalMangaCollectionRepository
+        local: LocalMangaCollectionRepository,
+        remote: RemoteMangaCollectionRepository
     ) {
         self.session = session
-        self.remoteRepo = remoteRepo
-        self.localRepo = localRepo
+        self.local = local
+        self.remote = remote
     }
 
-    var repository: MangaCollectionRepository {
-        if session.isAuthenticated {
-            return remoteRepo
-        } else {
-            return localRepo
-        }
+    func makeRepository() -> MangaCollectionRepository {
+        session.isAuthenticated ? remote : local
     }
 }

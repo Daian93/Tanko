@@ -10,7 +10,8 @@ import Foundation
 extension URLRequest {
 
     static func get(url: URL, bearerToken: String) -> URLRequest {
-        var request = URLRequest.get(url: url)
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
         request.setValue("Bearer \(bearerToken)", forHTTPHeaderField: "Authorization")
         return request
     }

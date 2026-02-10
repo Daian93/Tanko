@@ -12,44 +12,49 @@ struct Network: NetworkRepository {
     private let appToken = "sLGH38NhEJ0_anlIWwhsz1-LarClEohiAHQqayF0FY"
 
     // MARK: - Auth
-    func createUser(email: String, password: String) async throws(NetworkError) {
-        guard password.count >= 8 else { throw NetworkError.dataNotValid }
+        func createUser(email: String, password: String) async throws(NetworkError) {
+            guard password.count >= 8 else { throw NetworkError.dataNotValid }
 
-        let body = UsersCreate(email: email, password: password)
-        var request = URLRequest.post(url: .createUser, body: body)
+            let body = UsersCreate(email: email, password: password)
+            var request = URLRequest.post(url: .createUser, body: body)
+            
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue(appToken, forHTTPHeaderField: "App-Token")
+
+            try await postJSON(request, status: 201)
+        }
         
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(appToken, forHTTPHeaderField: "App-Token")
-
-        try await postJSON(request, status: 201)
-    }
-    
     func login(email: String, password: String) async throws(NetworkError) -> String {
+
         let credentials = "\(email):\(password)"
-        
         guard let data = credentials.data(using: .utf8) else {
             throw NetworkError.dataNotValid
         }
+
         let encoded = data.base64EncodedString()
-        
-        var request = URLRequest(url: .login)
+
+        var request = URLRequest(url: .jwtLogin)
         request.httpMethod = "POST"
+
+        // 🔑 JWT login usa Basic Auth
         request.setValue("Basic \(encoded)", forHTTPHeaderField: "Authorization")
-        
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        // 🔑 App token obligatorio
+        request.setValue(appToken, forHTTPHeaderField: "App-Token")
+
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
 
         let response = try await postJSON(request, type: JWTTokenResponse.self)
         return response.token
     }
 
-    func renew(token: String) async throws(NetworkError) -> String {
-        var request = URLRequest(url: .renew)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
-        let response = try await postJSON(request, type: JWTTokenResponse.self)
-        return response.token
-    }
+
+
+        func renew(token: String) async throws(NetworkError) -> String {
+            let request = authRequest(url: .renew, method: "POST", token: token)
+            let response = try await postJSON(request, type: JWTTokenResponse.self)
+            return response.token
+        }
 
 
     // MARK: - Manga list
@@ -213,5 +218,14 @@ struct Network: NetworkRepository {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         return try await getJSON(request, type: UserMangaCollectionDTO.self)
     }
+    
+    // MARK: - Helper Privado
+        /// Crea una URLRequest con el token de autorización configurado correctamente.
+        private func authRequest(url: URL, method: String, token: String) -> URLRequest {
+            var request = URLRequest(url: url)
+            request.httpMethod = method
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            return request
+        }
 }
 

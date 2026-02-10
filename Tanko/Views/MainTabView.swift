@@ -5,6 +5,7 @@
 //  Created by Diana Rammal Sansón on 21/1/26.
 //
 
+
 import SwiftUI
 import SwiftData
 
@@ -12,7 +13,9 @@ import SwiftData
 
 struct MainTabView: View {
     @Environment(\.modelContext) private var modelContext
-    @Environment(UserMangaCollectionViewModel.self) private var userMangaCollectionViewModel
+    // Ya no necesitas declarar la VM aquí si no la usas en esta vista,
+    // pero si la necesitas, se queda así:
+    @Environment(UserMangaCollectionViewModel.self) private var userCollectionVM
     
     var body: some View {
         TabView {
@@ -20,7 +23,7 @@ struct MainTabView: View {
                 if !isiPhone {
                     ContentViewiPad()
                 } else {
-                    ContentView()
+                    ContentView() // ✅ Ahora esto ya funciona
                 }
             }
 
@@ -38,9 +41,3 @@ struct MainTabView: View {
     }
 }
 
-#Preview {
-    MainTabView()
-        .environment(MangaViewModel())
-        .environment(UserMangaCollectionViewModel())
-        .modelContainer(for: [UserManga.self])
-}

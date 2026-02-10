@@ -11,9 +11,9 @@ import Foundation
 @Observable
 final class SessionManager {
     private let network: NetworkRepository
+
     private(set) var user: User?
     private(set) var token: String?
-    
     var isGuest: Bool = false
 
     var isAuthenticated: Bool { token != nil }
@@ -25,32 +25,33 @@ final class SessionManager {
     }
 
     func restoreSession() {
-        if let savedToken = KeychainService.load(key: SessionKeys.jwtToken) {
-            self.token = savedToken
-            Task {
-                await loadCurrentUser()
-            }
-        }
+        guard let savedToken = KeychainService.load(key: SessionKeys.jwtToken) else { return }
+        self.token = savedToken
+        Task { await loadCurrentUser() }
     }
 
     func login(email: String, password: String) async throws {
-        let newToken = try await network.login(email: email, password: password)
-        
-        self.token = newToken
+        let jwt = try await network.login(email: email, password: password)
+
+        self.token = jwt
         self.isGuest = false
-        
-        KeychainService.save(newToken, key: SessionKeys.jwtToken)
+        KeychainService.save(jwt, key: SessionKeys.jwtToken)
 
         await loadCurrentUser()
+        
     }
 
     func loadCurrentUser() async {
-        guard let token = self.token else { return }
-        
+        guard let token else { return }
+
         do {
             let request = URLRequest.get(url: .jwtMe, bearerToken: token)
             let response: UserResponse = try await network.getJSON(request, type: UserResponse.self)
             self.user = response.toDomain
+            print("✅ Usuario JWT cargado correctamente")
+        } catch {
+            print("❌ Token inválido, cerramos sesión: \(error)")
+            logout()
         }
     }
 
@@ -59,16 +60,26 @@ final class SessionManager {
     }
 
     func continueAsGuest() {
-        self.isGuest = true
-        self.token = nil
-        self.user = nil
-        print("DEBUG: Modo invitado activado. canAccessApp: \(canAccessApp)")
+        token = nil
+        user = nil
+        isGuest = true
     }
 
     func logout() {
-        self.user = nil
-        self.token = nil
-        self.isGuest = false
+        token = nil
+        user = nil
+        isGuest = false
         KeychainService.delete(key: SessionKeys.jwtToken)
+
+        NotificationCenter.default.post(
+            name: .didLogout,
+            object: nil
+        )
     }
+}
+
+import Foundation
+
+extension Notification.Name {
+    static let didLogout = Notification.Name("didLogout")
 }

@@ -5,12 +5,14 @@
 //  Created by Diana Rammal Sansón on 23/12/25.
 //
 
-import SwiftData
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
+    // 1. CAMBIO AQUÍ: Ahora lo cogemos del environment
+    @Environment(UserMangaCollectionViewModel.self) private var userCollectionVM
+
     @Environment(MangaViewModel.self) private var viewModel
-    @Environment(UserMangaCollectionViewModel.self) private var userMangaCollectionVM
     @Environment(\.modelContext) private var modelContext
     @State private var bestMangasViewModel = BestMangaViewModel()
     @Namespace private var namespace
@@ -29,7 +31,6 @@ struct ContentView: View {
                 case .loaded:
                     ScrollView {
                         LazyVStack(spacing: 20) {
-                            // --- SECCIÓN CABECERA ---
                             VStack(alignment: .leading, spacing: 12) {
                                 Text("content.best")
                                     .font(.title3)
@@ -46,11 +47,11 @@ struct ContentView: View {
                                     .padding(.horizontal)
                             }
 
-                            // --- LISTADO DE MANGAS ---
                             ForEach(viewModel.mangas) { manga in
                                 MangaCollectionRow(
                                     manga: manga,
-                                    namespace: namespace
+                                    namespace: namespace,
+                                    userCollectionVM: userCollectionVM // Pasamos la del environment
                                 )
                                 .onAppear {
                                     Task {
@@ -94,11 +95,13 @@ struct ContentView: View {
             }
         }
         .task {
-            userMangaCollectionVM.setContext(modelContext)
             await viewModel.getMangas()
             await bestMangasViewModel.getBestMangas()
         }
     }
+    
+    // ... mantén tu featuredCarousel igual
+
 
     private var featuredCarousel: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -120,28 +123,29 @@ struct ContentView: View {
     }
 }
 
+import SwiftUI
+
 struct MangaCollectionRow: View {
     let manga: Manga
     let namespace: Namespace.ID
-    
+    let userCollectionVM: UserMangaCollectionViewModel
+
     @Environment(MangaViewModel.self) private var viewModel
-    @Environment(UserMangaCollectionViewModel.self) private var userMangaCollectionVM
     @Environment(\.dismiss) private var dismiss
-    
     @State private var showDeleteConfirmation = false
-    
+
     var body: some View {
         @Bindable var mangasVM = viewModel
-        
-        let isCollected = userMangaCollectionVM.isInCollection(mangaID: manga.id)
-        
+
+        let isCollected = userCollectionVM.isInCollection(mangaID: manga.id)
+
         ZStack(alignment: .topTrailing) {
             NavigationLink(value: manga) {
                 MangaRow(manga: manga, namespace: namespace)
                     .padding(.horizontal)
             }
             .buttonStyle(.plain)
-            
+
             Button {
                 if isCollected {
                     showDeleteConfirmation = true
@@ -166,8 +170,8 @@ struct MangaCollectionRow: View {
             Button("Cancelar", role: .cancel) { }
             Button("Quitar", role: .destructive) {
                 Task {
-                    if let userManga = userMangaCollectionVM.mangas.first(where: { $0.mangaID == manga.id }) {
-                        await userMangaCollectionVM.removeFromCollection(userMangaID: userManga.id)
+                    if let userManga = userCollectionVM.mangas.first(where: { $0.mangaID == manga.id }) {
+                        await userCollectionVM.removeFromCollection(mangaID: userManga.mangaID)
                         dismiss()
                     }
                 }
@@ -178,9 +182,4 @@ struct MangaCollectionRow: View {
     }
 }
 
-#Preview {
-    ContentView()
-        .environment(MangaViewModel())
-        .environment(UserMangaCollectionViewModel())
-        .modelContainer(for: [UserManga.self])
-}
+
