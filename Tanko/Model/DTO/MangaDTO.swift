@@ -35,7 +35,7 @@ extension MangaDTO {
             title: title,
             titleEnglish: titleEnglish,
             titleJapanese: titleJapanese,
-            mainPicture: mainPicture.flatMap { URL(string: $0.cleanedURL) },
+            mainPicture: mainPicture?.asURL,
             synopsis: sypnosis ?? String(localized: "synopsis.not.available"),
             background: background ?? String(localized: "background.not.available"),
             score: score,

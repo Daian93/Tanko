@@ -38,11 +38,12 @@ final class RemoteMangaCollectionRepository: MangaCollectionRepository {
                 id: dto.id,
                 mangaID: dto.manga.id,
                 title: dto.manga.title,
-                coverURL: dto.manga.mainPicture.flatMap(URL.init(string:)),
+                coverURL: dto.manga.mainPicture?.asURL,
                 totalVolumes: dto.manga.volumes,
                 volumesOwned: Array(dto.volumesOwned),
                 readingVolume: dto.readingVolume,
-                completeCollection: dto.completeCollection
+                completeCollection: dto.completeCollection,
+                updatedAt: .now
             )
         }
     }
