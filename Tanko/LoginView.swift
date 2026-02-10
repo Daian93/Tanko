@@ -6,67 +6,57 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct LoginView: View {
     @Environment(SessionManager.self) private var session
+    @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
 
-    @State private var email = ""
-    @State private var password = ""
-    @State private var isLoading = false
-    @State private var error: String?
+    @Bindable private var vm: LoginViewModel
+
+    init(session: SessionManager, context: ModelContext) {
+        self.vm = LoginViewModel(session: session, context: context)
+    }
 
     var body: some View {
         NavigationStack {
             Form {
                 Section("Email") {
-                    TextField("email@ejemplo.com", text: $email)
+                    TextField("email@ejemplo.com", text: $vm.email)
                         .keyboardType(.emailAddress)
                         .textInputAutocapitalization(.never)
                 }
 
                 Section("Contraseña") {
-                    SecureField("••••••••", text: $password)
+                    SecureField("Mínimo 8 caracteres", text: $vm.password)
                 }
 
-                if let errorMessage = error {
-                    Text(errorMessage)
+                if let error = vm.error {
+                    Text(error)
                         .foregroundStyle(AppColors.primary)
+                        .font(.footnote)
+                        .padding(.top, 4)
                 }
             }
             .navigationTitle("Iniciar sesión")
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    if isLoading {
-                        ProgressView()
-                    } else {
-                        Button("Entrar") {
-                            login()
+                    Button {
+                        Task {
+                            await vm.login()
+                            if vm.error == nil { dismiss() }
+                        }
+                    } label: {
+                        if vm.isLoading {
+                            ProgressView()
+                        } else {
+                            Text("Entrar")
                         }
                     }
+                    .disabled(!vm.isFormValid || vm.isLoading)
                 }
             }
-        }
-    }
-
-    private func login() {
-        isLoading = true
-        self.error = nil
-
-        Task {
-            do {
-                try await session.login(
-                    email: email,
-                    password: password
-                )
-                dismiss()
-            } catch let authError as LocalizedError {
-                self.error = authError.errorDescription
-            } catch {
-                self.error = String(localized: "auth.error.unknown")
-            }
-
-            isLoading = false
         }
     }
 }

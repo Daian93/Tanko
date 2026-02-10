@@ -6,11 +6,18 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct OnboardingView: View {
     @Environment(SessionManager.self) private var session
-    @State private var showLogin = false
-    @State private var showRegister = false
+    @Environment(\.modelContext) private var context
+
+    @State private var activeSheet: Sheet?
+
+    enum Sheet: Identifiable {
+        case login, register
+        var id: Int { hashValue }
+    }
 
     var body: some View {
         VStack(spacing: 32) {
@@ -26,13 +33,17 @@ struct OnboardingView: View {
             Spacer()
 
             VStack(spacing: 16) {
-                Button("Iniciar sesión") { showLogin = true }
-                    .frame(maxWidth: .infinity)
-                    .buttonStyle(.borderedProminent)
+                Button("Iniciar sesión") {
+                    activeSheet = .login
+                }
+                .frame(maxWidth: .infinity)
+                .buttonStyle(.borderedProminent)
 
-                Button("Crear cuenta") { showRegister = true }
-                    .frame(maxWidth: .infinity)
-                    .buttonStyle(.bordered)
+                Button("Crear cuenta") {
+                    activeSheet = .register
+                }
+                .frame(maxWidth: .infinity)
+                .buttonStyle(.bordered)
 
                 Button("Continuar como invitado") {
                     session.continueAsGuest()
@@ -44,7 +55,13 @@ struct OnboardingView: View {
             Spacer()
         }
         .padding()
-        .sheet(isPresented: $showLogin) { LoginView() }
-        .sheet(isPresented: $showRegister) { RegisterView() }
+        .sheet(item: $activeSheet) { sheet in
+            switch sheet {
+            case .login:
+                LoginView(session: session, context: context)
+            case .register:
+                RegisterView(session: session)
+            }
+        }
     }
 }

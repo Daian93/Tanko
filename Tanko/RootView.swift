@@ -20,19 +20,31 @@ struct RootView: View {
                     MainTabView()
                         .environment(vm)
                         .task {
-                            // Solo cargamos si la lista está vacía o para refrescar
-                            if vm.mangas.isEmpty { await vm.loadCollection() }
+                            if session.canAccessApp {
+                                if session.isAuthenticated {
+                                    await userCollectionVM?.synchronize()
+                                } else {
+                                    await userCollectionVM?.loadCollection()
+                                }
+                            }
                         }
                 } else {
-                    ProgressView() // Mientras se construye la VM
+                    ProgressView()
                 }
             } else {
                 OnboardingView()
             }
         }
         .onAppear { buildViewModel() }
-        // Si cambia el estado de auth, reconstruimos para cambiar repositorios
-        .onChange(of: session.isAuthenticated) { _, _ in buildViewModel() }
+    
+        .onChange(of: session.isAuthenticated) { old, newValue in
+            buildViewModel()
+            if newValue {
+                Task {
+                    await userCollectionVM?.synchronize()
+                }
+            }
+        }
     }
 
     private func buildViewModel() {
@@ -43,11 +55,18 @@ struct RootView: View {
         
         let repo: MangaCollectionRepository = remote ?? local
         
+
+        let syncService = MangaCollectionSyncService(
+            local: local,
+            remote: remote ?? RemoteMangaCollectionRepository(network: Network(), session: session, localRepo: local)
+        )
+        
         userCollectionVM = UserMangaCollectionViewModel(
             context: context,
             repository: repo,
             localRepo: local,
-            remoteRepo: remote
+            remoteRepo: remote,
+            syncService: syncService
         )
     }
 }

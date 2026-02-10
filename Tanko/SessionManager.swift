@@ -30,15 +30,18 @@ final class SessionManager {
         Task { await loadCurrentUser() }
     }
 
-    func login(email: String, password: String) async throws {
+    // Cambia tu función login por esta:
+    func login(email: String, password: String, onCompletion: (() async -> Void)? = nil) async throws {
         let jwt = try await network.login(email: email, password: password)
 
         self.token = jwt
         self.isGuest = false
         KeychainService.save(jwt, key: SessionKeys.jwtToken)
 
+        // Cargamos el usuario para tener su ID disponible
         await loadCurrentUser()
         
+        await onCompletion?()
     }
 
     func loadCurrentUser() async {

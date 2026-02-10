@@ -11,69 +11,50 @@ struct RegisterView: View {
     @Environment(SessionManager.self) private var session
     @Environment(\.dismiss) private var dismiss
 
-    @State private var email = ""
-    @State private var password = ""
-    @State private var isLoading = false
-    @State private var error: String?
+    @Bindable private var vm: RegisterViewModel
+
+    init(session: SessionManager) {
+        self.vm = RegisterViewModel(session: session)
+    }
 
     var body: some View {
         NavigationStack {
             Form {
                 Section("Email") {
-                    TextField("email@ejemplo.com", text: $email)
+                    TextField("email@ejemplo.com", text: $vm.email)
                         .keyboardType(.emailAddress)
                         .textInputAutocapitalization(.never)
                 }
 
                 Section("Contraseña") {
-                    SecureField("Mínimo 8 caracteres", text: $password)
+                    SecureField("Mínimo 8 caracteres", text: $vm.password)
                 }
 
-                if let errorMessage = error {
-                    Text(errorMessage)
+                if let error = vm.error {
+                    Text(error)
                         .foregroundStyle(AppColors.primary)
+                        .font(.footnote)
+                        .padding(.top, 4)
                 }
             }
             .navigationTitle("Crear cuenta")
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    if isLoading {
-                        ProgressView()
-                    } else {
-                        Button("Crear") {
-                            register()
+                    Button {
+                        Task {
+                            await vm.register()
+                            if vm.error == nil { dismiss() }
+                        }
+                    } label: {
+                        if vm.isLoading {
+                            ProgressView()
+                        } else {
+                            Text("Crear")
                         }
                     }
+                    .disabled(!vm.isFormValid || vm.isLoading)
                 }
             }
-        }
-    }
-
-    private func register() {
-        isLoading = true
-        self.error = nil
-
-        Task {
-            do {
-                try await session.register(
-                    email: email,
-                    password: password
-                )
-
-                try await session.login(
-                    email: email,
-                    password: password
-                )
-
-                dismiss()
-
-            } catch let authError as LocalizedError {
-                self.error = authError.errorDescription
-            } catch {
-                self.error = String(localized: "auth.error.unknown")
-            }
-
-            isLoading = false
         }
     }
 }

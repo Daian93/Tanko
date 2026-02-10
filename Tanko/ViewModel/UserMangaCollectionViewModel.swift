@@ -17,21 +17,40 @@ final class UserMangaCollectionViewModel {
     private let remoteRepo: RemoteMangaCollectionRepository?
 
     var mangas: [UserManga] = []
+    private let syncService: MangaCollectionSyncService
 
-    init(context: ModelContext, repository: MangaCollectionRepository, localRepo: LocalMangaCollectionRepository, remoteRepo: RemoteMangaCollectionRepository?) {
-        self.modelContext = context
-        self.repository = repository
-        self.localRepo = localRepo
-        self.remoteRepo = remoteRepo
-    }
+        init(
+            context: ModelContext,
+            repository: MangaCollectionRepository,
+            localRepo: LocalMangaCollectionRepository,
+            remoteRepo: RemoteMangaCollectionRepository?,
+            syncService: MangaCollectionSyncService
+        ) {
+            self.modelContext = context
+            self.repository = repository
+            self.localRepo = localRepo
+            self.remoteRepo = remoteRepo
+            self.syncService = syncService
+        }
+    
+    func synchronize() async {
+            guard remoteRepo != nil else { return }
+            
+            do {
+                print("🔄 Iniciando sincronización...")
+                try await syncService.sync()
+                print("✅ Sincronización completada. Recargando datos...")
+                await loadCollection()
+            } catch {
+                print("❌ Error durante la sincronización: \(error)")
+            }
+        }
 
     func loadCollection() async {
         do {
             let items = try await repository.getCollection()
-            // Importante: Actualizar la lista en memoria para que la UI reaccione
             self.mangas = items
             
-            // Sincronizar el ModelContext de SwiftData
             let fetch = FetchDescriptor<UserManga>()
             let local = try modelContext.fetch(fetch)
             for m in local { modelContext.delete(m) }
@@ -43,7 +62,6 @@ final class UserMangaCollectionViewModel {
         }
     }
 
-    // Corregido: Ahora acepta los parámetros de la vista
     func add(manga: Manga, volumesOwned: [Int], readingVolume: Int?, completeCollection: Bool) async {
         let newUserManga = UserManga(
             mangaID: manga.id,
@@ -56,7 +74,6 @@ final class UserMangaCollectionViewModel {
         )
         
         modelContext.insert(newUserManga)
-        // Insertamos en memoria inmediatamente para feedback instantáneo
         self.mangas.append(newUserManga)
         
         try? modelContext.save()
