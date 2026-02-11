@@ -84,7 +84,7 @@ struct ProfileView: View {
 
     private func handleLogout() {
         withAnimation {
-            session.logout()
+            session.exitGuest()
         }
     }
 }

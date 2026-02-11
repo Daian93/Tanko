@@ -29,7 +29,6 @@ struct MainTabView: View {
                 CollectionView()
             }
 
-
             Tab("tab.profile", systemImage: "person.fill") {
                 ProfileView()
             }
