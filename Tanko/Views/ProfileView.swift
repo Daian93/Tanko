@@ -130,7 +130,7 @@ struct ProfileView: View {
     private var logoutButton: some View {
         Button {
             withAnimation {
-                session.logout()
+                handleLogout()
             }
         } label: {
             HStack {
@@ -144,6 +144,19 @@ struct ProfileView: View {
             .background(Color.red.opacity(0.1))
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .padding(.horizontal)
+        }
+    }
+    
+    private func handleLogout() {
+        withAnimation {
+            if session.isAuthenticated {
+                // Si es usuario real, borramos base de datos
+                let localRepo = LocalMangaCollectionRepository(context: context)
+                session.logout(clearData: true, localRepo: localRepo)
+            } else {
+                // Si es invitado, solo salimos al onboarding (conservando local)
+                session.logout(clearData: false)
+            }
         }
     }
 }

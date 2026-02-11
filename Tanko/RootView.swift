@@ -36,8 +36,10 @@ struct RootView: View {
             }
         }
         .onAppear { buildViewModel() }
-    
         .onChange(of: session.isAuthenticated) { old, newValue in
+            if !newValue && !session.isGuest {
+                userCollectionVM = nil
+            }
             buildViewModel()
             if newValue {
                 Task {

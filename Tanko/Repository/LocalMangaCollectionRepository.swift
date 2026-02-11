@@ -40,5 +40,14 @@ final class LocalMangaCollectionRepository: MangaCollectionRepository {
             try context.save()
         }
     }
+    
+    func clearAll() async throws {
+        let descriptor = FetchDescriptor<UserManga>()
+        let items = try context.fetch(descriptor)
+        for item in items {
+            context.delete(item)
+        }
+        try context.save()
+    }
 }
 

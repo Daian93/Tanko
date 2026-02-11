@@ -68,17 +68,24 @@ final class SessionManager {
         isGuest = true
     }
 
-    func logout() {
-        token = nil
-        user = nil
-        isGuest = false
-        KeychainService.delete(key: SessionKeys.jwtToken)
+    func logout(clearData: Bool = false, localRepo: LocalMangaCollectionRepository? = nil) {
+            if clearData, let repo = localRepo {
+                Task {
+                    try? await repo.clearAll()
+                    print("🗑️ Base de datos local borrada tras logout de usuario")
+                }
+            }
+            
+            token = nil
+            user = nil
+            isGuest = false
+            KeychainService.delete(key: SessionKeys.jwtToken)
 
-        NotificationCenter.default.post(
-            name: .didLogout,
-            object: nil
-        )
-    }
+            NotificationCenter.default.post(
+                name: .didLogout,
+                object: nil
+            )
+        }
 }
 
 import Foundation
