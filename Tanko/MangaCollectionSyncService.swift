@@ -58,6 +58,7 @@ final class MangaCollectionSyncService {
             mangaID: manga.mangaID,
             title: manga.title,
             coverURL: manga.coverURL,
+            totalVolumes: manga.totalVolumes,
             volumesOwned: manga.volumesOwned,
             readingVolume: manga.readingVolume,
             completeCollection: manga.completeCollection,
@@ -70,6 +71,7 @@ struct MangaSyncData {
     let mangaID: Int
     let title: String
     let coverURL: URL?
+    let totalVolumes: Int?
     let volumesOwned: [Int]
     let readingVolume: Int?
     let completeCollection: Bool

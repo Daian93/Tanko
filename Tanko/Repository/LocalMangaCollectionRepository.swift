@@ -24,6 +24,7 @@ final class LocalMangaCollectionRepository: MangaCollectionRepository {
                 mangaID: manga.mangaID,
                 title: manga.title,
                 coverURL: manga.coverURL,
+                totalVolumes: manga.totalVolumes,
                 volumesOwned: manga.volumesOwned,
                 readingVolume: manga.readingVolume,
                 completeCollection: manga.completeCollection,
@@ -39,6 +40,7 @@ final class LocalMangaCollectionRepository: MangaCollectionRepository {
         )
 
         if let existing = try context.fetch(fetch).first {
+            existing.totalVolumes = remote.totalVolumes
             existing.volumesOwned = remote.volumesOwned
             existing.readingVolume = remote.readingVolume
             existing.completeCollection = remote.completeCollection
@@ -48,6 +50,7 @@ final class LocalMangaCollectionRepository: MangaCollectionRepository {
                 mangaID: remote.mangaID,
                 title: remote.title,
                 coverURL: remote.coverURL,
+                totalVolumes: remote.totalVolumes,
                 volumesOwned: remote.volumesOwned,
                 readingVolume: remote.readingVolume,
                 completeCollection: remote.completeCollection,

@@ -41,10 +41,11 @@ final class RemoteMangaCollectionRepository: MangaCollectionRepository {
                 mangaID: dto.manga.id,
                 title: dto.manga.title,
                 coverURL: dto.manga.mainPicture?.asURL,
+                totalVolumes: dto.manga.volumes,
                 volumesOwned: Array(dto.volumesOwned),
                 readingVolume: dto.readingVolume,
                 completeCollection: dto.completeCollection,
-                updatedAt: .now  // O la fecha que venga de tu API si existe
+                updatedAt: .now
             )
         }
     }

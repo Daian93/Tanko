@@ -13,46 +13,84 @@ struct CollectionView: View {
     @Environment(UserMangaCollectionViewModel.self) private var collectionVM
     @Environment(SessionManager.self) private var session
     @Environment(\.modelContext) private var context
-    @Namespace private var namespace
-
     @State private var showOnboarding = false
-
+    @Namespace private var namespace
+    
+    
+    @State private var selectedFilter: CollectionFilter = .todo
+    
+    enum CollectionFilter: String, CaseIterable {
+        case todo = "Todos"
+        case porEmpezar = "Por empezar"
+        case leyendo = "Leyendo"
+        case completados = "Completados"
+    }
+    
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    headerView
-                    statsGrid
-
-                    VStack(alignment: .leading, spacing: 20) {
-                        LibraryListSection(
-                            title: "Leyendo actualmente",
-                            mangas: userMangas.filter {
-                                $0.readingVolume != nil && !$0.completeCollection
-                            },
-                            namespace: namespace
-                        )
-
-                        LibraryListSection(
-                            title: "Completados",
-                            mangas: userMangas.filter { $0.completeCollection },
-                            namespace: namespace
-                        )
-
-                        LibraryListSection(
-                            title: "Lista de deseos / Por empezar",
-                            mangas: userMangas.filter {
-                                $0.readingVolume == nil && !$0.completeCollection
-                            },
-                            namespace: namespace
-                        )
+                    
+                    // MARK: - Estadísticas
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Estadísticas")
+                            .font(.title2.bold())
+                            .padding(.horizontal)
+                        
+                        statsGrid
                     }
-
-                    if session.isAuthenticated {
-                        logoutButton
-                            .padding(.vertical, 30)
+                    
+                    // MARK: - Filtros
+                    
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(CollectionFilter.allCases, id: \.self) { filter in
+                                Button {
+                                    withAnimation(.easeInOut) {
+                                        selectedFilter = filter
+                                    }
+                                } label: {
+                                    Text(filter.rawValue)
+                                        .font(.subheadline.weight(.medium))
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 8)
+                                        .background(
+                                            selectedFilter == filter
+                                            ? Color("TankoPrimary")
+                                            : Color(.systemGray6)
+                                        )
+                                        .foregroundStyle(
+                                            selectedFilter == filter
+                                            ? .white
+                                            : .primary
+                                        )
+                                        .clipShape(Capsule())
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
                     }
+                    
+                    // MARK: - Lista
+                    
+                    VStack(spacing: 12) {
+                        
+                        if filteredMangas.isEmpty {
+                            EmptyStateView(filter: selectedFilter)
+                                .padding(.top, 40)
+                        } else {
+                            ForEach(filteredMangas) { manga in
+                                MangaProgressRow(
+                                    userManga: manga,
+                                    namespace: namespace
+                                )
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
                 }
+                .padding(.vertical)
             }
             .navigationTitle("Mi Biblioteca")
             .backgroundStyle(AppColors.primary)
@@ -61,35 +99,6 @@ struct CollectionView: View {
                     await collectionVM.synchronize()
                 } else {
                     await collectionVM.loadCollection()
-                }
-            }
-            .toolbar {
-
-                if session.isGuest {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            withAnimation {
-                                session.exitGuest()
-                                showOnboarding = true
-                            }
-                        } label: {
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
-                                .foregroundStyle(AppColors.primary)
-                        }
-                    }
-                }
-
-                if session.isAuthenticated {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button(role: .destructive) {
-                            withAnimation {
-                                session.logout()
-                            }
-                        } label: {
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
-                                .foregroundStyle(AppColors.primary)
-                        }
-                    }
                 }
             }
         }
@@ -102,50 +111,329 @@ struct CollectionView: View {
             }
         }
     }
-
-    // MARK: - Header
-
-    private var headerView: some View {
-        HStack(spacing: 16) {
-            Circle()
-                .fill(Color.red.opacity(0.1))
-                .frame(width: 70, height: 70)
-                .overlay(
-                    Text(
-                        session.isGuest
-                        ? "👤"
-                        : session.user?.email.prefix(2).uppercased() ?? "TU"
-                    )
-                    .font(.headline)
-                    .foregroundStyle(.red)
-                )
-
-            VStack(alignment: .leading) {
-                Text(session.isGuest ? "Modo Invitado" : "Mi Perfil")
-                    .font(.title3.bold())
-
-                Text("\(userMangas.count) mangas en total")
+    
+    // MARK: - StatItem
+    
+    struct StatItem: View {
+        
+        let label: String
+        let value: String
+        let icon: String
+        
+        var body: some View {
+            VStack(spacing: 4) {
+                Image(systemName: icon)
                     .font(.caption)
+                    .foregroundStyle(Color("TankoPrimary"))
+                
+                Text(value)
+                    .font(.headline)
+                
+                Text(label)
+                    .font(.caption2)
                     .foregroundStyle(.secondary)
+                    .textCase(.uppercase)
             }
-            Spacer()
+            .frame(maxWidth: .infinity)
         }
-        .padding(.horizontal)
+    }
+    
+    // MARK: - Manga Row
+    
+    struct MangaProgressRow: View {
+        
+        @Bindable var userManga: UserManga
+        let namespace: Namespace.ID
+        
+        @Environment(UserMangaCollectionViewModel.self) private var collectionVM
+        @State private var showVolumeManagement = false
+        
+        private var totalVolumes: Int {
+            userManga.totalVolumes ??
+            max(userManga.readingVolume ?? 0,
+                userManga.volumesOwned.max() ?? 0,
+                1)
+        }
+        
+        private var reading: Int {
+            userManga.readingVolume ?? 0
+        }
+        
+        private var progress: Double {
+            guard totalVolumes > 0 else { return 0 }
+            return Double(reading) / Double(totalVolumes)
+        }
+        
+        private var progressColor: Color {
+            if progress == 0 { return .gray }
+            if progress < 0.5 { return .orange }
+            if progress < 1 { return Color("TankoSecondary") }
+            return .green
+        }
+        
+        var body: some View {
+            
+            VStack(alignment: .leading, spacing: 14) {
+                
+                // MARK: Top Section
+                
+                HStack(spacing: 14) {
+                    
+                    CoverView(
+                        cover: userManga.coverURL,
+                        namespace: namespace,
+                        big: false
+                    )
+                    .frame(width: 65, height: 95)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        
+                        Text(userManga.title)
+                            .font(.system(size: 16, weight: .semibold))
+                            .lineLimit(2)
+                        
+                        // Progress Section
+                        VStack(alignment: .leading, spacing: 6) {
+                            
+                            HStack {
+                                Text("Progreso")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                
+                                Spacer()
+                                
+                                Text("\(reading)/\(totalVolumes)")
+                                    .font(.caption.weight(.medium))
+                                    .foregroundStyle(progressColor)
+                            }
+                            
+                            ProgressView(value: progress)
+                                .tint(progressColor)
+                                .scaleEffect(y: 2.2)
+                                .animation(.easeInOut, value: progress)
+                        }
+                        
+                        // Owned badge
+                        HStack {
+                            Label("\(userManga.volumesOwned.count) tomos",
+                                  systemImage: "books.vertical.fill")
+                                .font(.caption2)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.green.opacity(0.1))
+                                .foregroundStyle(.green)
+                                .clipShape(Capsule())
+                            
+                            if userManga.completeCollection {
+                                Label("Completo",
+                                      systemImage: "checkmark.seal.fill")
+                                    .font(.caption2)
+                                    .foregroundStyle(.green)
+                            }
+                        }
+                    }
+                    
+                    Spacer()
+                }
+                
+                // MARK: Bottom Controls
+                
+                HStack {
+                    
+                    // +/- Capsule
+                    HStack(spacing: 0) {
+                        
+                        Button {
+                            updateReading(by: -1)
+                        } label: {
+                            Image(systemName: "minus")
+                                .frame(width: 34, height: 34)
+                        }
+                        .disabled(reading <= 0)
+                        
+                        Divider()
+                            .frame(height: 20)
+                        
+                        Text("Vol \(reading)")
+                            .font(.subheadline.weight(.medium))
+                            .frame(minWidth: 60)
+                        
+                        Divider()
+                            .frame(height: 20)
+                        
+                        Button {
+                            updateReading(by: 1)
+                        } label: {
+                            Image(systemName: "plus")
+                                .frame(width: 34, height: 34)
+                        }
+                        .disabled(reading >= totalVolumes)
+                    }
+                    .foregroundStyle(Color("TankoPrimary"))
+                    .background(Color("TankoCardSurface"))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.gray.opacity(0.2))
+                    )
+                    
+                    Spacer()
+                    
+                    // Manage Volumes Button
+                    
+                    Button {
+                        showVolumeManagement.toggle()
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "square.grid.3x3")
+                            Text("Gestionar")
+                                .font(.subheadline.weight(.medium))
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color("TankoPrimary").opacity(0.1))
+                        .foregroundStyle(Color("TankoPrimary"))
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+                }
+            }
+            .padding()
+            .background(Color("TankoCardSurface"))
+            .clipShape(RoundedRectangle(cornerRadius: 18))
+            .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
+            .sheet(isPresented: $showVolumeManagement) {
+                VolumesManagementView(userManga: userManga)
+                    .presentationDetents([.medium])
+            }
+        }
+        
+        // MARK: Logic
+        
+        private func updateReading(by value: Int) {
+            let newValue = reading + value
+            
+            if newValue < 0 { return }
+            if newValue > totalVolumes { return }
+            
+            withAnimation(.easeInOut) {
+                userManga.readingVolume = newValue
+                userManga.completeCollection = (newValue == totalVolumes)
+                userManga.updatedAt = .now
+            }
+            
+            Task {
+                await collectionVM.updateRemote(userManga)
+            }
+        }
     }
 
-    // MARK: - Stats
+    
+    
+    struct VolumesManagementView: View {
+        @Environment(UserMangaCollectionViewModel.self) private var collectionVM
+        @Bindable var userManga: UserManga
+        @Environment(\.dismiss) var dismiss
+        
+        var totalVolumes: Int {
+            let volumes = userManga.totalVolumes ?? (userManga.volumesOwned.max() ?? 0)
+            return max(volumes, 1)
+        }
+        
+        private let columns = [GridItem(.adaptive(minimum: 45))]
+        
+        var body: some View {
+            NavigationStack {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        Text("Selecciona los tomos físicos que posees:")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal)
+                        
+                        LazyVGrid(columns: columns, spacing: 10) {
+                            ForEach(1...totalVolumes, id: \.self) { number in
+                                let isOwned = userManga.volumesOwned.contains(number)
+                                Button {
+                                    if isOwned {
+                                        userManga.volumesOwned.removeAll { $0 == number }
+                                    } else {
+                                        userManga.volumesOwned.append(number)
+                                    }
+                                    userManga.updatedAt = .now
+                                    
+                                    Task {
+                                        await collectionVM.updateRemote(userManga)
+                                    }
+                                } label: {
+                                    Text("\(number)")
+                                        .font(.system(.subheadline, design: .rounded).bold())
+                                        .frame(width: 45, height: 45)
+                                        .background(isOwned ? Color.green : Color(.secondarySystemBackground))
+                                        .foregroundStyle(isOwned ? .white : .primary)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    .padding(.top)
+                }
+                .navigationTitle("Gestionar Colección")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    Button("Hecho") { dismiss() }
+                        .fontWeight(.bold)
+                }
+            }
+        }
+    }
+}
 
+extension CollectionView {
+    
+    private var filteredMangas: [UserManga] {
+        switch selectedFilter {
+        case .todo:
+            return userMangas
+            
+        case .porEmpezar:
+            return userMangas.filter {
+                ($0.readingVolume ?? 0) == 0
+            }
+            
+        case .leyendo:
+            return userMangas.filter {
+                guard let total = $0.totalVolumes else { return false }
+                let reading = $0.readingVolume ?? 0
+                return reading > 0 && reading < total
+            }
+            
+        case .completados:
+            return userMangas.filter { $0.completeCollection }
+        }
+    }
+}
+
+// MARK: - Estadísticas
+
+extension CollectionView {
+    
     private var statsGrid: some View {
+        
         let readingCount = userMangas.filter {
-            $0.readingVolume != nil && !$0.completeCollection
+            guard let total = $0.totalVolumes else { return false }
+            let reading = $0.readingVolume ?? 0
+            return reading > 0 && reading < total
         }.count
-
+        
         let completeCount = userMangas.filter { $0.completeCollection }.count
-
+        
         let totalVolumesOwned = userMangas.reduce(0) {
             $0 + $1.volumesOwned.count
         }
-
+        
         return HStack {
             StatItem(label: "Leyendo", value: "\(readingCount)", icon: "book")
             Divider().frame(height: 40)
@@ -159,251 +447,39 @@ struct CollectionView: View {
         .shadow(color: .black.opacity(0.05), radius: 10)
         .padding(.horizontal)
     }
-
-    // MARK: - Logout
-
-    private var logoutButton: some View {
-        Button {
-            withAnimation {
-                session.logout()
-            }
-        } label: {
-            HStack {
-                Image(systemName: "power")
-                Text("Cerrar sesión")
-            }
-            .font(.subheadline.bold())
-            .foregroundStyle(.red)
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color.red.opacity(0.1))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .padding(.horizontal)
-        }
-    }
 }
 
+// MARK: - Empty State View
 
-
-// MARK: - Subvistas auxiliares
-
-struct LibraryListSection: View {
-    let title: String
-    let mangas: [UserManga]
-    let namespace: Namespace.ID
-
-    var body: some View {
-        if !mangas.isEmpty {
-            VStack(alignment: .leading, spacing: 12) {
-                Text(title)
-                    .font(.headline)
-                    .padding(.horizontal)
-
-                VStack(spacing: 8) {
-                    ForEach(mangas) { manga in
-                        MangaProgressRow(userManga: manga, namespace: namespace)
-                    }
-                }
-                .padding(.horizontal)
-            }
-        }
-    }
-}
-
-struct StatItem: View {
-    let label: String
-    let value: String
-    let icon: String
-
-    var body: some View {
-        VStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.caption)
-                .foregroundStyle(.red)
-            Text(value)
-                .font(.headline)
-            Text(label)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
-struct MangaProgressRow: View {
-    @Bindable var userManga: UserManga
-    let namespace: Namespace.ID
+struct EmptyStateView: View {
     
-    @Environment(UserMangaCollectionViewModel.self) private var collectionVM
-    @State private var showVolumeManagement = false
-
-    var isFinished: Bool {
-        guard let total = userManga.totalVolumes else { return false }
-        return (userManga.readingVolume ?? 0) >= total
+    let filter: CollectionView.CollectionFilter
+    
+    var message: String {
+        switch filter {
+        case .todo:
+            return "No tienes mangas en tu colección todavía."
+        case .porEmpezar:
+            return "No tienes mangas pendientes de empezar."
+        case .leyendo:
+            return "No estás leyendo ningún manga actualmente."
+        case .completados:
+            return "Aún no has completado ningún manga."
+        }
     }
-
+    
     var body: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 15) {
-                CoverView(
-                    cover: userManga.coverURL,
-                    namespace: namespace,
-                    big: false
-                )
-                .frame(width: 60, height: 90)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(userManga.title)
-                        .font(.headline)
-                        .lineLimit(1)
-
-                    if let total = userManga.totalVolumes, total > 0 {
-                        let progress = Double(userManga.readingVolume ?? 0) / Double(total)
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            ProgressView(value: progress)
-                                .tint(isFinished ? .green : .blue)
-                                .scaleEffect(y: 1.5)
-
-                            Text("\(userManga.readingVolume ?? 0) de \(total) leídos")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                        }
-                    } else {
-                        Label("Tomo \(userManga.readingVolume ?? 0) leído", systemImage: "book.fill")
-                            .font(.caption)
-                            .foregroundStyle(.blue)
-                    }
-
-                    Button {
-                        showVolumeManagement.toggle()
-                    } label: {
-                        Label("\(userManga.volumesOwned.count) en estantería", systemImage: "books.vertical.fill")
-                            .font(.caption2)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.green.opacity(0.1))
-                            .foregroundStyle(.green)
-                            .clipShape(Capsule())
-                    }
-                }
-
-                Spacer()
-
-                Button {
-                    updateReading(by: 1)
-                } label: {
-                    actionButton(
-                        icon: isFinished ? "checkmark.seal.fill" : "plus.circle.fill",
-                        text: isFinished ? "Listo" : "Leí",
-                        color: isFinished ? Color.green : Color.blue
-                    )
-                }
-                .disabled(isFinished)
-            }
-        }
-        .padding(12)
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 15))
-        .sheet(isPresented: $showVolumeManagement) {
-            VolumesManagementView(userManga: userManga)
-                .presentationDetents([.medium])
-        }
-    }
-
-    private func updateReading(by value: Int) {
-        let current = userManga.readingVolume ?? 0
-        let newValue = current + value
-        if newValue < 0 { return }
-        if let total = userManga.totalVolumes, newValue > total { return }
-
-        // 1. Actualización local (SwiftData)
-        withAnimation(.easeInOut) {
-            userManga.readingVolume = newValue
-            if let total = userManga.totalVolumes {
-                userManga.completeCollection = (newValue == total)
-            }
-            userManga.updatedAt = .now
-        }
-
-        Task {
-            await collectionVM.updateRemote(userManga)
-        }
-    }
-
-    private func actionButton(icon: String, text: String, color: Color) -> some View {
-        VStack(spacing: 2) {
-            Image(systemName: icon)
-                .font(.system(size: 18))
-            Text(text)
-                .font(.system(size: 8, weight: .bold))
-                .textCase(.uppercase)
-        }
-        .frame(width: 48, height: 44)
-        .background(color.opacity(0.1))
-        .foregroundStyle(color)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-    }
-}
-
-struct VolumesManagementView: View {
-    @Environment(UserMangaCollectionViewModel.self) private var collectionVM
-    @Bindable var userManga: UserManga
-    @Environment(\.dismiss) var dismiss
-
-    var totalVolumes: Int {
-        let volumes = userManga.totalVolumes ?? (userManga.volumesOwned.max() ?? 0)
-        return max(volumes, 1)
-    }
-
-    private let columns = [GridItem(.adaptive(minimum: 45))]
-
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    Text("Selecciona los tomos físicos que posees:")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal)
-
-                    LazyVGrid(columns: columns, spacing: 10) {
-                        ForEach(1...totalVolumes, id: \.self) { number in
-                            let isOwned = userManga.volumesOwned.contains(number)
-                            Button {
-                                if isOwned {
-                                    userManga.volumesOwned.removeAll { $0 == number }
-                                } else {
-                                    userManga.volumesOwned.append(number)
-                                }
-                                userManga.updatedAt = .now
-                                
-                                Task {
-                                    await collectionVM.updateRemote(userManga)
-                                }
-                            } label: {
-                                Text("\(number)")
-                                    .font(.system(.subheadline, design: .rounded).bold())
-                                    .frame(width: 45, height: 45)
-                                    .background(isOwned ? Color.green : Color(.secondarySystemBackground))
-                                    .foregroundStyle(isOwned ? .white : .primary)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .padding(.horizontal)
-                }
-                .padding(.top)
-            }
-            .navigationTitle("Gestionar Colección")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                Button("Hecho") { dismiss() }
-                    .fontWeight(.bold)
-            }
+        VStack(spacing: 16) {
+            
+            Image(systemName: "books.vertical")
+                .font(.system(size: 48))
+                .foregroundStyle(.gray.opacity(0.4))
+            
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
         }
     }
 }
