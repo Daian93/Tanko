@@ -23,8 +23,8 @@ final class MangaCollectionSyncService {
     }
 
     func sync() async throws {
-        let localItems = try await localRepo.getCollection() // [MangaSyncData]
-        let remoteItems = try await remoteRepo.getCollection() // [MangaSyncData]
+        let localItems = try await localRepo.getCollection()
+        let remoteItems = try await remoteRepo.getCollection()
 
         let localByID = Dictionary(uniqueKeysWithValues: localItems.map { ($0.mangaID, $0) })
         let remoteByID = Dictionary(uniqueKeysWithValues: remoteItems.map { ($0.mangaID, $0) })
