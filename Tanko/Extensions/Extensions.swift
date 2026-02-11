@@ -10,6 +10,7 @@ import Foundation
 extension String {
     var cleanedURL: String {
         self.replacingOccurrences(of: "\\", with: "")
+            .replacingOccurrences(of: "\"", with: "")
             .trimmingCharacters(in: .init(charactersIn: "\""))
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }

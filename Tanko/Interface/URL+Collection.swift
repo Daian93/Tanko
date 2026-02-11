@@ -10,7 +10,7 @@ import Foundation
 extension URL {
     static let collectionManga = api.appending(path: "collection/manga")
 
-    static func collectionManga(id: String) -> URL {
-        api.appending(path: "collection/manga").appending(path: id)
+    static func collectionMangaID(_ id: Int) -> URL {
+        api.appending(path: "collection/manga").appending(path: "\(id)")
     }
 }

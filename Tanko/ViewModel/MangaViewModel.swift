@@ -20,12 +20,12 @@ final class MangaViewModel {
     var mangas: [Manga] = []
 
     var state: MangaViewState = .loading
+    var selectedMangaForCollection: Manga? = nil
 
     var showError = false
     var errorMsg = ""
 
     private var isLoadingPage = false
-
     private var currentPage = NetworkConstants.defaultPage
     private var perPage = NetworkConstants.defaultPerPage
     private var hasMorePages = true

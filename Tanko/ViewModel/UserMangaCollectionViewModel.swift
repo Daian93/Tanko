@@ -5,117 +5,110 @@
 //  Created by Diana Rammal Sansón on 5/2/26.
 //
 
-import SwiftData
 import SwiftUI
+import SwiftData
 
 @Observable
 @MainActor
 final class UserMangaCollectionViewModel {
-    private var modelContext: ModelContext?
+    private let modelContext: ModelContext
+    private let repository: MangaCollectionRepository
+    
+    var mangas: [UserManga] = []
+    private let syncService: MangaCollectionSyncService
 
-    func setModelContext(_ context: ModelContext) {
-        modelContext = context
+    init(
+        context: ModelContext,
+        repository: MangaCollectionRepository,
+        syncService: MangaCollectionSyncService
+    ) {
+        self.modelContext = context
+        self.repository = repository
+        self.syncService = syncService
+    }
+    
+    func synchronize() async {
+        do {
+            print("🔄 Iniciando sincronización...")
+            try await syncService.sync()
+            print("✅ Sincronización completada. Recargando datos...")
+            await loadCollection()
+        } catch {
+            print("❌ Error durante la sincronización: \(error)")
+        }
     }
 
-    func addToCollection(
-        manga: Manga,
-        volumesOwned: [Int] = [],
-        readingVolume: Int? = nil,
-        completeCollection: Bool = false
-    ) {
-        guard let context = modelContext else { return }
-
-        if isInCollection(mangaID: manga.id) {
-            print("El manga ya está en la colección")
-            return
+    func loadCollection() async {
+        do {
+            _ = try await repository.getCollection()
+            
+            let descriptor = FetchDescriptor<UserManga>(
+                sortBy: [SortDescriptor(\UserManga.title)]
+            )
+            
+            self.mangas = try modelContext.fetch(descriptor)
+            
+        } catch {
+            print("❌ Error cargando colección:", error)
         }
+    }
 
-        let userManga = UserManga(
+    func add(manga: Manga, volumesOwned: [Int], readingVolume: Int?, completeCollection: Bool) async {
+        let newUserManga = UserManga(
             mangaID: manga.id,
             title: manga.title,
             coverURL: manga.mainPicture,
-            totalVolumes: manga.volumes,
             volumesOwned: volumesOwned,
             readingVolume: readingVolume,
-            completeCollection: completeCollection
+            completeCollection: completeCollection,
+            updatedAt: .now
         )
-
-        context.insert(userManga)
-        try? context.save()
+        
+        modelContext.insert(newUserManga)
+        self.mangas.append(newUserManga)
+        try? modelContext.save()
+        
+        let syncData = MangaSyncData(
+            mangaID: newUserManga.mangaID,
+            title: newUserManga.title,
+            coverURL: newUserManga.coverURL,
+            volumesOwned: newUserManga.volumesOwned,
+            readingVolume: newUserManga.readingVolume,
+            completeCollection: newUserManga.completeCollection,
+            updatedAt: newUserManga.updatedAt
+        )
+        
+        try? await repository.add(mangaData: syncData)
     }
 
-    func removeFromCollection(userMangaID: UUID) {
-        guard let context = modelContext else { return }
-
-        let fetch = FetchDescriptor<UserManga>(
-            predicate: #Predicate { $0.id == userMangaID }
-        )
-
-        if let userManga = (try? context.fetch(fetch))?.first {
-            context.delete(userManga)
-            try? context.save()
-        }
+    func remove(_ manga: UserManga) async {
+        let idToRemove = manga.mangaID
+        
+        try? await repository.remove(manga)
+        
+        modelContext.delete(manga)
+        self.mangas.removeAll { $0.mangaID == idToRemove }
+        
+        try? modelContext.save()
     }
 
     func isInCollection(mangaID: Int) -> Bool {
-        guard let context = modelContext else { return false }
-
-        let fetch = FetchDescriptor<UserManga>(
-            predicate: #Predicate { $0.mangaID == mangaID }
-        )
-
-        let count = (try? context.fetchCount(fetch)) ?? 0
-        return count > 0
+        mangas.contains(where: { $0.mangaID == mangaID })
     }
 
-    func userCollectionCount() -> Int {
-        guard let context = modelContext else { return 0 }
-        let fetch = FetchDescriptor<UserManga>()
-        return (try? context.fetchCount(fetch)) ?? 0
-    }
-
-    var mangas: [UserManga] {
-        guard let context = modelContext else { return [] }
-        let fetch = FetchDescriptor<UserManga>()
-        return (try? context.fetch(fetch)) ?? []
-    }
-
-    func updateVolumes(userMangaID: UUID, volumesOwned: [Int]) {
-        guard let context = modelContext else { return }
-
-        let fetch = FetchDescriptor<UserManga>(
-            predicate: #Predicate { $0.id == userMangaID }
-        )
-
-        if let userManga = (try? context.fetch(fetch))?.first {
-            userManga.volumesOwned = volumesOwned
-            try? context.save()
+    func removeFromCollection(mangaID: Int) async {
+        if let manga = mangas.first(where: { $0.mangaID == mangaID }) {
+            await remove(manga)
         }
     }
-
-    func updateReadingVolume(userMangaID: UUID, readingVolume: Int?) {
-        guard let context = modelContext else { return }
-
-        let fetch = FetchDescriptor<UserManga>(
-            predicate: #Predicate { $0.id == userMangaID }
-        )
-
-        if let userManga = (try? context.fetch(fetch))?.first {
-            userManga.readingVolume = readingVolume
-            try? context.save()
-        }
-    }
-
-    func updateCompleteStatus(userMangaID: UUID, completeCollection: Bool) {
-        guard let context = modelContext else { return }
-
-        let fetch = FetchDescriptor<UserManga>(
-            predicate: #Predicate { $0.id == userMangaID }
-        )
-
-        if let userManga = (try? context.fetch(fetch))?.first {
-            userManga.completeCollection = completeCollection
-            try? context.save()
+    
+    func updateRemote(_ userManga: UserManga) async {
+        let syncData = userManga.asSyncData
+        do {
+            try await repository.add(mangaData: syncData)
+            print("✅ Sincronizado con el servidor")
+        } catch {
+            print("❌ Error al sincronizar: \(error)")
         }
     }
 }

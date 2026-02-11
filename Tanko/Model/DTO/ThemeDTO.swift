@@ -19,3 +19,10 @@ extension ThemeDTO {
         )
     }
 }
+
+extension ThemeDTO {
+    static let test = ThemeDTO(
+        id: UUID(uuidString: "4394C99F-615B-494A-929E-356A342A95B8")!,
+        theme: "Psychological"
+    )
+}

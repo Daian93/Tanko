@@ -8,32 +8,54 @@
 import Foundation
 
 struct Network: NetworkRepository {
+    
+    private let appToken = "sLGH38NhEJ0_anlIWwhsz1-LarClEohiAHQqayF0FY"
 
     // MARK: - Auth
-    func createUser(email: String, password: String) async throws(NetworkError) {
-        let body = UsersCreate(email: email, password: password)
-        _ = try await postJSON(
-            .post(url: .createUser, body: body),
-            type: UserResponse.self
-        )
-    }
+        func createUser(email: String, password: String) async throws(NetworkError) {
+            guard password.count >= 8 else { throw NetworkError.dataNotValid }
 
+            let body = UsersCreate(email: email, password: password)
+            var request = URLRequest.post(url: .createUser, body: body)
+            
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue(appToken, forHTTPHeaderField: "App-Token")
+
+            try await postJSON(request, status: 201)
+        }
+        
     func login(email: String, password: String) async throws(NetworkError) -> String {
-        let login = UsersCreate(email: email, password: password)
-        let response = try await postJSON(
-            .post(url: .login, body: login),
-            type: TokenResponse.self
-        )
+
+        let credentials = "\(email):\(password)"
+        guard let data = credentials.data(using: .utf8) else {
+            throw NetworkError.dataNotValid
+        }
+
+        let encoded = data.base64EncodedString()
+
+        var request = URLRequest(url: .jwtLogin)
+        request.httpMethod = "POST"
+
+        // 🔑 JWT login usa Basic Auth
+        request.setValue("Basic \(encoded)", forHTTPHeaderField: "Authorization")
+
+        // 🔑 App token obligatorio
+        request.setValue(appToken, forHTTPHeaderField: "App-Token")
+
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        let response = try await postJSON(request, type: JWTTokenResponse.self)
         return response.token
     }
 
-    func renew(token: String) async throws(NetworkError) -> String {
-        let response = try await postJSON(
-            .post(url: .renew, bearerToken: token),
-            type: TokenResponse.self
-        )
-        return response.token
-    }
+
+
+        func renew(token: String) async throws(NetworkError) -> String {
+            let request = authRequest(url: .renew, method: "POST", token: token)
+            let response = try await postJSON(request, type: JWTTokenResponse.self)
+            return response.token
+        }
+
 
     // MARK: - Manga list
     func getMangas(
@@ -172,17 +194,38 @@ struct Network: NetworkRepository {
             type: [MangaDTO].self
         ).map(\.toManga)
     }
-
-    // MARK: - Collection
-
-    func deleteMangaFromCollection(mangaId: String, token: String) async throws(NetworkError) {
-        try await postJSON(
-            .delete(
-                url: .collectionManga(id: mangaId),
-                bearerToken: token
-            ),
-            status: 204
-        )
+    
+    func getUserCollection(token: String) async throws -> [UserMangaCollectionDTO] {
+        var request = URLRequest.get(url: .collectionManga)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        return try await getJSON(request, type: [UserMangaCollectionDTO].self)
     }
+
+    func addUserMangaToCollection(_ manga: UserMangaCollectionRequest, token: String) async throws {
+        var request = URLRequest.post(url: .collectionManga, body: manga)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        _ = try await postJSON(request, type: EmptyResponse.self)
+    }
+
+    func removeUserMangaFromCollection(mangaID: Int, token: String) async throws {
+        var request = URLRequest.delete(url: .collectionMangaID(mangaID))
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        _ = try await deleteJSON(request)
+    }
+
+    func getMangaFromCollection(mangaID: Int, token: String) async throws -> UserMangaCollectionDTO {
+        var request = URLRequest.get(url: .collectionMangaID(mangaID))
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        return try await getJSON(request, type: UserMangaCollectionDTO.self)
+    }
+    
+    // MARK: - Helper Privado
+        /// Crea una URLRequest con el token de autorización configurado correctamente.
+        private func authRequest(url: URL, method: String, token: String) -> URLRequest {
+            var request = URLRequest(url: url)
+            request.httpMethod = method
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            return request
+        }
 }
 
