@@ -16,50 +16,6 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1"
             endingLineNumber = "1">
-            <Locations>
-               <Location
-                  uuid = "AA0CDFCE-90CA-4214-9EBA-4D303602CA6F - 8f47c17916a0d7b7"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Tanko.AppSettings._isDarkMode.getter : Swift.Bool"
-                  moduleName = "Tanko.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///var/folders/0r/qyp7wkw15nv6gxyk7qlrpnv80000gn/T/-8749d9.@__swiftmacro_5Tanko11AppSettingsC10isDarkMode18ObservationTrackedfMp_.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "0"
-                  endingLineNumber = "0">
-               </Location>
-               <Location
-                  uuid = "AA0CDFCE-90CA-4214-9EBA-4D303602CA6F - 9acba3391fdbffcb"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Tanko.AppSettings._isDarkMode.setter : Swift.Bool"
-                  moduleName = "Tanko.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///var/folders/0r/qyp7wkw15nv6gxyk7qlrpnv80000gn/T/-8749d9.@__swiftmacro_5Tanko11AppSettingsC10isDarkMode18ObservationTrackedfMp_.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "0"
-                  endingLineNumber = "0">
-               </Location>
-               <Location
-                  uuid = "AA0CDFCE-90CA-4214-9EBA-4D303602CA6F - af9ffcf102c6fdba"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Tanko.AppSettings._isDarkMode.modify : Swift.Bool"
-                  moduleName = "Tanko.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///var/folders/0r/qyp7wkw15nv6gxyk7qlrpnv80000gn/T/-8749d9.@__swiftmacro_5Tanko11AppSettingsC10isDarkMode18ObservationTrackedfMp_.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "0"
-                  endingLineNumber = "0">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

@@ -53,6 +53,9 @@
 		84A18AE62F3BB071008AB07B /* AuthValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A18AE52F3BB06C008AB07B /* AuthValidator.swift */; };
 		84A18AEE2F3C957C008AB07B /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A18AED2F3C9576008AB07B /* ProfileView.swift */; };
 		84A18AF22F3CBD7C008AB07B /* LocalDatabaseCleaner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A18AF12F3CBD76008AB07B /* LocalDatabaseCleaner.swift */; };
+		84A18AF42F3CD198008AB07B /* EmojiPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A18AF32F3CD190008AB07B /* EmojiPickerView.swift */; };
+		84A18AF62F3CD1BE008AB07B /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A18AF52F3CD1BA008AB07B /* CollectionView.swift */; };
+		84A18AF82F3CD29B008AB07B /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A18AF72F3CD286008AB07B /* AppSettings.swift */; };
 		84B32A1F2F30E71B00F28131 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 84B32A1E2F30E71B00F28131 /* Localizable.xcstrings */; };
 		84EF4A2F2EFAE00400EE4B89 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 84EF4A2B2EFAE00400EE4B89 /* Assets.xcassets */; };
 		84EF4A302EFAE00400EE4B89 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EF4A2C2EFAE00400EE4B89 /* ContentView.swift */; };
@@ -133,6 +136,9 @@
 		84A18AE52F3BB06C008AB07B /* AuthValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthValidator.swift; sourceTree = "<group>"; };
 		84A18AED2F3C9576008AB07B /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		84A18AF12F3CBD76008AB07B /* LocalDatabaseCleaner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDatabaseCleaner.swift; sourceTree = "<group>"; };
+		84A18AF32F3CD190008AB07B /* EmojiPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiPickerView.swift; sourceTree = "<group>"; };
+		84A18AF52F3CD1BA008AB07B /* CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
+		84A18AF72F3CD286008AB07B /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		84B32A1E2F30E71B00F28131 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		84EF4A1D2EFAC07C00EE4B89 /* Tanko.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tanko.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84EF4A2B2EFAE00400EE4B89 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -210,6 +216,8 @@
 		849759B32F2164630049E62F /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				84A18AF52F3CD1BA008AB07B /* CollectionView.swift */,
+				84A18AF32F3CD190008AB07B /* EmojiPickerView.swift */,
 				84A18AED2F3C9576008AB07B /* ProfileView.swift */,
 				84A18A912F386023008AB07B /* AddMangaToCollection.swift */,
 				84A18A8B2F380912008AB07B /* AuthorMangaView.swift */,
@@ -299,6 +307,7 @@
 		84EF4A322EFAE01B00EE4B89 /* System */ = {
 			isa = PBXGroup;
 			children = (
+				84A18AF72F3CD286008AB07B /* AppSettings.swift */,
 				84EF4A2D2EFAE00400EE4B89 /* TankoApp.swift */,
 			);
 			path = System;
@@ -465,6 +474,7 @@
 				849759A82F203AAD0049E62F /* URLRequest+Auth.swift in Sources */,
 				849759AD2F214DD00049E62F /* Network.swift in Sources */,
 				849759FC2F2583650049E62F /* MangaCard.swift in Sources */,
+				84A18AF62F3CD1BE008AB07B /* CollectionView.swift in Sources */,
 				84EF9DEC2F1EF2C800EC2491 /* GenreDTO.swift in Sources */,
 				84EF9DE02F1EEACC00EC2491 /* MangaDTO.swift in Sources */,
 				849759A42F20092C0049E62F /* URL+Users.swift in Sources */,
@@ -481,6 +491,7 @@
 				84A18A962F3925F2008AB07B /* KeychainService.swift in Sources */,
 				84A18ADA2F3A381C008AB07B /* LocalMangaCollectionRepository.swift in Sources */,
 				84A18AE62F3BB071008AB07B /* AuthValidator.swift in Sources */,
+				84A18AF82F3CD29B008AB07B /* AppSettings.swift in Sources */,
 				849759C22F217D260049E62F /* ImageDownloader.swift in Sources */,
 				84A18A902F380B49008AB07B /* MangaGridCard.swift in Sources */,
 				84A18A982F39F087008AB07B /* RootView.swift in Sources */,
@@ -493,6 +504,7 @@
 				84A18AF22F3CBD7C008AB07B /* LocalDatabaseCleaner.swift in Sources */,
 				84EF9DE82F1EF25B00EC2491 /* UserMangaCollectionDTO.swift in Sources */,
 				849759A22F20056C0049E62F /* URL+Search.swift in Sources */,
+				84A18AF42F3CD198008AB07B /* EmojiPickerView.swift in Sources */,
 				84EF9E092F1FA30400EC2491 /* PreviewContainer.swift in Sources */,
 				849759F22F2545520049E62F /* CoverView.swift in Sources */,
 				84EF9DF62F1EF50100EC2491 /* Enums.swift in Sources */,

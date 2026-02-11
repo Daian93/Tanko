@@ -34,8 +34,10 @@ final class LocalMangaCollectionRepository: MangaCollectionRepository {
 
     func updateOrCreate(with remote: MangaSyncData) async throws {
         let id = remote.mangaID
-        let fetch = FetchDescriptor<UserManga>(predicate: #Predicate { $0.mangaID == id })
-        
+        let fetch = FetchDescriptor<UserManga>(
+            predicate: #Predicate { $0.mangaID == id }
+        )
+
         if let existing = try context.fetch(fetch).first {
             existing.volumesOwned = remote.volumesOwned
             existing.readingVolume = remote.readingVolume
@@ -63,6 +65,15 @@ final class LocalMangaCollectionRepository: MangaCollectionRepository {
     func remove(_ manga: UserManga) async throws {
         _ = manga.id
         context.delete(manga)
+        try context.save()
+    }
+
+    func clearAll() async throws {
+        let descriptor = FetchDescriptor<UserManga>()
+        let items = try context.fetch(descriptor)
+        for item in items {
+            context.delete(item)
+        }
         try context.save()
     }
 }
