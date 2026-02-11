@@ -13,8 +13,6 @@ import SwiftData
 
 struct MainTabView: View {
     @Environment(\.modelContext) private var modelContext
-    // Ya no necesitas declarar la VM aquí si no la usas en esta vista,
-    // pero si la necesitas, se queda así:
     @Environment(UserMangaCollectionViewModel.self) private var userCollectionVM
     
     var body: some View {
@@ -23,9 +21,14 @@ struct MainTabView: View {
                 if !isiPhone {
                     ContentViewiPad()
                 } else {
-                    ContentView() // ✅ Ahora esto ya funciona
+                    ContentView()
                 }
             }
+            
+            Tab("tab.collection", systemImage: "books.vertical.fill") {
+                CollectionView()
+            }
+
 
             Tab("tab.profile", systemImage: "person.fill") {
                 ProfileView()
@@ -40,4 +43,3 @@ struct MainTabView: View {
         .defaultAdaptableTabBarPlacement(.tabBar)
     }
 }
-
