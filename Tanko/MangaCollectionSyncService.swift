@@ -5,6 +5,9 @@
 //  Created by Diana Rammal Sansón on 10/2/26.
 //
 
+import Foundation
+import SwiftData
+
 @MainActor
 final class MangaCollectionSyncService {
 
@@ -20,8 +23,8 @@ final class MangaCollectionSyncService {
     }
 
     func sync() async throws {
-        let localItems = try await localRepo.getCollection()
-        let remoteItems = try await remoteRepo.getCollection()
+        let localItems = try await localRepo.getCollection() // [MangaSyncData]
+        let remoteItems = try await remoteRepo.getCollection() // [MangaSyncData]
 
         let localByID = Dictionary(uniqueKeysWithValues: localItems.map { ($0.mangaID, $0) })
         let remoteByID = Dictionary(uniqueKeysWithValues: remoteItems.map { ($0.mangaID, $0) })
@@ -31,25 +34,44 @@ final class MangaCollectionSyncService {
         for id in allIDs {
             switch (localByID[id], remoteByID[id]) {
 
-            // 🔄 Existe en ambos → resolver conflicto por timestamp
-            case let (localManga?, remoteManga?):
-                if localManga.updatedAt > remoteManga.updatedAt {
-                    try await remoteRepo.add(localManga)
-                } else if remoteManga.updatedAt > localManga.updatedAt {
-                    try await localRepo.add(remoteManga)
+            case let (local?, remote?):
+                if local.updatedAt > remote.updatedAt {
+                    try await remoteRepo.add(mangaData: local)
+                } else if remote.updatedAt > local.updatedAt {
+                    try await localRepo.updateOrCreate(with: remote)
                 }
 
-            // ⬆️ Solo local → subir a remoto
-            case let (localManga?, nil):
-                try await remoteRepo.add(localManga)
+            case let (local?, nil):
+                try await remoteRepo.add(mangaData: local)
 
-            // ⬇️ Solo remoto → guardar en local
-            case let (nil, remoteManga?):
-                try await localRepo.add(remoteManga)
+            case let (nil, remote?):
+                try await localRepo.updateOrCreate(with: remote)
 
             default:
                 break
             }
         }
     }
+
+    private func extractSyncData(from manga: UserManga) -> MangaSyncData {
+        return MangaSyncData(
+            mangaID: manga.mangaID,
+            title: manga.title,
+            coverURL: manga.coverURL,
+            volumesOwned: manga.volumesOwned,
+            readingVolume: manga.readingVolume,
+            completeCollection: manga.completeCollection,
+            updatedAt: manga.updatedAt
+        )
+    }
+}
+
+struct MangaSyncData {
+    let mangaID: Int
+    let title: String
+    let coverURL: URL?
+    let volumesOwned: [Int]
+    let readingVolume: Int?
+    let completeCollection: Bool
+    let updatedAt: Date
 }

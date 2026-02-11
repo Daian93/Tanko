@@ -13,50 +13,41 @@ import SwiftData
 final class UserMangaCollectionViewModel {
     private let modelContext: ModelContext
     private let repository: MangaCollectionRepository
-    private let localRepo: LocalMangaCollectionRepository
-    private let remoteRepo: RemoteMangaCollectionRepository?
-
+    
     var mangas: [UserManga] = []
     private let syncService: MangaCollectionSyncService
 
-        init(
-            context: ModelContext,
-            repository: MangaCollectionRepository,
-            localRepo: LocalMangaCollectionRepository,
-            remoteRepo: RemoteMangaCollectionRepository?,
-            syncService: MangaCollectionSyncService
-        ) {
-            self.modelContext = context
-            self.repository = repository
-            self.localRepo = localRepo
-            self.remoteRepo = remoteRepo
-            self.syncService = syncService
-        }
+    init(
+        context: ModelContext,
+        repository: MangaCollectionRepository,
+        syncService: MangaCollectionSyncService
+    ) {
+        self.modelContext = context
+        self.repository = repository
+        self.syncService = syncService
+    }
     
     func synchronize() async {
-            guard remoteRepo != nil else { return }
-            
-            do {
-                print("🔄 Iniciando sincronización...")
-                try await syncService.sync()
-                print("✅ Sincronización completada. Recargando datos...")
-                await loadCollection()
-            } catch {
-                print("❌ Error durante la sincronización: \(error)")
-            }
+        do {
+            print("🔄 Iniciando sincronización...")
+            try await syncService.sync()
+            print("✅ Sincronización completada. Recargando datos...")
+            await loadCollection()
+        } catch {
+            print("❌ Error durante la sincronización: \(error)")
         }
+    }
 
     func loadCollection() async {
         do {
-            let items = try await repository.getCollection()
-            self.mangas = items
+            _ = try await repository.getCollection()
             
-            let fetch = FetchDescriptor<UserManga>()
-            let local = try modelContext.fetch(fetch)
-            for m in local { modelContext.delete(m) }
-            for m in items { modelContext.insert(m) }
+            let descriptor = FetchDescriptor<UserManga>(
+                sortBy: [SortDescriptor(\UserManga.title)]
+            )
             
-            try modelContext.save()
+            self.mangas = try modelContext.fetch(descriptor)
+            
         } catch {
             print("❌ Error cargando colección:", error)
         }
@@ -75,18 +66,30 @@ final class UserMangaCollectionViewModel {
         
         modelContext.insert(newUserManga)
         self.mangas.append(newUserManga)
-        
         try? modelContext.save()
-        try? await repository.add(newUserManga)
+        
+        let syncData = MangaSyncData(
+            mangaID: newUserManga.mangaID,
+            title: newUserManga.title,
+            coverURL: newUserManga.coverURL,
+            volumesOwned: newUserManga.volumesOwned,
+            readingVolume: newUserManga.readingVolume,
+            completeCollection: newUserManga.completeCollection,
+            updatedAt: newUserManga.updatedAt
+        )
+        
+        try? await repository.add(mangaData: syncData)
     }
 
     func remove(_ manga: UserManga) async {
         let idToRemove = manga.mangaID
+        
+        try? await repository.remove(manga)
+        
         modelContext.delete(manga)
         self.mangas.removeAll { $0.mangaID == idToRemove }
         
         try? modelContext.save()
-        try? await repository.remove(manga)
     }
 
     func isInCollection(mangaID: Int) -> Bool {
@@ -96,6 +99,16 @@ final class UserMangaCollectionViewModel {
     func removeFromCollection(mangaID: Int) async {
         if let manga = mangas.first(where: { $0.mangaID == mangaID }) {
             await remove(manga)
+        }
+    }
+    
+    func updateRemote(_ userManga: UserManga) async {
+        let syncData = userManga.asSyncData
+        do {
+            try await repository.add(mangaData: syncData)
+            print("✅ Sincronizado con el servidor")
+        } catch {
+            print("❌ Error al sincronizar: \(error)")
         }
     }
 }

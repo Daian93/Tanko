@@ -10,25 +10,25 @@ import SwiftUI
 
 struct ProfileView: View {
     @Query(sort: \UserManga.title) private var userMangas: [UserManga]
-
+    @Environment(UserMangaCollectionViewModel.self) private var collectionVM
     @Environment(SessionManager.self) private var session
     @Environment(\.modelContext) private var context
     @Namespace private var namespace
+
+    @State private var showOnboarding = false
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
                     headerView
-
                     statsGrid
 
                     VStack(alignment: .leading, spacing: 20) {
                         LibraryListSection(
                             title: "Leyendo actualmente",
                             mangas: userMangas.filter {
-                                $0.readingVolume != nil
-                                    && !$0.completeCollection
+                                $0.readingVolume != nil && !$0.completeCollection
                             },
                             namespace: namespace
                         )
@@ -42,35 +42,68 @@ struct ProfileView: View {
                         LibraryListSection(
                             title: "Lista de deseos / Por empezar",
                             mangas: userMangas.filter {
-                                $0.readingVolume == nil
-                                    && !$0.completeCollection
+                                $0.readingVolume == nil && !$0.completeCollection
                             },
                             namespace: namespace
                         )
                     }
-                    
-                    // Botón de logout al final de la lista
-                    logoutButton
-                        .padding(.vertical, 30)
+
+                    if session.isAuthenticated {
+                        logoutButton
+                            .padding(.vertical, 30)
+                    }
                 }
             }
             .navigationTitle("Mi Biblioteca")
             .backgroundStyle(AppColors.primary)
+            .refreshable {
+                if session.isAuthenticated {
+                    await collectionVM.synchronize()
+                } else {
+                    await collectionVM.loadCollection()
+                }
+            }
             .toolbar {
-                // Icono de logout en la barra superior
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(role: .destructive) {
-                        withAnimation {
-                            session.logout()
+
+                if session.isGuest {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            withAnimation {
+                                session.exitGuest()
+                                showOnboarding = true
+                            }
+                        } label: {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                                .foregroundStyle(AppColors.primary)
                         }
-                    } label: {
-                        Image(systemName: "rectangle.portrait.and.arrow.right")
-                            .foregroundStyle(.red)
+                    }
+                }
+
+                if session.isAuthenticated {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(role: .destructive) {
+                            withAnimation {
+                                session.logout()
+                            }
+                        } label: {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                                .foregroundStyle(AppColors.primary)
+                        }
                     }
                 }
             }
         }
+        .fullScreenCover(isPresented: $showOnboarding) {
+            OnboardingView()
+        }
+        .onChange(of: session.isAuthenticated) { _, isAuth in
+            if isAuth {
+                showOnboarding = false
+            }
+        }
     }
+
+    // MARK: - Header
 
     private var headerView: some View {
         HStack(spacing: 16) {
@@ -78,14 +111,19 @@ struct ProfileView: View {
                 .fill(Color.red.opacity(0.1))
                 .frame(width: 70, height: 70)
                 .overlay(
-                    Text(session.user?.email.prefix(2).uppercased() ?? "DR")
-                        .font(.headline)
-                        .foregroundStyle(.red)
+                    Text(
+                        session.isGuest
+                        ? "👤"
+                        : session.user?.email.prefix(2).uppercased() ?? "TU"
+                    )
+                    .font(.headline)
+                    .foregroundStyle(.red)
                 )
 
             VStack(alignment: .leading) {
                 Text(session.isGuest ? "Modo Invitado" : "Mi Perfil")
                     .font(.title3.bold())
+
                 Text("\(userMangas.count) mangas en total")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -95,10 +133,13 @@ struct ProfileView: View {
         .padding(.horizontal)
     }
 
+    // MARK: - Stats
+
     private var statsGrid: some View {
         let readingCount = userMangas.filter {
             $0.readingVolume != nil && !$0.completeCollection
         }.count
+
         let completeCount = userMangas.filter { $0.completeCollection }.count
 
         let totalVolumesOwned = userMangas.reduce(0) {
@@ -108,17 +149,9 @@ struct ProfileView: View {
         return HStack {
             StatItem(label: "Leyendo", value: "\(readingCount)", icon: "book")
             Divider().frame(height: 40)
-            StatItem(
-                label: "Tomos",
-                value: "\(totalVolumesOwned)",
-                icon: "books.vertical"
-            )
+            StatItem(label: "Tomos", value: "\(totalVolumesOwned)", icon: "books.vertical")
             Divider().frame(height: 40)
-            StatItem(
-                label: "Completos",
-                value: "\(completeCount)",
-                icon: "checkmark.seal"
-            )
+            StatItem(label: "Completos", value: "\(completeCount)", icon: "checkmark.seal")
         }
         .padding()
         .background(Color(.systemBackground))
@@ -126,16 +159,18 @@ struct ProfileView: View {
         .shadow(color: .black.opacity(0.05), radius: 10)
         .padding(.horizontal)
     }
-    
+
+    // MARK: - Logout
+
     private var logoutButton: some View {
         Button {
             withAnimation {
-                handleLogout()
+                session.logout()
             }
         } label: {
             HStack {
                 Image(systemName: "power")
-                Text("Cerrar Sesión")
+                Text("Cerrar sesión")
             }
             .font(.subheadline.bold())
             .foregroundStyle(.red)
@@ -146,20 +181,9 @@ struct ProfileView: View {
             .padding(.horizontal)
         }
     }
-    
-    private func handleLogout() {
-        withAnimation {
-            if session.isAuthenticated {
-                // Si es usuario real, borramos base de datos
-                let localRepo = LocalMangaCollectionRepository(context: context)
-                session.logout(clearData: true, localRepo: localRepo)
-            } else {
-                // Si es invitado, solo salimos al onboarding (conservando local)
-                session.logout(clearData: false)
-            }
-        }
-    }
 }
+
+
 
 // MARK: - Subvistas auxiliares
 
@@ -186,9 +210,32 @@ struct LibraryListSection: View {
     }
 }
 
+struct StatItem: View {
+    let label: String
+    let value: String
+    let icon: String
+
+    var body: some View {
+        VStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.caption)
+                .foregroundStyle(.red)
+            Text(value)
+                .font(.headline)
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
 struct MangaProgressRow: View {
     @Bindable var userManga: UserManga
     let namespace: Namespace.ID
+    
+    @Environment(UserMangaCollectionViewModel.self) private var collectionVM
     @State private var showVolumeManagement = false
 
     var isFinished: Bool {
@@ -272,11 +319,17 @@ struct MangaProgressRow: View {
         if newValue < 0 { return }
         if let total = userManga.totalVolumes, newValue > total { return }
 
+        // 1. Actualización local (SwiftData)
         withAnimation(.easeInOut) {
             userManga.readingVolume = newValue
             if let total = userManga.totalVolumes {
                 userManga.completeCollection = (newValue == total)
             }
+            userManga.updatedAt = .now
+        }
+
+        Task {
+            await collectionVM.updateRemote(userManga)
         }
     }
 
@@ -295,28 +348,8 @@ struct MangaProgressRow: View {
     }
 }
 
-struct StatItem: View {
-    let label: String
-    let value: String
-    let icon: String
-
-    var body: some View {
-        VStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.caption)
-                .foregroundStyle(.red)
-            Text(value)
-                .font(.headline)
-            Text(label)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
 struct VolumesManagementView: View {
+    @Environment(UserMangaCollectionViewModel.self) private var collectionVM
     @Bindable var userManga: UserManga
     @Environment(\.dismiss) var dismiss
 
@@ -344,6 +377,11 @@ struct VolumesManagementView: View {
                                     userManga.volumesOwned.removeAll { $0 == number }
                                 } else {
                                     userManga.volumesOwned.append(number)
+                                }
+                                userManga.updatedAt = .now
+                                
+                                Task {
+                                    await collectionVM.updateRemote(userManga)
                                 }
                             } label: {
                                 Text("\(number)")

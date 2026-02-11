@@ -30,7 +30,6 @@ final class SessionManager {
         Task { await loadCurrentUser() }
     }
 
-    // Cambia tu función login por esta:
     func login(email: String, password: String, onCompletion: (() async -> Void)? = nil) async throws {
         let jwt = try await network.login(email: email, password: password)
 
@@ -38,12 +37,9 @@ final class SessionManager {
         self.isGuest = false
         KeychainService.save(jwt, key: SessionKeys.jwtToken)
 
-        // Cargamos el usuario para tener su ID disponible
         await loadCurrentUser()
-        
-        await onCompletion?()
     }
-
+    
     func loadCurrentUser() async {
         guard let token else { return }
 
@@ -68,28 +64,27 @@ final class SessionManager {
         isGuest = true
     }
 
-    func logout(clearData: Bool = false, localRepo: LocalMangaCollectionRepository? = nil) {
-            if clearData, let repo = localRepo {
-                Task {
-                    try? await repo.clearAll()
-                    print("🗑️ Base de datos local borrada tras logout de usuario")
-                }
-            }
-            
-            token = nil
-            user = nil
-            isGuest = false
-            KeychainService.delete(key: SessionKeys.jwtToken)
+    func logout() {
+        token = nil
+        user = nil
+        isGuest = false
+        KeychainService.delete(key: SessionKeys.jwtToken)
 
-            NotificationCenter.default.post(
-                name: .didLogout,
-                object: nil
-            )
-        }
+        NotificationCenter.default.post(
+            name: .didLogout,
+            object: nil
+        )
+    }
+    
+    func exitGuest() {
+        token = nil
+        user = nil
+        isGuest = false
+    }
+
 }
-
-import Foundation
 
 extension Notification.Name {
     static let didLogout = Notification.Name("didLogout")
+    static let didLogin  = Notification.Name("didLogin")
 }

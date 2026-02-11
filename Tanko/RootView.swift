@@ -36,15 +36,19 @@ struct RootView: View {
             }
         }
         .onAppear { buildViewModel() }
+    
         .onChange(of: session.isAuthenticated) { old, newValue in
-            if !newValue && !session.isGuest {
-                userCollectionVM = nil
-            }
             buildViewModel()
             if newValue {
                 Task {
                     await userCollectionVM?.synchronize()
                 }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .didLogout)) { _ in
+            Task {
+                await LocalDatabaseCleaner.clear(context: context)
+                buildViewModel() // Reinicia con repos locales
             }
         }
     }
@@ -66,8 +70,6 @@ struct RootView: View {
         userCollectionVM = UserMangaCollectionViewModel(
             context: context,
             repository: repo,
-            localRepo: local,
-            remoteRepo: remote,
             syncService: syncService
         )
     }

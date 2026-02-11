@@ -43,3 +43,17 @@ final class UserManga {
         self.updatedAt = updatedAt
     }
 }
+
+extension UserManga {
+    var asSyncData: MangaSyncData {
+        MangaSyncData(
+            mangaID: self.mangaID,
+            title: self.title,
+            coverURL: self.coverURL,
+            volumesOwned: self.volumesOwned,
+            readingVolume: self.readingVolume,
+            completeCollection: self.completeCollection,
+            updatedAt: self.updatedAt
+        )
+    }
+}

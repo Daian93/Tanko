@@ -13,10 +13,10 @@ struct LoginView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
 
-    @Bindable private var vm: LoginViewModel
+    @State private var vm: LoginViewModel
 
     init(session: SessionManager, context: ModelContext) {
-        self.vm = LoginViewModel(session: session, context: context)
+        _vm = State(wrappedValue: LoginViewModel(session: session, context: context))
     }
 
     var body: some View {
@@ -26,10 +26,12 @@ struct LoginView: View {
                     TextField("email@ejemplo.com", text: $vm.email)
                         .keyboardType(.emailAddress)
                         .textInputAutocapitalization(.never)
+                        .textContentType(.username)
                 }
 
                 Section("Contraseña") {
                     SecureField("Mínimo 8 caracteres", text: $vm.password)
+                        .textContentType(.password)
                 }
 
                 if let error = vm.error {
