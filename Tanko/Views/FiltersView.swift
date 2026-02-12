@@ -139,3 +139,12 @@ struct MultiSelectionRow: View {
         }
     }
 }
+
+#Preview {
+    let mockFiltersVM = FiltersViewModel()
+    
+    FiltersView(filtersViewModel: mockFiltersVM) { dto in
+        print("Filtros aplicados: \(dto)")
+    }
+    .withPreviewEnvironment() 
+}

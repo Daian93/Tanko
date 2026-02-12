@@ -17,12 +17,19 @@ private let pillColumns: [GridItem] = [
 
 struct MangaDetailView: View {
     let manga: Manga
+    @Environment(UserMangaCollectionViewModel.self) private var collectionVM
+
     @State private var mainImage: UIImage? = nil
     @State private var backgroundImage: UIImage? = nil
     @State private var isMainLoading = false
     @State private var isBackgroundLoading = false
     @State private var isSynopsisExpanded = false
     @State private var isBackgroundExpanded = false
+    @State private var showAddSheet = false
+
+    private var isInCollection: Bool {
+        collectionVM.isInCollection(mangaID: manga.id)
+    }
 
     let namespace: Namespace.ID
 
@@ -42,7 +49,9 @@ struct MangaDetailView: View {
                     } placeholder: {
                         ZStack {
                             LinearGradient(
-                                colors: [.gray.opacity(0.2), .gray.opacity(0.4)],
+                                colors: [
+                                    .gray.opacity(0.2), .gray.opacity(0.4),
+                                ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
@@ -53,7 +62,6 @@ struct MangaDetailView: View {
                         .frame(height: bannerHeight)
                         .clipped()
                     }
-
 
                     HStack(alignment: .bottom, spacing: 16) {
                         CoverView(
@@ -112,7 +120,7 @@ struct MangaDetailView: View {
                             )
                     }
                     .frame(maxWidth: .infinity)
-                    
+
                     Divider().frame(height: 45)
 
                     // 📌 Estado
@@ -131,7 +139,7 @@ struct MangaDetailView: View {
                             )
                     }
                     .frame(maxWidth: .infinity)
-                    
+
                     Divider().frame(height: 45)
 
                     VStack(spacing: 4) {
@@ -146,7 +154,7 @@ struct MangaDetailView: View {
                             )
                     }
                     .frame(maxWidth: .infinity)
-                    
+
                     Divider().frame(height: 45)
 
                     VStack(spacing: 4) {
@@ -184,14 +192,19 @@ struct MangaDetailView: View {
                                         Text(author.fullName)
                                             .font(.subheadline)
                                             .fontWeight(.medium)
-                                            .foregroundStyle(AppColors.textSecondary)
-                                        
-                            
+                                            .foregroundStyle(
+                                                AppColors.textSecondary
+                                            )
+
                                         Image(systemName: author.role.icon)
-                                            .font(.system(size: 8, weight: .bold))
+                                            .font(
+                                                .system(size: 8, weight: .bold)
+                                            )
                                             .foregroundStyle(.white)
                                             .frame(width: 18, height: 18)
-                                            .background(AppColors.primary.gradient)
+                                            .background(
+                                                AppColors.primary.gradient
+                                            )
                                             .clipShape(Circle())
                                     }
                                     .padding(.leading, 4)
@@ -200,7 +213,7 @@ struct MangaDetailView: View {
                                     .background(AppColors.primary.opacity(0.1))
                                     .clipShape(Capsule())
                                 }
-                                
+
                             }
                         }
                     }
@@ -211,7 +224,6 @@ struct MangaDetailView: View {
 
                     sectionDivider
 
-                    
                     if !manga.genreNames.isEmpty {
                         VStack(alignment: .leading, spacing: 8) {
                             Text(genreSectionTitle)
@@ -331,7 +343,9 @@ struct MangaDetailView: View {
                             )
                     }
                     .overlay(alignment: .bottom) {
-                        if !isSynopsisExpanded && (manga.background?.count ?? 0) > 200 {
+                        if !isSynopsisExpanded
+                            && (manga.background?.count ?? 0) > 200
+                        {
                             LinearGradient(
                                 colors: [
                                     .clear,
@@ -357,14 +371,15 @@ struct MangaDetailView: View {
                             HStack(spacing: 4) {
                                 Text(
                                     isSynopsisExpanded
-                                    ? "section.showLess" : "section.showMore"
+                                        ? "section.showLess"
+                                        : "section.showMore"
                                 )
                                 .font(.caption)
                                 .fontWeight(.semibold)
-                                
+
                                 Image(
                                     systemName: isSynopsisExpanded
-                                    ? "chevron.up" : "chevron.down"
+                                        ? "chevron.up" : "chevron.down"
                                 )
                                 .font(.caption2)
                             }
@@ -374,7 +389,7 @@ struct MangaDetailView: View {
                 }
                 .padding(.horizontal)
             }
-            
+
             Spacer(minLength: 20)
 
             // Background
@@ -395,7 +410,9 @@ struct MangaDetailView: View {
                         )
                 }
                 .overlay(alignment: .bottom) {
-                    if !isBackgroundExpanded && (manga.background?.count ?? 0) > 200{
+                    if !isBackgroundExpanded
+                        && (manga.background?.count ?? 0) > 200
+                    {
                         LinearGradient(
                             colors: [
                                 .clear,
@@ -421,14 +438,14 @@ struct MangaDetailView: View {
                         HStack(spacing: 4) {
                             Text(
                                 isBackgroundExpanded
-                                ? "section.showLess" : "section.showMore"
+                                    ? "section.showLess" : "section.showMore"
                             )
                             .font(.caption)
                             .fontWeight(.semibold)
-                            
+
                             Image(
                                 systemName: isBackgroundExpanded
-                                ? "chevron.up" : "chevron.down"
+                                    ? "chevron.up" : "chevron.down"
                             )
                             .font(.caption2)
                         }
@@ -453,12 +470,48 @@ struct MangaDetailView: View {
                 }
                 .padding(.horizontal)
             }
-            
+
             Spacer(minLength: 20)
         }
         .navigationTitle(manga.title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    toggleBookmark()
+                } label: {
+                    Image(
+                        systemName: isInCollection
+                            ? "bookmark.fill" : "bookmark"
+                    )
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(
+                        isInCollection ? AppColors.primary : .primary
+                    )
+                }
+                .animation(.easeInOut(duration: 0.2), value: isInCollection)
+            }
+        }
+        .sheet(isPresented: $showAddSheet) {
+            AddMangaToCollectionView(manga: manga)
+                .environment(collectionVM)
+        }
     }
+
+    private func toggleBookmark() {
+        if isInCollection {
+            if let existing = collectionVM.mangas.first(where: {
+                $0.mangaID == manga.id
+            }) {
+                Task {
+                    await collectionVM.remove(existing)
+                }
+            }
+        } else {
+            showAddSheet = true
+        }
+    }
+
 }
 
 extension MangaDetailView {
@@ -585,4 +638,7 @@ struct FlowLayout: Layout {
 #Preview {
     @Previewable @Namespace var namespace
     MangaDetailView(manga: .test, namespace: namespace)
+        .withPreviewEnvironment()
 }
+
+

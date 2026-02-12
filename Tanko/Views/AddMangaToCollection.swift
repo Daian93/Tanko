@@ -107,3 +107,8 @@ struct AddMangaToCollectionView: View {
         }
     }
 }
+
+#Preview {
+    AddMangaToCollectionView(manga: .test)
+        .withPreviewEnvironment()
+}

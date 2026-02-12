@@ -147,3 +147,8 @@ struct ProfileView: View {
         }
     }
 }
+
+#Preview {
+    ProfileView()
+        .withPreviewEnvironment()
+}

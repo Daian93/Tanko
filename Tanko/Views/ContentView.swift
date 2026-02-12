@@ -177,4 +177,9 @@ struct MangaCollectionRow: View {
     }
 }
 
+#Preview {
+    ContentView()
+        .withPreviewEnvironment()
+}
+
 
