@@ -12,7 +12,7 @@ struct MangaGridCard: View {
     let manga: Manga
     let namespace: Namespace.ID
 
-    private let cardSize: CGFloat = 160 // tamaño cuadrado
+    private let cardSize: CGFloat = 170
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -47,7 +47,7 @@ struct MangaGridCard: View {
                 Text(manga.title)
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                    .lineLimit(2)
+                    .lineLimit(1)
                     .foregroundStyle(AppColors.textPrimary)
 
                 HStack(spacing: 4) {
