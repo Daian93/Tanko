@@ -5,15 +5,30 @@
 //  Created by Diana Rammal Sansón on 21/1/26.
 //
 
+import SwiftData
 import SwiftUI
 
 struct SearchView: View {
     @State private var searchText = ""
     @State private var viewModel = SearchViewModel()
+    @Environment(UserMangaCollectionViewModel.self) private var collectionVM
     @State private var filtersViewModel = FiltersViewModel()
     @State private var showFilters = false
     @State private var searchTask: Task<Void, Never>?
     @Namespace private var namespace
+
+    @State private var mangaToDelete: Manga?
+    @State private var showDeleteAlert = false
+    @State private var mangaToAdd: Manga?
+
+    private func confirmDelete(manga: Manga) {
+        mangaToDelete = manga
+        showDeleteAlert = true
+    }
+
+    private func addToCollection(manga: Manga) {
+        mangaToAdd = manga
+    }
 
     var body: some View {
         NavigationStack {
@@ -85,12 +100,7 @@ struct SearchView: View {
             try? await Task.sleep(nanoseconds: 500_000_000)
             guard !Task.isCancelled else { return }
 
-            let dto = CustomSearchDTO(
-                title: query,
-                contains: true
-            )
-
-            await viewModel.search(using: dto)
+            await viewModel.search(mode: .simple(title: query))
         }
     }
 
@@ -99,7 +109,7 @@ struct SearchView: View {
         searchTask?.cancel()
 
         Task {
-            await viewModel.search(using: dto)
+            await viewModel.search(mode: .advanced(dto: dto))
         }
     }
 
@@ -153,11 +163,15 @@ struct SearchView: View {
 
             Button("Reintentar") {
                 Task {
-                    let dto = CustomSearchDTO(
-                        title: searchText.isEmpty ? nil : searchText,
-                        contains: true
-                    )
-                    await viewModel.search(using: dto)
+                    let mode: SearchMode
+                    if filtersViewModel.hasActiveFilters {
+                        let dto = filtersViewModel.createSearchDTO()
+                        mode = .advanced(dto: dto)
+                    } else {
+                        mode = .simple(title: searchText)
+                    }
+
+                    await viewModel.search(mode: mode)
                 }
             }
             .buttonStyle(.borderedProminent)
@@ -169,30 +183,88 @@ struct SearchView: View {
     private var searchResultsList: some View {
         List {
             ForEach(viewModel.results) { manga in
-                NavigationLink {
-                    MangaDetailView(manga: manga, namespace: namespace)
-                } label: {
-                    MangaRow(manga: manga, namespace: namespace)
-                        .task {
-                            await viewModel.loadNextPageIfNeeded(
-                                currentItem: manga
-                            )
+                ZStack {
+                    MangaRow(
+                        manga: manga,
+                        namespace: namespace,
+                        isInCollection: collectionVM.isInCollection(
+                            mangaID: manga.id
+                        ),
+                        showBackground: false
+                    )
+
+                    NavigationLink(
+                        destination: MangaDetailView(
+                            manga: manga,
+                            namespace: namespace
+                        )
+                    ) {
+                        EmptyView()
+                    }
+                    .opacity(0)
+                }
+                .listRowSeparatorTint(AppColors.surface)
+                    .listRowInsets(EdgeInsets(top: 1, leading: 6, bottom: 1, trailing: 12))
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    if collectionVM.isInCollection(mangaID: manga.id) {
+                        Button(role: .destructive) {
+                            mangaToDelete = manga
+                            showDeleteAlert = true
+                        } label: {
+                            Label("Eliminar", systemImage: "trash")
                         }
+                    } else {
+                        Button {
+                            mangaToAdd = manga
+                        } label: {
+                            Label("Añadir", systemImage: "plus")
+                        }
+                        .tint(.green)
+                    }
+                }
+                .onAppear {
+                    Task {
+                        await viewModel.loadNextPageIfNeeded(currentItem: manga)
+                    }
                 }
             }
 
             if viewModel.canLoadMore {
-                HStack {
-                    Spacer()
-                    ProgressView()
-                    Spacer()
-                }
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+                    .listRowSeparator(.hidden)
             }
         }
         .listStyle(.plain)
+        .sheet(item: $mangaToAdd) { manga in
+            AddMangaToCollectionView(manga: manga)
+                .interactiveDismissDisabled()
+        }
+        .alert("Eliminar manga", isPresented: $showDeleteAlert) {
+            Button("Cancelar", role: .cancel) {
+                mangaToDelete = nil
+            }
+            Button("Eliminar", role: .destructive) {
+                if let manga = mangaToDelete,
+                    let userManga = collectionVM.mangas.first(where: {
+                        $0.mangaID == manga.id
+                    })
+                {
+                    Task {
+                        await collectionVM.remove(userManga)
+                        mangaToDelete = nil
+                    }
+                }
+            }
+        } message: {
+            Text(
+                "¿Seguro que quieres eliminar '\(mangaToDelete?.title ?? "este manga")' de tu colección?"
+            )
+        }
     }
 }
 
 #Preview {
     SearchView()
+        .withPreviewEnvironment()
 }

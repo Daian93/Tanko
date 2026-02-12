@@ -11,24 +11,38 @@ struct MangaRow: View {
     let manga: Manga
     let namespace: Namespace.ID
 
+    var isInCollection: Bool = false
+    var onBookmarkTap: (() -> Void)? = nil
+
+    var showBackground: Bool = true
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            CoverView(cover: manga.mainPicture,namespace: namespace)
+            CoverView(cover: manga.mainPicture, namespace: namespace)
                 .frame(width: 70, height: 100)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
                 .shadow(radius: 2)
 
             VStack(alignment: .leading, spacing: 6) {
-                Text(manga.title)
-                    .font(.headline)
-                    .foregroundStyle(AppColors.textPrimary)
-                    .lineLimit(2)
-
+                HStack() {
+                    Text(manga.title)
+                        .font(.headline)
+                        .foregroundStyle(AppColors.textPrimary)
+                        .lineLimit(2)
+                    
+                    Spacer()
+                    
+                    if isInCollection {
+                        Image(systemName: "bookmark.fill")
+                            .foregroundStyle(AppColors.primary)
+                            .padding(.trailing, 2)
+                    }
+                }
                 Text(manga.authorNames)
                     .font(.subheadline)
                     .foregroundStyle(AppColors.textSecondary)
                     .lineLimit(1)
-                
+
                 Spacer(minLength: 20)
 
                 HStack {
@@ -55,7 +69,10 @@ struct MangaRow: View {
             }
         }
         .padding()
-        .background(AppColors.surface, in: .rect(cornerRadius: 16))
+        .background(
+            showBackground ? AppColors.surface : Color.clear,
+            in: .rect(cornerRadius: 16)
+        )
     }
 }
 
