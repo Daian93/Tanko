@@ -17,7 +17,6 @@ struct AuthorMangaView: View {
         _viewModel = State(initialValue: AuthorViewModel(author: author))
     }
 
-    // Un grid un poco más apretado suele verse más profesional en móviles
     private let columns = [
         GridItem(.flexible(), spacing: 20),
         GridItem(.flexible(), spacing: 20)
@@ -25,8 +24,7 @@ struct AuthorMangaView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) { // Más aire entre secciones
-                
+            VStack(alignment: .leading, spacing: 24) {
                 header
                     .padding(.top, 20)
 
