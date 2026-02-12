@@ -8,6 +8,11 @@
 import Foundation
 import Observation
 
+enum SearchMode {
+    case simple(title: String)
+    case advanced(dto: CustomSearchDTO)
+}
+
 enum SearchViewState: Equatable {
     case idle
     case loading
@@ -39,23 +44,20 @@ final class SearchViewModel {
     private let perPage = NetworkConstants.defaultPerPage
     private var hasMorePages = true
 
-    private var lastSearchDTO: CustomSearchDTO?
+    private var lastSearchMode: SearchMode?
+    private var isLoadingNextPage = false
 
     init(repository: NetworkRepository = Network()) {
         self.repository = repository
     }
 
-    func search(using dto: CustomSearchDTO) async {
+    func search(mode: SearchMode) async {
         reset()
         state = .loading
-        lastSearchDTO = dto
+        lastSearchMode = mode
 
         do {
-            let page = try await repository.advancedSearch(
-                dto,
-                page: currentPage,
-                per: perPage
-            )
+            let page = try await fetchPage(for: mode, page: currentPage)
 
             results = page.items
             hasMorePages = page.metadata.hasNextPage
@@ -70,37 +72,49 @@ final class SearchViewModel {
         guard
             state == .loaded,
             hasMorePages,
+            !isLoadingNextPage,
             results.last?.id == manga.id,
-            let dto = lastSearchDTO
+            let mode = lastSearchMode
         else { return }
 
-        await loadNextPage(using: dto)
+        isLoadingNextPage = true
+        await loadNextPage(using: mode)
+        isLoadingNextPage = false
     }
 
-    private func loadNextPage(using dto: CustomSearchDTO) async {
+    private func loadNextPage(using mode: SearchMode) async {
         currentPage += 1
 
         do {
-            let page = try await repository.advancedSearch(
-                dto,
-                page: currentPage,
-                per: perPage
-            )
-
+            let page = try await fetchPage(for: mode, page: currentPage)
             results.append(contentsOf: page.items)
             hasMorePages = page.metadata.hasNextPage
-
         } catch {
             currentPage -= 1
             state = .error(error.localizedDescription)
         }
     }
+    
+    private func fetchPage(for mode: SearchMode, page: Int) async throws -> Page<Manga> {
+        switch mode {
+        case .simple(let title):
+            if title.count < 3 {
+                let items = try await repository.searchMangasBeginsWith(title)
+                return Page(metadata: PageMetadata(total: items.count, page: 1, per: items.count), items: items)
+            } else {
+                return try await repository.searchMangasContains(title, page: page, per: perPage)
+            }
+        case .advanced(let dto):
+            return try await repository.advancedSearch(dto, page: page, per: perPage)
+        }
+    }
+
 
     func reset() {
         results.removeAll()
         currentPage = NetworkConstants.defaultPage
         hasMorePages = true
-        lastSearchDTO = nil
+        lastSearchMode = nil
         state = .idle
     }
 
@@ -108,3 +122,4 @@ final class SearchViewModel {
         state == .loaded && hasMorePages
     }
 }
+

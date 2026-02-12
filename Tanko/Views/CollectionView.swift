@@ -146,7 +146,9 @@ struct CollectionView: View {
         let namespace: Namespace.ID
         
         @Environment(UserMangaCollectionViewModel.self) private var collectionVM
+        @Environment(\.modelContext) private var context
         @State private var showVolumeManagement = false
+        @State private var showDeleteAlert = false
         
         private var totalVolumes: Int {
             userManga.totalVolumes ??
@@ -235,6 +237,15 @@ struct CollectionView: View {
                     }
                     
                     Spacer()
+                    
+                    Button {
+                                        showDeleteAlert = true
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundStyle(AppColors.primary)
+                                            .font(.title2)
+                                    }
+                                    .buttonStyle(.plain)
                 }
                 
                 // MARK: Bottom Controls
@@ -306,6 +317,16 @@ struct CollectionView: View {
                 VolumesManagementView(userManga: userManga)
                     .presentationDetents([.medium])
             }
+            .alert("Eliminar manga", isPresented: $showDeleteAlert, actions: {
+                  Button("Eliminar", role: .destructive) {
+                      Task {
+                          await collectionVM.remove(userManga)
+                      }
+                  }
+                  Button("Cancelar", role: .cancel) {}
+              }, message: {
+                  Text("¿Estás seguro que quieres eliminar este manga de tu colección?")
+              })
         }
         
         // MARK: Logic
@@ -313,8 +334,7 @@ struct CollectionView: View {
         private func updateReading(by value: Int) {
             let newValue = reading + value
             
-            if newValue < 0 { return }
-            if newValue > totalVolumes { return }
+            guard newValue >= 0 && newValue <= totalVolumes else { return }
             
             withAnimation(.easeInOut) {
                 userManga.readingVolume = newValue
@@ -482,4 +502,9 @@ struct EmptyStateView: View {
                 .padding(.horizontal, 40)
         }
     }
+}
+
+#Preview {
+    CollectionView()
+        .withPreviewEnvironment()
 }

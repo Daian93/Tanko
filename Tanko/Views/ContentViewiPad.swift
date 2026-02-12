@@ -90,6 +90,9 @@ struct ContentViewiPad: View {
                     .navigationDestination(for: Manga.self) { manga in
                         MangaDetailView(manga: manga, namespace: namespace)
                     }
+                    .navigationDestination(for: Author.self) { author in
+                        AuthorMangaViewiPad(author: author)
+                    }
                     .refreshable {
                         await viewModel.refresh()
                         await bestMangaViewModel.refresh()
@@ -143,3 +146,9 @@ struct ContentViewiPad: View {
         .contentMargins(.horizontal, 60, for: .scrollContent)
     }
 }
+
+#Preview {
+    ContentViewiPad()
+        .withPreviewEnvironment()
+}
+

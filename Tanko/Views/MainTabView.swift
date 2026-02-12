@@ -42,3 +42,9 @@ struct MainTabView: View {
         .defaultAdaptableTabBarPlacement(.tabBar)
     }
 }
+
+#Preview {
+    MainTabView()
+        .withPreviewEnvironment()
+}
+

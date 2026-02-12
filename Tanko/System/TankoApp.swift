@@ -11,8 +11,8 @@ import SwiftUI
 @main
 struct TankoApp: App {
     @State private var session = SessionManager()
-    @State private var mangasVM = MangaViewModel()
     @State private var settings = AppSettings()
+    @State private var mangasVM = MangaViewModel()
 
     var body: some Scene {
         WindowGroup {
@@ -25,5 +25,3 @@ struct TankoApp: App {
         .modelContainer(for: [UserManga.self])
     }
 }
-
-

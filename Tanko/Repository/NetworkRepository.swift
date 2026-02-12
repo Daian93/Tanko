@@ -36,10 +36,9 @@ protocol NetworkRepository: Sendable, NetworkInteractor {
     func getAuthorsByIds(ids: [String]) async throws(NetworkError) -> [Author]
     
     // MARK: - Search
-    func advancedSearch(_ search: CustomSearchDTO, page: Int, per: Int)
-    async throws(NetworkError) -> Page<Manga>
+    func advancedSearch(_ search: CustomSearchDTO, page: Int, per: Int) async throws(NetworkError) -> Page<Manga>
     func searchMangasBeginsWith(_ search: String) async throws(NetworkError) -> [Manga]
-    func searchMangasContains(_ search: String) async throws(NetworkError) -> [Manga]
+    func searchMangasContains(_ search: String, page: Int, per: Int) async throws(NetworkError) -> Page<Manga>
     
     // MARK: - Collection
     func getUserCollection(token: String) async throws -> [UserMangaCollectionDTO]

@@ -8,8 +8,18 @@
 import Foundation
 
 extension URL {
-    static func mangasContains(_ search: String) -> URL {
-        api.appending(path: "search/mangasContains").appending(path: search)
+    static func mangasContains(
+        _ search: String,
+        page: Int = NetworkConstants.defaultPage,
+        perPage: Int = NetworkConstants.defaultPerPage
+    ) -> URL {
+        api
+
+            .appending(path: "search/mangasContains").appending(path: search)
+            .appending(queryItems: [
+                URLQueryItem(name: "page", value: "\(page)"),
+                URLQueryItem(name: "per", value: "\(perPage)"),
+            ])
     }
 
     static func mangasBeginsWith(_ search: String) -> URL {
@@ -24,5 +34,16 @@ extension URL {
         api.appending(path: "search/manga").appending(path: "\(id)")
     }
 
-    static let advancedMangaSearch = api.appending(path: "search/manga")
+    static func advancedMangaSearch(
+        page: Int = NetworkConstants.defaultPage,
+        perPage: Int = NetworkConstants.defaultPerPage
+    ) -> URL {
+        api
+            .appending(path: "search/manga")
+            .appending(queryItems: [
+                URLQueryItem(name: "page", value: "\(page)"),
+                URLQueryItem(name: "per", value: "\(perPage)"),
+            ])
+    }
+
 }
