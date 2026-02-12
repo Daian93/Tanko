@@ -50,6 +50,7 @@ extension UserManga {
             mangaID: self.mangaID,
             title: self.title,
             coverURL: self.coverURL,
+            totalVolumes: self.totalVolumes,
             volumesOwned: self.volumesOwned,
             readingVolume: self.readingVolume,
             completeCollection: self.completeCollection,

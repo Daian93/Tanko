@@ -9,9 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    // 1. CAMBIO AQUÍ: Ahora lo cogemos del environment
     @Environment(UserMangaCollectionViewModel.self) private var userCollectionVM
-
     @Environment(MangaViewModel.self) private var viewModel
     @Environment(\.modelContext) private var modelContext
     @State private var bestMangasViewModel = BestMangaViewModel()
@@ -51,7 +49,7 @@ struct ContentView: View {
                                 MangaCollectionRow(
                                     manga: manga,
                                     namespace: namespace,
-                                    userCollectionVM: userCollectionVM // Pasamos la del environment
+                                    userCollectionVM: userCollectionVM
                                 )
                                 .onAppear {
                                     Task {
@@ -99,9 +97,6 @@ struct ContentView: View {
             await bestMangasViewModel.getBestMangas()
         }
     }
-    
-    // ... mantén tu featuredCarousel igual
-
 
     private var featuredCarousel: some View {
         ScrollView(.horizontal, showsIndicators: false) {

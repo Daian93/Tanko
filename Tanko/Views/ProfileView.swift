@@ -13,9 +13,38 @@ struct ProfileView: View {
     @Environment(AppSettings.self) private var settings
     @Environment(\.modelContext) private var context
     @State private var showEmojiPicker = false
+    @State private var showOnboarding = false
 
     var body: some View {
         @Bindable var settings = settings
+        
+        /*private var headerView: some View {
+         HStack(spacing: 16) {
+             Circle()
+                 .fill(Color.red.opacity(0.1))
+                 .frame(width: 70, height: 70)
+                 .overlay(
+                     Text(
+                         session.isGuest
+                         ? "👤"
+                         : session.user?.email.prefix(2).uppercased() ?? "TU"
+                     )
+                     .font(.headline)
+                     .foregroundStyle(.red)
+                 )
+
+             VStack(alignment: .leading) {
+                 Text(session.isGuest ? "Modo Invitado" : "Mi Perfil")
+                     .font(.title3.bold())
+
+                 Text("\(userMangas.count) mangas en total")
+                     .font(.caption)
+                     .foregroundStyle(.secondary)
+             }
+             Spacer()
+         }
+         .padding(.horizontal)
+     }*/
         NavigationStack {
             Form {
                 Section("Personalización") {
@@ -79,12 +108,42 @@ struct ProfileView: View {
             .sheet(isPresented: $showEmojiPicker) {
                 EmojiPickerView(selectedEmoji: $settings.profileEmoji)
             }
+            .toolbar {
+
+                            if session.isGuest {
+                                ToolbarItem(placement: .topBarTrailing) {
+                                    Button {
+                                        withAnimation {
+                                            session.exitGuest()
+                                            showOnboarding = true
+                                        }
+                                    } label: {
+                                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                                            .foregroundStyle(AppColors.primary)
+                                    }
+                                }
+                            }
+
+                            if session.isAuthenticated {
+                                ToolbarItem(placement: .topBarTrailing) {
+                                    Button(role: .destructive) {
+                                        withAnimation {
+                                            session.logout()
+                                        }
+                                    } label: {
+                                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                                            .foregroundStyle(AppColors.primary)
+                                    }
+                                }
+                            }
+                        }
+
         }
     }
 
     private func handleLogout() {
         withAnimation {
-            session.logout()
+            session.exitGuest()
         }
     }
 }

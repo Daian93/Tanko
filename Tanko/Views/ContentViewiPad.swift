@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentViewiPad: View {
+    @Environment(UserMangaCollectionViewModel.self) private var userCollectionVM
     @Environment(MangaViewModel.self) private var viewModel
     @State private var bestMangaViewModel = BestMangaViewModel()
     @Namespace private var namespace
@@ -61,22 +62,16 @@ struct ContentViewiPad: View {
                                         spacing: 20
                                     ) {
                                         ForEach(viewModel.mangas) { manga in
-                                            NavigationLink(value: manga) {
-                                                MangaRow(manga: manga, namespace: namespace)
-                                                    .background(AppColors.surface)
-                                                    .clipShape(
-                                                        RoundedRectangle(cornerRadius: 20)
-                                                    )
-                                                    .onAppear {
-                                                        Task {
-                                                            await viewModel
-                                                                .loadNextPageIfNeeded(
-                                                                    currentItem: manga
-                                                                )
-                                                        }
-                                                    }
+                                            MangaCollectionRow(
+                                                manga: manga,
+                                                namespace: namespace,
+                                                userCollectionVM: userCollectionVM
+                                            )
+                                            .onAppear {
+                                                Task {
+                                                    await viewModel.loadNextPageIfNeeded(currentItem: manga)
+                                                }
                                             }
-                                            .buttonStyle(.plain)
                                         }
                                     }
                                     .padding(.horizontal)
@@ -98,6 +93,9 @@ struct ContentViewiPad: View {
                     .refreshable {
                         await viewModel.refresh()
                         await bestMangaViewModel.refresh()
+                    }
+                    .sheet(item: $mangasVM.selectedMangaForCollection) { manga in
+                        AddMangaToCollectionView(manga: manga)
                     }
 
                 case .empty:
@@ -144,9 +142,4 @@ struct ContentViewiPad: View {
         .scrollClipDisabled()
         .contentMargins(.horizontal, 60, for: .scrollContent)
     }
-}
-
-#Preview {
-    ContentViewiPad()
-        .environment(MangaViewModel())
 }

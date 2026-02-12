@@ -23,8 +23,8 @@ final class MangaCollectionSyncService {
     }
 
     func sync() async throws {
-        let localItems = try await localRepo.getCollection() // [MangaSyncData]
-        let remoteItems = try await remoteRepo.getCollection() // [MangaSyncData]
+        let localItems = try await localRepo.getCollection()
+        let remoteItems = try await remoteRepo.getCollection()
 
         let localByID = Dictionary(uniqueKeysWithValues: localItems.map { ($0.mangaID, $0) })
         let remoteByID = Dictionary(uniqueKeysWithValues: remoteItems.map { ($0.mangaID, $0) })
@@ -58,6 +58,7 @@ final class MangaCollectionSyncService {
             mangaID: manga.mangaID,
             title: manga.title,
             coverURL: manga.coverURL,
+            totalVolumes: manga.totalVolumes,
             volumesOwned: manga.volumesOwned,
             readingVolume: manga.readingVolume,
             completeCollection: manga.completeCollection,
@@ -70,6 +71,7 @@ struct MangaSyncData {
     let mangaID: Int
     let title: String
     let coverURL: URL?
+    let totalVolumes: Int?
     let volumesOwned: [Int]
     let readingVolume: Int?
     let completeCollection: Bool
