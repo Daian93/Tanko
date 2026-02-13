@@ -11,24 +11,36 @@ enum NetworkError: LocalizedError {
     case general(Error)
     case status(Int)
     case json(Error)
-    case dataNotValid
-    case nonHTTP
+    case invalidData
+    case nonHTTPResponse
     case unauthorized
+    case cancelled
+    case noInternet
+    case timedOut
+    case invalidJSON
 
     var errorDescription: String? {
         switch self {
         case .general(let error):
             error.localizedDescription
-        case .status(let int):
-            "HTTP status code: \(int)"
+        case .status(let code):
+            "HTTP status code: \(code)"
         case .json(let error):
             "JSON error: \(error)"
-        case .dataNotValid:
+        case .invalidData:
             "Invalid data received from server"
-        case .nonHTTP:
-            "URLSession did not return a HTTPURLResponse"
+        case .nonHTTPResponse:
+            "URLSession did not return an HTTP response"
         case .unauthorized:
-            "No valid token available for authorization"
+            "No valid authorization token available"
+        case .cancelled:
+            "The request was cancelled"
+        case .noInternet:
+            "No internet connection available"
+        case .timedOut:
+            "The request timed out"
+        case .invalidJSON:
+            "Server returned invalid JSON"
         }
     }
 }

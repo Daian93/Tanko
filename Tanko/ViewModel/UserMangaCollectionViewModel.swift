@@ -5,16 +5,18 @@
 //  Created by Diana Rammal Sansón on 5/2/26.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 @Observable
 @MainActor
 final class UserMangaCollectionViewModel {
     private let modelContext: ModelContext
     private let repository: MangaCollectionRepository
-    
+
     var mangas: [UserManga] = []
+    private var isSyncing = false
+    private var isLoading = false
     private let syncService: MangaCollectionSyncService
 
     init(
@@ -26,34 +28,70 @@ final class UserMangaCollectionViewModel {
         self.repository = repository
         self.syncService = syncService
     }
-    
+
     func synchronize() async {
+        guard !isSyncing else {
+            print("⚠️ Sincronización ya en progreso")
+            return
+        }
+        isSyncing = true
+
+        defer { isSyncing = false }
+
         do {
             print("🔄 Iniciando sincronización...")
             try await syncService.sync()
             print("✅ Sincronización completada. Recargando datos...")
-            await loadCollection()
+            await reloadFromLocalDatabase()
+        } catch NetworkError.cancelled {
+            print("⚠️ Synchronization cancelled")
+        } catch NetworkError.invalidJSON {
+            print("⚠️ Server returned OK but no valid JSON")
         } catch {
-            print("❌ Error durante la sincronización: \(error)")
+            print("❌ Error during synchronization: \(error)")
         }
     }
 
     func loadCollection() async {
+        guard !isLoading else {
+            print("⚠️ Carga ya en progreso")
+            return
+        }
+        isLoading = true
+
+        defer { isLoading = false }
+
         do {
             _ = try await repository.getCollection()
-            
-            let descriptor = FetchDescriptor<UserManga>(
-                sortBy: [SortDescriptor(\UserManga.title)]
-            )
-            
-            self.mangas = try modelContext.fetch(descriptor)
-            
+            await reloadFromLocalDatabase()
+
+        } catch NetworkError.cancelled {
+            print("⚠️ Load cancelled")
         } catch {
-            print("❌ Error cargando colección:", error)
+            print("❌ Error loading collection: \(error)")
         }
     }
 
-    func add(manga: Manga, volumesOwned: [Int], readingVolume: Int?, completeCollection: Bool) async {
+    // MARK: - Private helper to reload from local database
+    private func reloadFromLocalDatabase() async {
+        do {
+            let descriptor = FetchDescriptor<UserManga>(
+                sortBy: [SortDescriptor(\UserManga.title)]
+            )
+
+            self.mangas = try modelContext.fetch(descriptor)
+            print("✅ Local collection updated: \(mangas.count) mangas")
+        } catch {
+            print("❌ Error reloading from local database: \(error)")
+        }
+    }
+
+    func add(
+        manga: Manga,
+        volumesOwned: [Int],
+        readingVolume: Int?,
+        completeCollection: Bool
+    ) async {
         let newUserManga = UserManga(
             mangaID: manga.id,
             title: manga.title,
@@ -64,11 +102,11 @@ final class UserMangaCollectionViewModel {
             completeCollection: completeCollection,
             updatedAt: .now
         )
-        
+
         modelContext.insert(newUserManga)
         self.mangas.append(newUserManga)
         try? modelContext.save()
-        
+
         let syncData = MangaSyncData(
             mangaID: newUserManga.mangaID,
             title: newUserManga.title,
@@ -79,18 +117,23 @@ final class UserMangaCollectionViewModel {
             completeCollection: newUserManga.completeCollection,
             updatedAt: newUserManga.updatedAt
         )
-        
-        try? await repository.add(mangaData: syncData)
+
+        do {
+            try await repository.add(mangaData: syncData)
+            print("✅ Manga added to server")
+        } catch {
+            print("⚠️ Failed to add to server, saved locally: \(error)")
+        }
     }
 
     func remove(_ manga: UserManga) async {
         let idToRemove = manga.mangaID
-        
+
         try? await repository.remove(manga)
-        
+
         modelContext.delete(manga)
         self.mangas.removeAll { $0.mangaID == idToRemove }
-        
+
         try? modelContext.save()
     }
 
@@ -103,14 +146,14 @@ final class UserMangaCollectionViewModel {
             await remove(manga)
         }
     }
-    
+
     func updateRemote(_ userManga: UserManga) async {
         let syncData = userManga.asSyncData
         do {
             try await repository.add(mangaData: syncData)
-            print("✅ Sincronizado con el servidor")
+            print("✅ Synced with server")
         } catch {
-            print("❌ Error al sincronizar: \(error)")
+            print("⚠️ Failed to sync, data saved locally: \(error)")
         }
     }
 }
