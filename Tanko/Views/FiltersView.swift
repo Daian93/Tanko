@@ -37,38 +37,82 @@ struct FiltersView: View {
                     )
                 }
 
-                Section(header: Text("Géneros")) {
-                    ForEach(filtersViewModel.availableGenres) { genre in
-                        MultiSelectionRow(
-                            title: genre.rawValue,
-                            isSelected: filtersViewModel.selectedGenres
-                                .contains(genre)
-                        ) {
-                            toggleGenre(genre)
+                Section(header: Text("Categorías")) {
+                    DisclosureGroup {
+                        ForEach(filtersViewModel.availableGenres) { genre in
+                            MultiSelectionRow(
+                                title: genre.localized,
+                                isSelected: filtersViewModel.selectedGenres.contains(genre)
+                            ) {
+                                toggleGenre(genre)
+                            }
+                        }
+                    } label: {
+                        HStack {
+                            Text("Géneros")
+                            Spacer()
+                            if !filtersViewModel.selectedGenres.isEmpty {
+                                Text("\(filtersViewModel.selectedGenres.count)")
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 2)
+                                    .background(Color.green)
+                                    .clipShape(Capsule())
+                            }
                         }
                     }
-                }
-
-                Section(header: Text("Temáticas")) {
-                    ForEach(filtersViewModel.availableThemes) { theme in
-                        MultiSelectionRow(
-                            title: theme.rawValue,
-                            isSelected: filtersViewModel.selectedThemes
-                                .contains(theme)
-                        ) {
-                            toggleTheme(theme)
+                    
+                    DisclosureGroup {
+                        ForEach(filtersViewModel.availableThemes) { theme in
+                            MultiSelectionRow(
+                                title: theme.localized,
+                                isSelected: filtersViewModel.selectedThemes.contains(theme)
+                            ) {
+                                toggleTheme(theme)
+                            }
+                        }
+                    } label: {
+                        HStack {
+                            Text("Temáticas")
+                            Spacer()
+                            if !filtersViewModel.selectedThemes.isEmpty {
+                                Text("\(filtersViewModel.selectedThemes.count)")
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 2)
+                                    .background(Color.orange)
+                                    .clipShape(Capsule())
+                            }
                         }
                     }
-                }
-
-                Section(header: Text("Demografía")) {
-                    ForEach(filtersViewModel.availableDemographics) { demo in
-                        MultiSelectionRow(
-                            title: demo.rawValue,
-                            isSelected: filtersViewModel.selectedDemographics
-                                .contains(demo)
-                        ) {
-                            toggleDemographic(demo)
+                    
+                    DisclosureGroup {
+                        ForEach(filtersViewModel.availableDemographics) { demo in
+                            MultiSelectionRow(
+                                title: demo.localized,
+                                isSelected: filtersViewModel.selectedDemographics.contains(demo)
+                            ) {
+                                toggleDemographic(demo)
+                            }
+                        }
+                    } label: {
+                        HStack {
+                            Text("Demografía")
+                            Spacer()
+                            if !filtersViewModel.selectedDemographics.isEmpty {
+                                Text("\(filtersViewModel.selectedDemographics.count)")
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 2)
+                                    .background(Color.pink)
+                                    .clipShape(Capsule())
+                            }
                         }
                     }
                 }
@@ -125,7 +169,7 @@ struct FiltersView: View {
 }
 
 struct MultiSelectionRow: View {
-    let title: String
+    let title: LocalizedStringKey
     let isSelected: Bool
     let action: () -> Void
 
@@ -134,9 +178,13 @@ struct MultiSelectionRow: View {
             HStack {
                 Text(title)
                 Spacer()
-                if isSelected { Image(systemName: "checkmark") }
+                if isSelected {
+                    Image(systemName: "checkmark")
+                        .foregroundColor(.accentColor)
+                }
             }
         }
+        .foregroundStyle(.primary)
     }
 }
 
@@ -146,5 +194,5 @@ struct MultiSelectionRow: View {
     FiltersView(filtersViewModel: mockFiltersVM) { dto in
         print("Filtros aplicados: \(dto)")
     }
-    .withPreviewEnvironment() 
+    .withPreviewEnvironment()
 }

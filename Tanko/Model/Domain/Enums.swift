@@ -34,7 +34,8 @@ enum Genre: String, Codable, CaseIterable, Identifiable {
     var id: String { rawValue }
 
     var localizedKey: String {
-        "genre.\(rawValue)"
+        "genre.\(String(describing: self))"
+
     }
 
     var localized: LocalizedStringKey {
@@ -52,7 +53,8 @@ enum Demographic: String, Codable, CaseIterable, Identifiable {
     var id: String { rawValue }
 
     var localizedKey: String {
-        "demographic.\(rawValue)"
+        "demographic.\(String(describing: self))"
+
     }
 
     var localized: LocalizedStringKey {
@@ -117,7 +119,7 @@ enum Theme: String, Codable, CaseIterable, Identifiable {
     var id: String { rawValue }
 
     var localizedKey: String {
-        "theme.\(rawValue)"
+        "theme.\(String(describing: self))"
     }
 
     var localized: LocalizedStringKey {
