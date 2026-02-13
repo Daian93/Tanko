@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		846127B62F3EF2AE0075B2E4 /* SearchViewiPad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846127B52F3EF29F0075B2E4 /* SearchViewiPad.swift */; };
+		846127B82F3EFF8D0075B2E4 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846127B72F3EFF890075B2E4 /* LoadingView.swift */; };
 		8497599E2F2000A40049E62F /* URL+List.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8497599D2F2000960049E62F /* URL+List.swift */; };
 		849759A02F20011E0049E62F /* NetworkConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8497599F2F2001180049E62F /* NetworkConstants.swift */; };
 		849759A22F20056C0049E62F /* URL+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849759A12F2005650049E62F /* URL+Search.swift */; };
@@ -92,6 +94,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		846127B52F3EF29F0075B2E4 /* SearchViewiPad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewiPad.swift; sourceTree = "<group>"; };
+		846127B72F3EFF890075B2E4 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		8497599D2F2000960049E62F /* URL+List.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+List.swift"; sourceTree = "<group>"; };
 		8497599F2F2001180049E62F /* NetworkConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkConstants.swift; sourceTree = "<group>"; };
 		849759A12F2005650049E62F /* URL+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Search.swift"; sourceTree = "<group>"; };
@@ -220,6 +224,7 @@
 		849759B32F2164630049E62F /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				846127B52F3EF29F0075B2E4 /* SearchViewiPad.swift */,
 				84CF6EE32F3D44C400F2E6B5 /* AuthorMangaViewiPad.swift */,
 				84A18AF52F3CD1BA008AB07B /* CollectionView.swift */,
 				84A18AF32F3CD190008AB07B /* EmojiPickerView.swift */,
@@ -291,6 +296,7 @@
 		84EF4A2E2EFAE00400EE4B89 /* Tanko */ = {
 			isa = PBXGroup;
 			children = (
+				846127B72F3EFF890075B2E4 /* LoadingView.swift */,
 				84A18AF12F3CBD76008AB07B /* LocalDatabaseCleaner.swift */,
 				84A18ADF2F3B441C008AB07B /* MangaCollectionSyncService.swift */,
 				84A18AD52F3A265E008AB07B /* AuthError.swift */,
@@ -543,8 +549,10 @@
 				84A18AE42F3BACA8008AB07B /* RegisterViewModel.swift in Sources */,
 				849759C42F217D7D0049E62F /* UIImage.swift in Sources */,
 				84CF6EE42F3D44CF00F2E6B5 /* AuthorMangaViewiPad.swift in Sources */,
+				846127B62F3EF2AE0075B2E4 /* SearchViewiPad.swift in Sources */,
 				84EF9DEA2F1EF2AB00EC2491 /* CustomSearchDTO.swift in Sources */,
 				849759A62F200BA80049E62F /* URL+Collection.swift in Sources */,
+				846127B82F3EFF8D0075B2E4 /* LoadingView.swift in Sources */,
 				84EF4A312EFAE00400EE4B89 /* TankoApp.swift in Sources */,
 				849759B22F2156850049E62F /* MangaViewModel.swift in Sources */,
 				849759F42F2545C90049E62F /* CoverVM.swift in Sources */,

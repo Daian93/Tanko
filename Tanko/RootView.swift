@@ -12,22 +12,23 @@ struct RootView: View {
     @Environment(SessionManager.self) private var session
     @Environment(\.modelContext) private var context
     @State private var userCollectionVM: UserMangaCollectionViewModel?
+    @State private var isInitialLoading = false
+    @State private var hasLoadedOnce = false
 
     var body: some View {
         Group {
             if session.canAccessApp {
                 if let vm = userCollectionVM {
-                    MainTabView()
-                        .environment(vm)
-                        .task {
-                            if session.canAccessApp {
-                                if session.isAuthenticated {
-                                    await userCollectionVM?.synchronize()
-                                } else {
-                                    await userCollectionVM?.loadCollection()
-                                }
-                            }
-                        }
+                    if isInitialLoading || !hasLoadedOnce {
+                        // Show loading screen during initial sync
+                        LoadingView(message: session.isAuthenticated
+                            ? "Sincronizando tu colección..."
+                            : "Cargando tu biblioteca...")
+                    } else {
+                        // Show main app
+                        MainTabView()
+                            .environment(vm)
+                    }
                 } else {
                     ProgressView()
                 }
@@ -35,14 +36,40 @@ struct RootView: View {
                 OnboardingView()
             }
         }
-        .onAppear { buildViewModel() }
-    
-        .onChange(of: session.isAuthenticated) { old, newValue in
+        .animation(.easeInOut(duration: 0.3), value: isInitialLoading)
+        .onAppear {
             buildViewModel()
-            if newValue {
-                Task {
-                    await userCollectionVM?.synchronize()
-                }
+        }
+        .task(id: session.canAccessApp) {
+            // Initial load/sync when user accesses the app (authenticated OR guest)
+            guard session.canAccessApp, let vm = userCollectionVM else { return }
+            
+            isInitialLoading = true
+            hasLoadedOnce = false
+            
+            // Track when loading started
+            let startTime = Date()
+            
+            if session.isAuthenticated {
+                await vm.synchronize()
+            } else if session.isGuest {
+                await vm.loadCollection()
+            }
+            
+            // Calculate elapsed time
+            let elapsed = Date().timeIntervalSince(startTime)
+            let minimumDisplayTime: TimeInterval = 1.5 // 1.5 seconds minimum
+            
+            // If loading was too fast, add delay to avoid jarring flash
+            if elapsed < minimumDisplayTime {
+                let remainingTime = minimumDisplayTime - elapsed
+                try? await Task.sleep(nanoseconds: UInt64(remainingTime * 1_000_000_000))
+            }
+            
+            // Hide loading screen after minimum display time
+            withAnimation {
+                isInitialLoading = false
+                hasLoadedOnce = true
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .didLogout)) { _ in
