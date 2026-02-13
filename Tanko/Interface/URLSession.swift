@@ -16,7 +16,7 @@ extension URLSession {
                 for: request
             )
             guard let httpResponse = response as? HTTPURLResponse else {
-                throw NetworkError.nonHTTP
+                throw NetworkError.nonHTTPResponse
             }
             return (data, httpResponse)
         } catch {

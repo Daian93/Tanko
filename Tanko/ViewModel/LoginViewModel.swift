@@ -19,14 +19,14 @@ final class LoginViewModel {
     var error: String?
     var isLoading = false
     
-    init(session: SessionManager, context: ModelContext) {
-        self.session = session
-        self.context = context
-    }
-    
     var isFormValid: Bool {
         AuthValidator.isValidEmail(email)
         && AuthValidator.isValidPassword(password)
+    }
+    
+    init(session: SessionManager, context: ModelContext) {
+        self.session = session
+        self.context = context
     }
     
     func login() async {

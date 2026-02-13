@@ -10,8 +10,8 @@ import Foundation
 protocol NetworkRepository: Sendable, NetworkInteractor {
     
     // MARK: - Auth
-    func createUser(email: String, password: String) async throws(NetworkError)
-    func login(email: String, password: String) async throws(NetworkError) -> String
+    func createUser(email: String, password: String) async throws
+    func login(email: String, password: String) async throws -> String
     func renew(token: String) async throws(NetworkError) -> String
     
     // MARK: - Manga list

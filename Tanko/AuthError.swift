@@ -11,6 +11,8 @@ enum AuthError: LocalizedError {
     case invalidCredentials
     case emailAlreadyExists
     case sessionExpired
+    case invalidEmail
+    case weakPassword
     case unknown
 
     var errorDescription: String? {
@@ -21,6 +23,10 @@ enum AuthError: LocalizedError {
             String(localized: "auth.error.email_exists")
         case .sessionExpired:
             String(localized: "auth.error.session_expired")
+        case .invalidEmail:
+            String(localized: "auth.error.invalid_email")
+        case .weakPassword:
+            String(localized: "auth.error.weak_password")
         case .unknown:
             String(localized: "auth.error.unknown")
         }

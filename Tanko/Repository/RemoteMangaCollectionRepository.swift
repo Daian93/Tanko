@@ -8,8 +8,6 @@
 import Foundation
 import SwiftData
 
-struct EmptyResponse: Codable {}
-
 @MainActor
 final class RemoteMangaCollectionRepository: MangaCollectionRepository {
 
@@ -72,19 +70,23 @@ final class RemoteMangaCollectionRepository: MangaCollectionRepository {
 
     // MARK: - Añadir manga a colección remota y local
     func add(mangaData: MangaSyncData) async throws {
-            guard let token = session.token else { return }
+        guard let token = session.token else { return }
 
-            let requestDTO = UserMangaCollectionRequest(
-                manga: mangaData.mangaID,
-                volumesOwned: mangaData.volumesOwned,
-                readingVolume: mangaData.readingVolume,
-                completeCollection: mangaData.completeCollection
-            )
+        let requestDTO = UserMangaCollectionRequest(
+            manga: mangaData.mangaID,
+            volumesOwned: mangaData.volumesOwned,
+            readingVolume: mangaData.readingVolume,
+            completeCollection: mangaData.completeCollection
+        )
 
-            let request = URLRequest.post(url: .collectionManga, body: requestDTO, bearerToken: token)
-            _ = try await network.postJSON(request, type: EmptyResponse.self)
-        }
-        
+        let request = URLRequest.post(
+            url: .collectionManga,
+            body: requestDTO,
+            bearerToken: token
+        )
+
+        try await network.postJSON(request, status: 200)
+    }
 
     // MARK: - Eliminar manga de colección remota y local
     func remove(_ manga: UserManga) async throws {
@@ -94,7 +96,7 @@ final class RemoteMangaCollectionRepository: MangaCollectionRepository {
             url: .collectionMangaID(manga.mangaID),
             bearerToken: token
         )
-        _ = try await network.deleteJSON(request)
+        try await network.deleteJSON(request)
 
         try await localRepo.remove(manga)
     }

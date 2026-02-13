@@ -94,6 +94,13 @@ struct CollectionView: View {
             }
             .navigationTitle("Mi Biblioteca")
             .backgroundStyle(AppColors.primary)
+            .task {
+                if session.isAuthenticated {
+                    await collectionVM.synchronize()
+                    await collectionVM.loadCollection()
+                }
+            }
+            
             .refreshable {
                 if session.isAuthenticated {
                     await collectionVM.synchronize()
@@ -351,17 +358,17 @@ struct CollectionView: View {
     
     
     struct VolumesManagementView: View {
-        @Environment(UserMangaCollectionViewModel.self) private var collectionVM
         @Bindable var userManga: UserManga
+        @Environment(UserMangaCollectionViewModel.self) private var collectionVM
         @Environment(\.dismiss) var dismiss
-        
+
         var totalVolumes: Int {
             let volumes = userManga.totalVolumes ?? (userManga.volumesOwned.max() ?? 0)
             return max(volumes, 1)
         }
-        
+
         private let columns = [GridItem(.adaptive(minimum: 45))]
-        
+
         var body: some View {
             NavigationStack {
                 ScrollView {
@@ -370,21 +377,12 @@ struct CollectionView: View {
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .padding(.horizontal)
-                        
+
                         LazyVGrid(columns: columns, spacing: 10) {
                             ForEach(1...totalVolumes, id: \.self) { number in
                                 let isOwned = userManga.volumesOwned.contains(number)
                                 Button {
-                                    if isOwned {
-                                        userManga.volumesOwned.removeAll { $0 == number }
-                                    } else {
-                                        userManga.volumesOwned.append(number)
-                                    }
-                                    userManga.updatedAt = .now
-                                    
-                                    Task {
-                                        await collectionVM.updateRemote(userManga)
-                                    }
+                                    toggleVolume(number: number)
                                 } label: {
                                     Text("\(number)")
                                         .font(.system(.subheadline, design: .rounded).bold())
@@ -406,6 +404,22 @@ struct CollectionView: View {
                     Button("Hecho") { dismiss() }
                         .fontWeight(.bold)
                 }
+            }
+        }
+        
+        private func toggleVolume(number: Int) {
+            var updatedVolumes = userManga.volumesOwned
+            
+            if updatedVolumes.contains(number) {
+                updatedVolumes.removeAll { $0 == number }
+            } else {
+                updatedVolumes.append(number)
+            }
+            userManga.volumesOwned = updatedVolumes
+            userManga.updatedAt = .now
+            
+            Task {
+                await collectionVM.updateRemote(userManga)
             }
         }
     }
@@ -434,14 +448,10 @@ extension CollectionView {
             return userMangas.filter { $0.completeCollection }
         }
     }
-}
-
-// MARK: - Estadísticas
-
-extension CollectionView {
+    
+    // MARK: - Stats Grid
     
     private var statsGrid: some View {
-        
         let readingCount = userMangas.filter {
             guard let total = $0.totalVolumes else { return false }
             let reading = $0.readingVolume ?? 0
@@ -450,19 +460,19 @@ extension CollectionView {
         
         let completeCount = userMangas.filter { $0.completeCollection }.count
         
-        let totalVolumesOwned = userMangas.reduce(0) {
-            $0 + $1.volumesOwned.count
-        }
+        let totalVolumesOwned = userMangas.reduce(0) { $0 + $1.volumesOwned.count }
         
         return HStack {
+            StatItem(label: "Total", value: "\(userMangas.count)", icon: "books.vertical")
+            Divider().frame(height: 40)
             StatItem(label: "Leyendo", value: "\(readingCount)", icon: "book")
             Divider().frame(height: 40)
-            StatItem(label: "Tomos", value: "\(totalVolumesOwned)", icon: "books.vertical")
+            StatItem(label: "Tomos", value: "\(totalVolumesOwned)", icon: "square.stack.3d.up")
             Divider().frame(height: 40)
             StatItem(label: "Completos", value: "\(completeCount)", icon: "checkmark.seal")
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color("TankoCardSurface"))
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: .black.opacity(0.05), radius: 10)
         .padding(.horizontal)

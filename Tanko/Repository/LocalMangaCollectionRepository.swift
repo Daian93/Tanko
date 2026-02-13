@@ -40,11 +40,15 @@ final class LocalMangaCollectionRepository: MangaCollectionRepository {
         )
 
         if let existing = try context.fetch(fetch).first {
-            existing.totalVolumes = remote.totalVolumes
-            existing.volumesOwned = remote.volumesOwned
-            existing.readingVolume = remote.readingVolume
-            existing.completeCollection = remote.completeCollection
-            existing.updatedAt = remote.updatedAt
+            // Only update if the remote data is actually newer
+            // This prevents infinite sync loops
+            if remote.updatedAt > existing.updatedAt {
+                existing.totalVolumes = remote.totalVolumes
+                existing.volumesOwned = remote.volumesOwned
+                existing.readingVolume = remote.readingVolume
+                existing.completeCollection = remote.completeCollection
+                existing.updatedAt = remote.updatedAt
+            }
         } else {
             let newManga = UserManga(
                 mangaID: remote.mangaID,
