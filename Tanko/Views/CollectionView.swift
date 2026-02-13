@@ -326,7 +326,9 @@ struct CollectionView: View {
             }
             .alert("Eliminar manga", isPresented: $showDeleteAlert, actions: {
                   Button("Eliminar", role: .destructive) {
+                      showDeleteAlert = false
                       Task {
+                          try? await Task.sleep(nanoseconds: 100_000_000)
                           await collectionVM.remove(userManga)
                       }
                   }

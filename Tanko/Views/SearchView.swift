@@ -250,7 +250,9 @@ struct SearchView: View {
                         $0.mangaID == manga.id
                     })
                 {
+                    showDeleteAlert = false
                     Task {
+                        try? await Task.sleep(nanoseconds: 100_000_000)
                         await collectionVM.remove(userManga)
                         mangaToDelete = nil
                     }
