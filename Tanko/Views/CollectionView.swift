@@ -158,10 +158,16 @@ struct CollectionView: View {
         @State private var showDeleteAlert = false
         
         private var totalVolumes: Int {
-            userManga.totalVolumes ??
-            max(userManga.readingVolume ?? 0,
-                userManga.volumesOwned.max() ?? 0,
-                1)
+            if let definedTotal = userManga.totalVolumes {
+                return definedTotal
+            }
+            return max(userManga.readingVolume ?? 0,
+                      userManga.volumesOwned.max() ?? 0,
+                      1)
+        }
+        
+        private var hasDynamicTotal: Bool {
+            userManga.totalVolumes == nil
         }
         
         private var reading: Int {
@@ -202,7 +208,6 @@ struct CollectionView: View {
                             .font(.system(size: 16, weight: .semibold))
                             .lineLimit(2)
                         
-                        // Progress Section
                         VStack(alignment: .leading, spacing: 6) {
                             
                             HStack {
@@ -212,9 +217,15 @@ struct CollectionView: View {
                                 
                                 Spacer()
                                 
-                                Text("\(reading)/\(totalVolumes)")
-                                    .font(.caption.weight(.medium))
-                                    .foregroundStyle(progressColor)
+                                if hasDynamicTotal {
+                                    Text("\(reading)/\(totalVolumes)+")
+                                        .font(.caption.weight(.medium))
+                                        .foregroundStyle(progressColor)
+                                } else {
+                                    Text("\(reading)/\(totalVolumes)")
+                                        .font(.caption.weight(.medium))
+                                        .foregroundStyle(progressColor)
+                                }
                             }
                             
                             ProgressView(value: progress)
@@ -273,9 +284,15 @@ struct CollectionView: View {
                         Divider()
                             .frame(height: 20)
                         
-                        Text("Vol \(reading)")
-                            .font(.subheadline.weight(.medium))
-                            .frame(minWidth: 60)
+                        if hasDynamicTotal {
+                            Text("Vol \(reading)+")
+                                .font(.subheadline.weight(.medium))
+                                .frame(minWidth: 60)
+                        } else {
+                            Text("Vol \(reading)")
+                                .font(.subheadline.weight(.medium))
+                                .frame(minWidth: 60)
+                        }
                         
                         Divider()
                             .frame(height: 20)
@@ -286,7 +303,8 @@ struct CollectionView: View {
                             Image(systemName: "plus")
                                 .frame(width: 34, height: 34)
                         }
-                        .disabled(reading >= totalVolumes)
+
+                        .disabled(!hasDynamicTotal && reading >= totalVolumes)
                     }
                     .foregroundStyle(Color("TankoPrimary"))
                     .background(Color("TankoCardSurface"))
@@ -343,12 +361,20 @@ struct CollectionView: View {
         private func updateReading(by value: Int) {
             let newValue = reading + value
             
-            guard newValue >= 0 && newValue <= totalVolumes else { return }
+            guard newValue >= 0 else { return }
             
-            withAnimation(.easeInOut) {
-                userManga.readingVolume = newValue
-                userManga.completeCollection = (newValue == totalVolumes)
-                userManga.updatedAt = .now
+            if let definedTotal = userManga.totalVolumes {
+                guard newValue <= definedTotal else { return }
+                
+                withAnimation(.easeInOut) {
+                    userManga.readingVolume = newValue
+                    userManga.updatedAt = .now
+                }
+            } else {
+                withAnimation(.easeInOut) {
+                    userManga.readingVolume = newValue
+                    userManga.updatedAt = .now
+                }
             }
             
             Task {
@@ -363,10 +389,17 @@ struct CollectionView: View {
         @Bindable var userManga: UserManga
         @Environment(UserMangaCollectionViewModel.self) private var collectionVM
         @Environment(\.dismiss) var dismiss
+        @State private var maxVolume: Int = 1
 
-        var totalVolumes: Int {
-            let volumes = userManga.totalVolumes ?? (userManga.volumesOwned.max() ?? 0)
-            return max(volumes, 1)
+        private var hasDynamicTotal: Bool {
+            userManga.totalVolumes == nil
+        }
+        
+        private var totalVolumes: Int {
+            if let definedTotal = userManga.totalVolumes {
+                return definedTotal
+            }
+            return maxVolume
         }
 
         private let columns = [GridItem(.adaptive(minimum: 45))]
@@ -375,11 +408,30 @@ struct CollectionView: View {
             NavigationStack {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
-                        Text("Selecciona los tomos físicos que posees:")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                        
+                        // Info text
+                        if hasDynamicTotal {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Label("Total de volúmenes desconocido", systemImage: "info.circle")
+                                    .font(.subheadline.bold())
+                                    .foregroundStyle(Color("TankoPrimary"))
+                                
+                                Text("Este manga no tiene un total definido. Puedes añadir volúmenes según los vayas coleccionando.")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding()
+                            .background(Color("TankoPrimary").opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                             .padding(.horizontal)
+                        } else {
+                            Text("Selecciona los tomos físicos que posees:")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal)
+                        }
 
+                        // Volume grid
                         LazyVGrid(columns: columns, spacing: 10) {
                             ForEach(1...totalVolumes, id: \.self) { number in
                                 let isOwned = userManga.volumesOwned.contains(number)
@@ -395,6 +447,21 @@ struct CollectionView: View {
                                 }
                                 .buttonStyle(.plain)
                             }
+                            
+                            // Add more button for dynamic totals
+                            if hasDynamicTotal {
+                                Button {
+                                    maxVolume += 5
+                                } label: {
+                                    Image(systemName: "plus.circle.fill")
+                                        .font(.title2)
+                                        .frame(width: 45, height: 45)
+                                        .background(Color("TankoPrimary").opacity(0.1))
+                                        .foregroundStyle(Color("TankoPrimary"))
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
                         .padding(.horizontal)
                     }
@@ -405,6 +472,16 @@ struct CollectionView: View {
                 .toolbar {
                     Button("Hecho") { dismiss() }
                         .fontWeight(.bold)
+                }
+                .onAppear {
+                    if hasDynamicTotal {
+                        let currentMax = max(
+                            userManga.readingVolume ?? 0,
+                            userManga.volumesOwned.max() ?? 0,
+                            10
+                        )
+                        maxVolume = currentMax + 5
+                    }
                 }
             }
         }
@@ -417,8 +494,15 @@ struct CollectionView: View {
             } else {
                 updatedVolumes.append(number)
             }
+            
             userManga.volumesOwned = updatedVolumes
             userManga.updatedAt = .now
+            
+            if let total = userManga.totalVolumes, total > 0 {
+                userManga.completeCollection = (updatedVolumes.count == total)
+            } else {
+                userManga.completeCollection = false
+            }
             
             Task {
                 await collectionVM.updateRemote(userManga)
