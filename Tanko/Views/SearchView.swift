@@ -291,6 +291,12 @@ struct SearchView: View {
     }
     
     private func applyCurrentFilters() {
+        if !filtersViewModel.hasActiveFilters {
+            viewModel.reset()
+            searchText = ""
+            return
+        }
+        
         let dto = filtersViewModel.createSearchDTO()
         Task {
             await viewModel.search(mode: .advanced(dto: dto))

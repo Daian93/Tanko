@@ -34,7 +34,11 @@ struct MainTabView: View {
             }
 
             Tab("tab.search", systemImage: "magnifyingglass", role: .search) {
-                SearchView()
+                if !isiPhone {
+                    SearchViewiPad()
+                } else {
+                    SearchView()
+                }
             }
         }
         .tabBarMinimizeBehavior(.onScrollDown)
@@ -47,4 +51,3 @@ struct MainTabView: View {
     MainTabView()
         .withPreviewEnvironment()
 }
-

@@ -62,6 +62,9 @@ struct ProfileView: View {
                             TextField("Tu nombre", text: $settings.userName)
                                 .multilineTextAlignment(.center)
                                 .font(.headline)
+                                .onChange(of: settings.userName) { oldValue, newValue in
+                                    settings.updateName(newValue)
+                                }
                         }
                         Spacer()
                     }
@@ -107,6 +110,9 @@ struct ProfileView: View {
             .navigationTitle("Ajustes")
             .sheet(isPresented: $showEmojiPicker) {
                 EmojiPickerView(selectedEmoji: $settings.profileEmoji)
+            }
+            .onChange(of: settings.profileEmoji) { oldValue, newValue in
+                settings.updateEmoji(newValue)
             }
             .toolbar {
 
