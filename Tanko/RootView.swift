@@ -12,23 +12,21 @@ struct RootView: View {
     @Environment(SessionManager.self) private var session
     @Environment(\.modelContext) private var context
     @State private var userCollectionVM: UserMangaCollectionViewModel?
-    
-    @State private var isInitialSyncDone = false
+    @State private var showLoadingOverlay = true
 
     var body: some View {
         Group {
             if session.canAccessApp {
                 if let vm = userCollectionVM {
-                    if !isInitialSyncDone {
+                    if showLoadingOverlay {
                         LoadingView(message: session.isAuthenticated
                                     ? "Sincronizando tu colección..."
                                     : "Cargando biblioteca...")
-                        .task {
-                            await performInitialLoad(vm: vm)
-                        }
+                        .transition(.opacity)
                     } else {
                         MainTabView()
                             .environment(vm)
+                            .transition(.opacity)
                     }
                 } else {
                     ProgressView()
@@ -37,41 +35,43 @@ struct RootView: View {
                 OnboardingView()
             }
         }
-        .onAppear {
-            if userCollectionVM == nil {
-                buildViewModel()
+        .task(id: session.canAccessApp) {
+            if session.canAccessApp, let vm = userCollectionVM {
+                if session.isAuthenticated {
+                    await vm.synchronize()
+                } else {
+                    await vm.loadCollection()
+                }
             }
         }
-        .onChange(of: session.isAuthenticated) { _, _ in
-            isInitialSyncDone = false
+        .onAppear {
             buildViewModel()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                withAnimation {
+                    showLoadingOverlay = false
+                }
+            }
+        }
+    
+        .onChange(of: session.isAuthenticated) { old, newValue in
+            buildViewModel()
+            showLoadingOverlay = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                withAnimation {
+                    showLoadingOverlay = false
+                }
+            }
+            if newValue {
+                Task {
+                    await userCollectionVM?.synchronize()
+                }
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .didLogout)) { _ in
             Task {
                 await LocalDatabaseCleaner.clear(context: context)
-                isInitialSyncDone = false
                 buildViewModel()
             }
-        }
-    }
-
-    // MARK: - Lógica de carga
-    private func performInitialLoad(vm: UserMangaCollectionViewModel) async {
-        let startTime = Date()
-        
-        if session.isAuthenticated {
-            await vm.synchronize()
-        } else {
-            await vm.loadCollection()
-        }
-        
-        let elapsed = Date().timeIntervalSince(startTime)
-        if elapsed < 1.2 {
-            try? await Task.sleep(nanoseconds: UInt64((1.2 - elapsed) * 1_000_000_000))
-        }
-        
-        withAnimation {
-            isInitialSyncDone = true
         }
     }
 
@@ -82,6 +82,7 @@ struct RootView: View {
             : nil
         
         let repo: MangaCollectionRepository = remote ?? local
+        
 
         let syncService = MangaCollectionSyncService(
             local: local,
