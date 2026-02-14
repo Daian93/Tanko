@@ -11,9 +11,17 @@ import SwiftData
 @MainActor
 enum PreviewHelper {
     static let container: ModelContainer = {
-        let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        return try! ModelContainer(for: UserManga.self, configurations: config)
-    }()
+            let config = ModelConfiguration(isStoredInMemoryOnly: true)
+            let container = try! ModelContainer(for: UserManga.self, configurations: config)
+    
+            UserManga.sampleCollection.forEach { manga in
+                container.mainContext.insert(manga)
+            }
+
+            try? container.mainContext.save()
+            
+            return container
+        }()
 
     static func makeCollectionVM() -> UserMangaCollectionViewModel {
         let context = container.mainContext

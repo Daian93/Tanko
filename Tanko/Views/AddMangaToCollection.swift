@@ -5,28 +5,28 @@
 //  Created by Diana Rammal Sansón on 8/2/26.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct AddMangaToCollectionView: View {
     let manga: Manga
-    
+
     @Environment(\.dismiss) private var dismiss
-    @Environment(UserMangaCollectionViewModel.self) private var userMangaCollectionVM
+    @Environment(UserMangaCollectionViewModel.self) private
+        var userMangaCollectionVM
 
     @State private var volumesOwned: Set<Int> = []
     @State private var readingVolume: Int = 0
-    @State private var readingVolumeText: String = "0"
     @FocusState private var isTextFieldFocused: Bool
 
     private var totalVolumes: Int {
         max(manga.volumes ?? 0, 0)
     }
-    
+
     private var maxVolume: Int {
         totalVolumes > 0 ? totalVolumes : 999
     }
-    
+
     private var isCompleteCollection: Bool {
         guard totalVolumes > 0 else { return false }
         return volumesOwned.count == totalVolumes
@@ -35,45 +35,65 @@ struct AddMangaToCollectionView: View {
     var body: some View {
         NavigationStack {
             Form {
+                // MARK: - Progreso de lectura
                 Section {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Tomo actual", systemImage: "book.closed.fill")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        
-                        HStack(spacing: 12) {
-                            // Botón -
-                            Button {
-                                decrementReading()
-                            } label: {
-                                Image(systemName: "minus.circle.fill")
-                                    .font(.system(size: 32))
-                                    .foregroundStyle(readingVolume > 0 ? Color.red : Color.gray)
-                            }
-                            .disabled(readingVolume <= 0)
-                            
-                            TextField("0", text: $readingVolumeText)
-                                .keyboardType(.numberPad)
-                                .textFieldStyle(.roundedBorder)
-                                .multilineTextAlignment(.center)
-                                .font(.title2.bold())
-                                .focused($isTextFieldFocused)
-                                .onChange(of: readingVolumeText) { _, newValue in
-                                    updateReadingFromText(newValue)
-                                }
-                                .frame(maxWidth: 100)
-                            
-                            // Botón +
-                            Button {
-                                incrementReading()
-                            } label: {
-                                Image(systemName: "plus.circle.fill")
-                                    .font(.system(size: 32))
-                                    .foregroundStyle(readingVolume < maxVolume ? Color.green : Color.gray)
-                            }
-                            .disabled(readingVolume >= maxVolume)
+                    HStack(spacing: 12) {
+                        Spacer()
+
+                        // Botón -
+                        Button {
+                            isTextFieldFocused = false
+                            decrementReading()
+                        } label: {
+                            Image(systemName: "minus.circle.fill")
+                                .font(.system(size: 32))
+                                .foregroundStyle(
+                                    readingVolume > 0 ? Color.red : Color.gray
+                                )
                         }
-                        .frame(maxWidth: .infinity)
+                        .buttonStyle(.plain)
+                        .disabled(readingVolume <= 0)
+
+                        // TextField
+                        TextField("0", value: $readingVolume, format: .number)
+                            .keyboardType(.numberPad)
+                            .multilineTextAlignment(.center)
+                            .font(.title2.bold())
+                            .frame(width: 80)
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 16)
+                            .background(Color(.secondarySystemBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .focused($isTextFieldFocused)
+                            .onChange(of: readingVolume) { _, newValue in
+                                readingVolume = min(max(newValue, 0), maxVolume)
+                            }
+                            .toolbar {
+                                ToolbarItemGroup(placement: .keyboard) {
+                                    Spacer()
+                                    Button("Listo") {
+                                        isTextFieldFocused = false
+                                    }
+                                    .fontWeight(.semibold)
+                                }
+                            }
+
+                        // Botón +
+                        Button {
+                            isTextFieldFocused = false
+                            incrementReading()
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 32))
+                                .foregroundStyle(
+                                    readingVolume < maxVolume
+                                        ? Color.green : Color.gray
+                                )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(readingVolume >= maxVolume)
+
+                        Spacer()
                     }
                     .padding(.vertical, 8)
                 } header: {
@@ -86,42 +106,55 @@ struct AddMangaToCollectionView: View {
                     }
                 }
 
+                // MARK: - Tomos en estantería
                 if totalVolumes > 0 {
                     Section {
-                        HStack(spacing: 10) {
+                        HStack(spacing: 8) {
                             Button {
                                 selectAllVolumes()
                             } label: {
-                                Label("Todos", systemImage: "checkmark.circle.fill")
-                                    .font(.subheadline)
-                                    .frame(maxWidth: .infinity)
+                                Label(
+                                    "Todos",
+                                    systemImage: "checkmark.circle.fill"
+                                )
+                                .font(.subheadline)
+                                .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(.bordered)
                             .tint(.green)
-                            
+
                             Button {
                                 clearAllVolumes()
                             } label: {
-                                Label("Ninguno", systemImage: "xmark.circle.fill")
-                                    .font(.subheadline)
-                                    .frame(maxWidth: .infinity)
+                                Label(
+                                    "Ninguno",
+                                    systemImage: "xmark.circle.fill"
+                                )
+                                .font(.subheadline)
+                                .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(.bordered)
                             .tint(.red)
-                            
+
                             Button {
                                 invertSelection()
                             } label: {
-                                Label("Invertir", systemImage: "arrow.triangle.2.circlepath")
-                                    .font(.subheadline)
-                                    .frame(maxWidth: .infinity)
+                                Label(
+                                    "Invertir",
+                                    systemImage: "arrow.triangle.2.circlepath"
+                                )
+                                .font(.subheadline)
+                                .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(.bordered)
                             .tint(.blue)
                         }
                         .padding(.vertical, 4)
-                        
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 44))], spacing: 10) {
+
+                        LazyVGrid(
+                            columns: [GridItem(.adaptive(minimum: 44))],
+                            spacing: 10
+                        ) {
                             ForEach(1...totalVolumes, id: \.self) { number in
                                 let owned = volumesOwned.contains(number)
                                 Button {
@@ -130,9 +163,17 @@ struct AddMangaToCollectionView: View {
                                     Text("\(number)")
                                         .font(.caption.bold())
                                         .frame(width: 44, height: 44)
-                                        .background(owned ? Color.green : Color.gray.opacity(0.2))
-                                        .foregroundStyle(owned ? .white : .primary)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .background(
+                                            owned
+                                                ? Color.green
+                                                : Color.gray.opacity(0.2)
+                                        )
+                                        .foregroundStyle(
+                                            owned ? .white : .primary
+                                        )
+                                        .clipShape(
+                                            RoundedRectangle(cornerRadius: 8)
+                                        )
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -141,16 +182,20 @@ struct AddMangaToCollectionView: View {
                     } header: {
                         Text("Tomos en estantería")
                     } footer: {
-                        Text("\(volumesOwned.count) de \(totalVolumes) tomos seleccionados")
+                        Text(
+                            "\(volumesOwned.count) de \(totalVolumes) tomos seleccionados"
+                        )
                     }
                 }
-
 
                 if totalVolumes > 0 {
                     Section {
                         HStack {
-                            Label("Estado de la colección", systemImage: "checkmark.seal.fill")
-                                .foregroundStyle(.secondary)
+                            Label(
+                                "Estado de la colección",
+                                systemImage: "checkmark.seal.fill"
+                            )
+                            .foregroundStyle(.secondary)
                             Spacer()
                             if isCompleteCollection {
                                 Text("Completa")
@@ -163,19 +208,21 @@ struct AddMangaToCollectionView: View {
                         }
                     } footer: {
                         if isCompleteCollection {
-                            Text("Tienes todos los \(totalVolumes) tomos en tu estantería.")
+                            Text(
+                                "Tienes todos los \(totalVolumes) tomos en tu estantería."
+                            )
                         } else {
-                            Text("Te faltan \(totalVolumes - volumesOwned.count) tomos para completar la colección.")
+                            Text(
+                                "Te faltan \(totalVolumes - volumesOwned.count) tomos para completar la colección."
+                            )
                         }
                     }
                 }
             }
-            .onTapGesture {
-                isTextFieldFocused = false
-            }
+            .scrollDismissesKeyboard(.immediately)
             .navigationTitle("Añadir a colección")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarTitleDisplayMode(.inline)
+
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancelar") {
@@ -189,7 +236,8 @@ struct AddMangaToCollectionView: View {
                             await userMangaCollectionVM.add(
                                 manga: manga,
                                 volumesOwned: Array(volumesOwned).sorted(),
-                                readingVolume: readingVolume == 0 ? nil : readingVolume,
+                                readingVolume: readingVolume == 0
+                                    ? nil : readingVolume,
                                 completeCollection: isCompleteCollection
                             )
                             dismiss()
@@ -199,37 +247,19 @@ struct AddMangaToCollectionView: View {
             }
         }
     }
-    
+
     // MARK: - Helper Methods
-    
+
     private func incrementReading() {
-        if readingVolume < maxVolume {
-            readingVolume += 1
-            readingVolumeText = "\(readingVolume)"
-        }
+        guard readingVolume < maxVolume else { return }
+        readingVolume += 1
     }
-    
+
     private func decrementReading() {
-        if readingVolume > 0 {
-            readingVolume -= 1
-            readingVolumeText = "\(readingVolume)"
-        }
+        guard readingVolume > 0 else { return }
+        readingVolume -= 1
     }
-    
-    private func updateReadingFromText(_ text: String) {
-        let filtered = text.filter { $0.isNumber }
-        
-        if let value = Int(filtered) {
-            readingVolume = min(value, maxVolume)
-            if value > maxVolume {
-                readingVolumeText = "\(maxVolume)"
-            }
-        } else if filtered.isEmpty {
-            readingVolume = 0
-            readingVolumeText = "0"
-        }
-    }
-    
+
     private func toggleVolume(_ number: Int) {
         if volumesOwned.contains(number) {
             volumesOwned.remove(number)
@@ -237,15 +267,15 @@ struct AddMangaToCollectionView: View {
             volumesOwned.insert(number)
         }
     }
-    
+
     private func selectAllVolumes() {
         volumesOwned = Set(1...totalVolumes)
     }
-    
+
     private func clearAllVolumes() {
         volumesOwned.removeAll()
     }
-    
+
     private func invertSelection() {
         let allVolumes = Set(1...totalVolumes)
         volumesOwned = allVolumes.subtracting(volumesOwned)

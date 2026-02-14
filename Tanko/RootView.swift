@@ -101,3 +101,8 @@ struct RootView: View {
         )
     }
 }
+
+#Preview {
+    RootView()
+        .withPreviewEnvironment()
+}

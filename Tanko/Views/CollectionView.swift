@@ -525,9 +525,13 @@ extension CollectionView {
             
         case .leyendo:
             return userMangas.filter {
-                guard let total = $0.totalVolumes else { return false }
                 let reading = $0.readingVolume ?? 0
-                return reading > 0 && reading < total
+                
+                if let total = $0.totalVolumes {
+                    return reading > 0 && reading < total
+                }
+            
+                return reading > 0 && !$0.completeCollection
             }
             
         case .completados:

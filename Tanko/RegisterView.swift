@@ -58,3 +58,8 @@ struct RegisterView: View {
         }
     }
 }
+
+#Preview {
+    RegisterView(session: SessionManager())
+        .withPreviewEnvironment()
+}

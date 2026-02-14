@@ -1,5 +1,5 @@
 //
-//  PreviewData.swift
+//  PreviewDataModel.swift
 //  Tanko
 //
 //  Created by Diana Rammal Sansón on 20/1/26.
