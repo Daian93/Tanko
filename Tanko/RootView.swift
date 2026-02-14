@@ -12,20 +12,21 @@ struct RootView: View {
     @Environment(SessionManager.self) private var session
     @Environment(\.modelContext) private var context
     @State private var userCollectionVM: UserMangaCollectionViewModel?
-    @State private var isInitialLoading = false
-    @State private var hasLoadedOnce = false
+    
+    @State private var isInitialSyncDone = false
 
     var body: some View {
         Group {
             if session.canAccessApp {
                 if let vm = userCollectionVM {
-                    if isInitialLoading || !hasLoadedOnce {
-                        // Show loading screen during initial sync
+                    if !isInitialSyncDone {
                         LoadingView(message: session.isAuthenticated
-                            ? "Sincronizando tu colección..."
-                            : "Cargando tu biblioteca...")
+                                    ? "Sincronizando tu colección..."
+                                    : "Cargando biblioteca...")
+                        .task {
+                            await performInitialLoad(vm: vm)
+                        }
                     } else {
-                        // Show main app
                         MainTabView()
                             .environment(vm)
                     }
@@ -36,47 +37,41 @@ struct RootView: View {
                 OnboardingView()
             }
         }
-        .animation(.easeInOut(duration: 0.3), value: isInitialLoading)
         .onAppear {
-            buildViewModel()
+            if userCollectionVM == nil {
+                buildViewModel()
+            }
         }
-        .task(id: session.canAccessApp) {
-            // Initial load/sync when user accesses the app (authenticated OR guest)
-            guard session.canAccessApp, let vm = userCollectionVM else { return }
-            
-            isInitialLoading = true
-            hasLoadedOnce = false
-            
-            // Track when loading started
-            let startTime = Date()
-            
-            if session.isAuthenticated {
-                await vm.synchronize()
-            } else if session.isGuest {
-                await vm.loadCollection()
-            }
-            
-            // Calculate elapsed time
-            let elapsed = Date().timeIntervalSince(startTime)
-            let minimumDisplayTime: TimeInterval = 1.5 // 1.5 seconds minimum
-            
-            // If loading was too fast, add delay to avoid jarring flash
-            if elapsed < minimumDisplayTime {
-                let remainingTime = minimumDisplayTime - elapsed
-                try? await Task.sleep(nanoseconds: UInt64(remainingTime * 1_000_000_000))
-            }
-            
-            // Hide loading screen after minimum display time
-            withAnimation {
-                isInitialLoading = false
-                hasLoadedOnce = true
-            }
+        .onChange(of: session.isAuthenticated) { _, _ in
+            isInitialSyncDone = false
+            buildViewModel()
         }
         .onReceive(NotificationCenter.default.publisher(for: .didLogout)) { _ in
             Task {
                 await LocalDatabaseCleaner.clear(context: context)
-                buildViewModel() // Reinicia con repos locales
+                isInitialSyncDone = false
+                buildViewModel()
             }
+        }
+    }
+
+    // MARK: - Lógica de carga
+    private func performInitialLoad(vm: UserMangaCollectionViewModel) async {
+        let startTime = Date()
+        
+        if session.isAuthenticated {
+            await vm.synchronize()
+        } else {
+            await vm.loadCollection()
+        }
+        
+        let elapsed = Date().timeIntervalSince(startTime)
+        if elapsed < 1.2 {
+            try? await Task.sleep(nanoseconds: UInt64((1.2 - elapsed) * 1_000_000_000))
+        }
+        
+        withAnimation {
+            isInitialSyncDone = true
         }
     }
 
@@ -87,7 +82,6 @@ struct RootView: View {
             : nil
         
         let repo: MangaCollectionRepository = remote ?? local
-        
 
         let syncService = MangaCollectionSyncService(
             local: local,
