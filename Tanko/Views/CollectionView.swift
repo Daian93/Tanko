@@ -15,37 +15,38 @@ struct CollectionView: View {
     @Environment(\.modelContext) private var context
     @State private var showOnboarding = false
     @Namespace private var namespace
-    
-    
+
     @State private var selectedFilter: CollectionFilter = .todo
-    
+
     enum CollectionFilter: String, CaseIterable {
         case todo = "Todos"
         case porEmpezar = "Por empezar"
         case leyendo = "Leyendo"
-        case completados = "Completados"
+        case leidos = "Leídos"
+        case completados = "Colección completa"
     }
-    
+
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    
+
                     // MARK: - Estadísticas
-                    
+
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Estadísticas")
                             .font(.title2.bold())
                             .padding(.horizontal)
-                        
+
                         statsGrid
                     }
-                    
+
                     // MARK: - Filtros
-                    
+
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
-                            ForEach(CollectionFilter.allCases, id: \.self) { filter in
+                            ForEach(CollectionFilter.allCases, id: \.self) {
+                                filter in
                                 Button {
                                     withAnimation(.easeInOut) {
                                         selectedFilter = filter
@@ -57,13 +58,13 @@ struct CollectionView: View {
                                         .padding(.vertical, 8)
                                         .background(
                                             selectedFilter == filter
-                                            ? Color("TankoPrimary")
-                                            : Color(.systemGray6)
+                                                ? Color("TankoPrimary")
+                                                : Color(.systemGray6)
                                         )
                                         .foregroundStyle(
                                             selectedFilter == filter
-                                            ? .white
-                                            : .primary
+                                                ? .white
+                                                : .primary
                                         )
                                         .clipShape(Capsule())
                                 }
@@ -71,11 +72,11 @@ struct CollectionView: View {
                         }
                         .padding(.horizontal)
                     }
-                    
+
                     // MARK: - Lista
-                    
+
                     VStack(spacing: 12) {
-                        
+
                         if filteredMangas.isEmpty {
                             EmptyStateView(filter: selectedFilter)
                                 .padding(.top, 40)
@@ -97,10 +98,11 @@ struct CollectionView: View {
             .task {
                 if session.isAuthenticated {
                     await collectionVM.synchronize()
+                } else {
                     await collectionVM.loadCollection()
                 }
             }
-            
+
             .refreshable {
                 if session.isAuthenticated {
                     await collectionVM.synchronize()
@@ -118,24 +120,24 @@ struct CollectionView: View {
             }
         }
     }
-    
+
     // MARK: - StatItem
-    
+
     struct StatItem: View {
-        
+
         let label: String
         let value: String
         let icon: String
-        
+
         var body: some View {
             VStack(spacing: 4) {
                 Image(systemName: icon)
                     .font(.caption)
                     .foregroundStyle(Color("TankoPrimary"))
-                
+
                 Text(value)
                     .font(.headline)
-                
+
                 Text(label)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
@@ -144,56 +146,60 @@ struct CollectionView: View {
             .frame(maxWidth: .infinity)
         }
     }
-    
+
     // MARK: - Manga Row
-    
+
     struct MangaProgressRow: View {
-        
+
         @Bindable var userManga: UserManga
         let namespace: Namespace.ID
-        
+
         @Environment(UserMangaCollectionViewModel.self) private var collectionVM
         @Environment(\.modelContext) private var context
         @State private var showVolumeManagement = false
         @State private var showDeleteAlert = false
-        
+        @State private var showErrorAlert = false
+        @State private var errorMessage = ""
+
         private var totalVolumes: Int {
             if let definedTotal = userManga.totalVolumes {
                 return definedTotal
             }
-            return max(userManga.readingVolume ?? 0,
-                      userManga.volumesOwned.max() ?? 0,
-                      1)
+            return max(
+                userManga.readingVolume ?? 0,
+                userManga.volumesOwned.max() ?? 0,
+                1
+            )
         }
-        
+
         private var hasDynamicTotal: Bool {
             userManga.totalVolumes == nil
         }
-        
+
         private var reading: Int {
             userManga.readingVolume ?? 0
         }
-        
+
         private var progress: Double {
             guard totalVolumes > 0 else { return 0 }
             return Double(reading) / Double(totalVolumes)
         }
-        
+
         private var progressColor: Color {
             if progress == 0 { return .gray }
             if progress < 0.5 { return .orange }
             if progress < 1 { return Color("TankoSecondary") }
             return .green
         }
-        
+
         var body: some View {
-            
+
             VStack(alignment: .leading, spacing: 14) {
-                
+
                 // MARK: Top Section
-                
+
                 HStack(spacing: 14) {
-                    
+
                     CoverView(
                         cover: userManga.coverURL,
                         namespace: namespace,
@@ -201,22 +207,22 @@ struct CollectionView: View {
                     )
                     .frame(width: 65, height: 95)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
-                    
+
                     VStack(alignment: .leading, spacing: 8) {
-                        
+
                         Text(userManga.title)
                             .font(.system(size: 16, weight: .semibold))
                             .lineLimit(2)
-                        
+
                         VStack(alignment: .leading, spacing: 6) {
-                            
+
                             HStack {
                                 Text("Progreso")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
-                                
+
                                 Spacer()
-                                
+
                                 if hasDynamicTotal {
                                     Text("\(reading)/\(totalVolumes)+")
                                         .font(.caption.weight(.medium))
@@ -227,52 +233,56 @@ struct CollectionView: View {
                                         .foregroundStyle(progressColor)
                                 }
                             }
-                            
+
                             ProgressView(value: progress)
                                 .tint(progressColor)
                                 .scaleEffect(y: 2.2)
                                 .animation(.easeInOut, value: progress)
                         }
-                        
+
                         // Owned badge
                         HStack {
-                            Label("\(userManga.volumesOwned.count) tomos",
-                                  systemImage: "books.vertical.fill")
-                                .font(.caption2)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Color.green.opacity(0.1))
-                                .foregroundStyle(.green)
-                                .clipShape(Capsule())
-                            
+                            Label(
+                                "\(userManga.volumesOwned.count) tomos",
+                                systemImage: "books.vertical.fill"
+                            )
+                            .font(.caption2)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.green.opacity(0.1))
+                            .foregroundStyle(.green)
+                            .clipShape(Capsule())
+
                             if userManga.completeCollection {
-                                Label("Completo",
-                                      systemImage: "checkmark.seal.fill")
-                                    .font(.caption2)
-                                    .foregroundStyle(.green)
+                                Label(
+                                    "Completo",
+                                    systemImage: "checkmark.seal.fill"
+                                )
+                                .font(.caption2)
+                                .foregroundStyle(.green)
                             }
                         }
                     }
-                    
+
                     Spacer()
-                    
+
                     Button {
-                                        showDeleteAlert = true
-                                    } label: {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundStyle(AppColors.primary)
-                                            .font(.title2)
-                                    }
-                                    .buttonStyle(.plain)
+                        showDeleteAlert = true
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(AppColors.primary)
+                            .font(.title2)
+                    }
+                    .buttonStyle(.plain)
                 }
-                
+
                 // MARK: Bottom Controls
-                
+
                 HStack {
-                    
+
                     // +/- Capsule
                     HStack(spacing: 0) {
-                        
+
                         Button {
                             updateReading(by: -1)
                         } label: {
@@ -280,10 +290,10 @@ struct CollectionView: View {
                                 .frame(width: 34, height: 34)
                         }
                         .disabled(reading <= 0)
-                        
+
                         Divider()
                             .frame(height: 20)
-                        
+
                         if hasDynamicTotal {
                             Text("Vol \(reading)+")
                                 .font(.subheadline.weight(.medium))
@@ -293,10 +303,10 @@ struct CollectionView: View {
                                 .font(.subheadline.weight(.medium))
                                 .frame(minWidth: 60)
                         }
-                        
+
                         Divider()
                             .frame(height: 20)
-                        
+
                         Button {
                             updateReading(by: 1)
                         } label: {
@@ -313,11 +323,11 @@ struct CollectionView: View {
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(Color.gray.opacity(0.2))
                     )
-                    
+
                     Spacer()
-                    
+
                     // Manage Volumes Button
-                    
+
                     Button {
                         showVolumeManagement.toggle()
                     } label: {
@@ -342,30 +352,37 @@ struct CollectionView: View {
                 VolumesManagementView(userManga: userManga)
                     .presentationDetents([.medium])
             }
-            .alert("Eliminar manga", isPresented: $showDeleteAlert, actions: {
-                  Button("Eliminar", role: .destructive) {
-                      showDeleteAlert = false
-                      Task {
-                          try? await Task.sleep(nanoseconds: 100_000_000)
-                          await collectionVM.remove(userManga)
-                      }
-                  }
-                  Button("Cancelar", role: .cancel) {}
-              }, message: {
-                  Text("¿Estás seguro que quieres eliminar este manga de tu colección?")
-              })
+            .alert(
+                "Eliminar manga",
+                isPresented: $showDeleteAlert,
+                actions: {
+                    Button("Eliminar", role: .destructive) {
+                        showDeleteAlert = false
+                        Task {
+                            try? await Task.sleep(nanoseconds: 100_000_000)
+                            await collectionVM.remove(userManga)
+                        }
+                    }
+                    Button("Cancelar", role: .cancel) {}
+                },
+                message: {
+                    Text(
+                        "¿Estás seguro que quieres eliminar este manga de tu colección?"
+                    )
+                }
+            )
         }
-        
+
         // MARK: Logic
-        
+
         private func updateReading(by value: Int) {
             let newValue = reading + value
-            
+
             guard newValue >= 0 else { return }
-            
+
             if let definedTotal = userManga.totalVolumes {
                 guard newValue <= definedTotal else { return }
-                
+
                 withAnimation(.easeInOut) {
                     userManga.readingVolume = newValue
                     userManga.updatedAt = .now
@@ -376,15 +393,13 @@ struct CollectionView: View {
                     userManga.updatedAt = .now
                 }
             }
-            
+
             Task {
                 await collectionVM.updateRemote(userManga)
             }
         }
     }
 
-    
-    
     struct VolumesManagementView: View {
         @Bindable var userManga: UserManga
         @Environment(UserMangaCollectionViewModel.self) private var collectionVM
@@ -394,7 +409,7 @@ struct CollectionView: View {
         private var hasDynamicTotal: Bool {
             userManga.totalVolumes == nil
         }
-        
+
         private var totalVolumes: Int {
             if let definedTotal = userManga.totalVolumes {
                 return definedTotal
@@ -408,17 +423,22 @@ struct CollectionView: View {
             NavigationStack {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
-                        
+
                         // Info text
                         if hasDynamicTotal {
                             VStack(alignment: .leading, spacing: 8) {
-                                Label("Total de volúmenes desconocido", systemImage: "info.circle")
-                                    .font(.subheadline.bold())
-                                    .foregroundStyle(Color("TankoPrimary"))
-                                
-                                Text("Este manga no tiene un total definido. Puedes añadir volúmenes según los vayas coleccionando.")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                Label(
+                                    "Total de volúmenes desconocido",
+                                    systemImage: "info.circle"
+                                )
+                                .font(.subheadline.bold())
+                                .foregroundStyle(Color("TankoPrimary"))
+
+                                Text(
+                                    "Este manga no tiene un total definido. Puedes añadir volúmenes según los vayas coleccionando."
+                                )
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                             }
                             .padding()
                             .background(Color("TankoPrimary").opacity(0.1))
@@ -434,20 +454,37 @@ struct CollectionView: View {
                         // Volume grid
                         LazyVGrid(columns: columns, spacing: 10) {
                             ForEach(1...totalVolumes, id: \.self) { number in
-                                let isOwned = userManga.volumesOwned.contains(number)
+                                let isOwned = userManga.volumesOwned.contains(
+                                    number
+                                )
                                 Button {
                                     toggleVolume(number: number)
                                 } label: {
                                     Text("\(number)")
-                                        .font(.system(.subheadline, design: .rounded).bold())
+                                        .font(
+                                            .system(
+                                                .subheadline,
+                                                design: .rounded
+                                            ).bold()
+                                        )
                                         .frame(width: 45, height: 45)
-                                        .background(isOwned ? Color.green : Color(.secondarySystemBackground))
-                                        .foregroundStyle(isOwned ? .white : .primary)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .background(
+                                            isOwned
+                                                ? Color.green
+                                                : Color(
+                                                    .secondarySystemBackground
+                                                )
+                                        )
+                                        .foregroundStyle(
+                                            isOwned ? .white : .primary
+                                        )
+                                        .clipShape(
+                                            RoundedRectangle(cornerRadius: 8)
+                                        )
                                 }
                                 .buttonStyle(.plain)
                             }
-                            
+
                             // Add more button for dynamic totals
                             if hasDynamicTotal {
                                 Button {
@@ -456,9 +493,13 @@ struct CollectionView: View {
                                     Image(systemName: "plus.circle.fill")
                                         .font(.title2)
                                         .frame(width: 45, height: 45)
-                                        .background(Color("TankoPrimary").opacity(0.1))
+                                        .background(
+                                            Color("TankoPrimary").opacity(0.1)
+                                        )
                                         .foregroundStyle(Color("TankoPrimary"))
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .clipShape(
+                                            RoundedRectangle(cornerRadius: 8)
+                                        )
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -485,25 +526,25 @@ struct CollectionView: View {
                 }
             }
         }
-        
+
         private func toggleVolume(number: Int) {
             var updatedVolumes = userManga.volumesOwned
-            
+
             if updatedVolumes.contains(number) {
                 updatedVolumes.removeAll { $0 == number }
             } else {
                 updatedVolumes.append(number)
             }
-            
+
             userManga.volumesOwned = updatedVolumes
             userManga.updatedAt = .now
-            
+
             if let total = userManga.totalVolumes, total > 0 {
                 userManga.completeCollection = (updatedVolumes.count == total)
             } else {
                 userManga.completeCollection = false
             }
-            
+
             Task {
                 await collectionVM.updateRemote(userManga)
             }
@@ -512,54 +553,75 @@ struct CollectionView: View {
 }
 
 extension CollectionView {
-    
+
     private var filteredMangas: [UserManga] {
         switch selectedFilter {
+
         case .todo:
             return userMangas
-            
+
         case .porEmpezar:
             return userMangas.filter {
                 ($0.readingVolume ?? 0) == 0
             }
-            
+
         case .leyendo:
             return userMangas.filter {
-                let reading = $0.readingVolume ?? 0
-                
-                if let total = $0.totalVolumes {
-                    return reading > 0 && reading < total
+                guard let total = $0.totalVolumes else {
+                    return ($0.readingVolume ?? 0) > 0
                 }
-            
-                return reading > 0 && !$0.completeCollection
+                let reading = $0.readingVolume ?? 0
+                return reading > 0 && reading < total
             }
-            
+
+        case .leidos:
+            return userMangas.filter {
+                guard let total = $0.totalVolumes else { return false }
+                return ($0.readingVolume ?? 0) >= total
+            }
+
         case .completados:
-            return userMangas.filter { $0.completeCollection }
+            return userMangas.filter {
+                $0.completeCollection
+            }
         }
     }
-    
+
     // MARK: - Stats Grid
-    
+
     private var statsGrid: some View {
         let readingCount = userMangas.filter {
             guard let total = $0.totalVolumes else { return false }
             let reading = $0.readingVolume ?? 0
             return reading > 0 && reading < total
         }.count
-        
+
         let completeCount = userMangas.filter { $0.completeCollection }.count
-        
-        let totalVolumesOwned = userMangas.reduce(0) { $0 + $1.volumesOwned.count }
-        
+
+        let totalVolumesOwned = userMangas.reduce(0) {
+            $0 + $1.volumesOwned.count
+        }
+
         return HStack {
-            StatItem(label: "Total", value: "\(userMangas.count)", icon: "books.vertical")
+            StatItem(
+                label: "Total",
+                value: "\(userMangas.count)",
+                icon: "books.vertical"
+            )
             Divider().frame(height: 40)
             StatItem(label: "Leyendo", value: "\(readingCount)", icon: "book")
             Divider().frame(height: 40)
-            StatItem(label: "Tomos", value: "\(totalVolumesOwned)", icon: "square.stack.3d.up")
+            StatItem(
+                label: "Tomos",
+                value: "\(totalVolumesOwned)",
+                icon: "square.stack.3d.up"
+            )
             Divider().frame(height: 40)
-            StatItem(label: "Completos", value: "\(completeCount)", icon: "checkmark.seal")
+            StatItem(
+                label: "Completos",
+                value: "\(completeCount)",
+                icon: "checkmark.seal"
+            )
         }
         .padding()
         .background(Color("TankoCardSurface"))
@@ -572,9 +634,9 @@ extension CollectionView {
 // MARK: - Empty State View
 
 struct EmptyStateView: View {
-    
+
     let filter: CollectionView.CollectionFilter
-    
+
     var message: String {
         switch filter {
         case .todo:
@@ -583,18 +645,20 @@ struct EmptyStateView: View {
             return "No tienes mangas pendientes de empezar."
         case .leyendo:
             return "No estás leyendo ningún manga actualmente."
+        case .leidos:
+            return "No has leído ningún manga todavía."
         case .completados:
             return "Aún no has completado ningún manga."
         }
     }
-    
+
     var body: some View {
         VStack(spacing: 16) {
-            
+
             Image(systemName: "books.vertical")
                 .font(.system(size: 48))
                 .foregroundStyle(.gray.opacity(0.4))
-            
+
             Text(message)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)

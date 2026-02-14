@@ -15,6 +15,8 @@ struct SearchViewiPad: View {
     @State private var filtersViewModel = FiltersViewModel()
     @State private var searchTask: Task<Void, Never>?
     @Namespace private var namespace
+    @FocusState private var isSearchFocused: Bool
+    @State private var navigationPath = NavigationPath()
     
     var body: some View {
         NavigationSplitView {
@@ -163,7 +165,7 @@ struct SearchViewiPad: View {
     // MARK: - Search Results Detail
     
     private var searchResultsDetail: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             Group {
                 switch viewModel.state {
                 case .idle:
@@ -227,6 +229,9 @@ struct SearchViewiPad: View {
     private func performSearch(query: String) {
         searchTask?.cancel()
         
+        // Bajar el teclado al buscar
+        isSearchFocused = false
+        
         guard !query.isEmpty else {
             viewModel.reset()
             return
@@ -241,6 +246,12 @@ struct SearchViewiPad: View {
     }
     
     private func applyFilters() {
+        // Volver a la raíz de navegación para mostrar los nuevos resultados
+        navigationPath.removeLast(navigationPath.count)
+        
+        // Bajar el teclado
+        isSearchFocused = false
+        
         let dto = filtersViewModel.createSearchDTO()
         Task {
             await viewModel.search(mode: .advanced(dto: dto))
@@ -333,7 +344,6 @@ struct SearchViewiPad: View {
     private var searchResultsList: some View {
         List {
             ForEach(Array(viewModel.results.enumerated()), id: \.element.id) { index, manga in
-                let isInCollection = collectionVM.isInCollection(mangaID: manga.id)
                 let isFirst = index == 0
                 let isLast = index == viewModel.results.count - 1
                 
@@ -341,7 +351,6 @@ struct SearchViewiPad: View {
                     MangaRow(
                         manga: manga,
                         namespace: namespace,
-                        isInCollection: isInCollection,
                         showBackground: false
                     )
                 }
