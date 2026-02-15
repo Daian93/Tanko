@@ -20,10 +20,8 @@ struct SearchViewiPad: View {
     
     var body: some View {
         NavigationSplitView {
-            // SIDEBAR: Filtros
             filtersSidebar
         } detail: {
-            // DETAIL: Resultados de búsqueda
             searchResultsDetail
         }
     }
@@ -229,7 +227,6 @@ struct SearchViewiPad: View {
     private func performSearch(query: String) {
         searchTask?.cancel()
         
-        // Bajar el teclado al buscar
         isSearchFocused = false
         
         guard !query.isEmpty else {
@@ -246,10 +243,8 @@ struct SearchViewiPad: View {
     }
     
     private func applyFilters() {
-        // Volver a la raíz de navegación para mostrar los nuevos resultados
         navigationPath.removeLast(navigationPath.count)
         
-        // Bajar el teclado
         isSearchFocused = false
         
         let dto = filtersViewModel.createSearchDTO()

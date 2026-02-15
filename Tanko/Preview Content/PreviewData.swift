@@ -96,34 +96,3 @@ extension User {
         isAdmin: true
     )
 }
-
-extension ReadingManga {
-    static let onePieceWidget = ReadingManga(
-        id: 1,
-        title: "One Piece",
-        coverURL: URL(
-            string: "https://cdn.myanimelist.net/images/manga/2/253146.jpg"
-        ),
-        readingVolume: 50,
-        totalVolumes: nil,
-        isCompleteCollection: false
-    )
-
-    static let berserkWidget = ReadingManga(
-        id: 3,
-        title: "Berserk",
-        coverURL: URL(
-            string: "https://cdn.myanimelist.net/images/manga/1/157897.jpg"
-        ),
-        readingVolume: 41,
-        totalVolumes: 41,
-        isCompleteCollection: true
-    )
-}
-
-extension ReadingCollection {
-    static let preview = ReadingCollection(
-        mangas: [.onePieceWidget, .berserkWidget],
-        lastUpdated: Date()
-    )
-}

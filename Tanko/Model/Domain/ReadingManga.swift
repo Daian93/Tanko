@@ -29,9 +29,6 @@ struct ReadingManga: Identifiable, Codable, Hashable {
     /// Total published volumes.
     let totalVolumes: Int?
 
-    /// Whether the user marked the collection as complete.
-    let isCompleteCollection: Bool
-
     // MARK: - Computed Properties
 
     /// Indicates if total volumes are officially known.

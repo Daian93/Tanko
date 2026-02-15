@@ -8,22 +8,18 @@
 import SwiftUI
 import WidgetKit
 
-/*
-
 struct TankoTimeline: TimelineProvider {
     typealias Entry = MangaEntry
 
     func placeholder(in context: Context) -> MangaEntry {
-        /*MangaEntry(date: Date(), manga: "Loading...")*/
-        
+        .test
     }
 
     func getSnapshot(
         in context: Context,
         completion: @escaping (MangaEntry) -> Void
     ) {
-        /* let entry = MangaEntry(date: Date(), manga: "Snapshot")
-         completion(entry)*/
+        completion(.test)
     }
 
     func getTimeline(
@@ -37,4 +33,3 @@ struct TankoTimeline: TimelineProvider {
             let entry = MangaEntry(date: date, manga: "Manga for \(hourOffset)")*/
     }
 }
-*/
