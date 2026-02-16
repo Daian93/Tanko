@@ -11,7 +11,7 @@
 		846127B82F3EFF8D0075B2E4 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846127B72F3EFF890075B2E4 /* LoadingView.swift */; };
 		846127C02F3F7C550075B2E4 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846127BF2F3F7C550075B2E4 /* WidgetKit.framework */; };
 		846127C22F3F7C550075B2E4 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846127C12F3F7C550075B2E4 /* SwiftUI.framework */; };
-		846127CD2F3F7C570075B2E4 /* TankoWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 846127BD2F3F7C550075B2E4 /* TankoWidgetExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		846127CD2F3F7C570075B2E4 /* TankoWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 846127BD2F3F7C550075B2E4 /* TankoWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		846127EE2F3F91610075B2E4 /* ReadingManga.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846127ED2F3F91530075B2E4 /* ReadingManga.swift */; };
 		846127EF2F3F97090075B2E4 /* ReadingManga.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846127ED2F3F91530075B2E4 /* ReadingManga.swift */; };
 		846127F62F3F9D0B0075B2E4 /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846127F52F3F9D080075B2E4 /* PreviewData.swift */; };
@@ -85,6 +85,7 @@
 		84B32A1F2F30E71B00F28131 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 84B32A1E2F30E71B00F28131 /* Localizable.xcstrings */; };
 		84CF6EE42F3D44CF00F2E6B5 /* AuthorMangaViewiPad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CF6EE32F3D44C400F2E6B5 /* AuthorMangaViewiPad.swift */; };
 		84CF6EE92F3E459500F2E6B5 /* PreviewHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CF6EE82F3E459000F2E6B5 /* PreviewHelpers.swift */; };
+		84D432DD2F4385C100143763 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849759C32F217D770049E62F /* UIImage.swift */; };
 		84EF4A2F2EFAE00400EE4B89 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 84EF4A2B2EFAE00400EE4B89 /* Assets.xcassets */; };
 		84EF4A302EFAE00400EE4B89 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EF4A2C2EFAE00400EE4B89 /* ContentView.swift */; };
 		84EF4A312EFAE00400EE4B89 /* TankoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EF4A2D2EFAE00400EE4B89 /* TankoApp.swift */; };
@@ -680,6 +681,7 @@
 				846128DB2F436CB40075B2E4 /* MangaCardWidget.swift in Sources */,
 				846128DC2F436CB40075B2E4 /* LargeWidgetView.swift in Sources */,
 				846128DD2F436CB40075B2E4 /* MediumWidgetView.swift in Sources */,
+				84D432DD2F4385C100143763 /* UIImage.swift in Sources */,
 				846128DE2F436CB40075B2E4 /* SmallWidgetView.swift in Sources */,
 				846128DF2F436CB40075B2E4 /* TankoWidgetView.swift in Sources */,
 				846128E02F436CB40075B2E4 /* TankoTimeline.swift in Sources */,
@@ -786,7 +788,6 @@
 /* Begin PBXTargetDependency section */
 		846127CC2F3F7C570075B2E4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			platformFilter = ios;
 			target = 846127BC2F3F7C550075B2E4 /* TankoWidgetExtension */;
 			targetProxy = 846127CB2F3F7C570075B2E4 /* PBXContainerItemProxy */;
 		};
@@ -1011,13 +1012,14 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dianars.Tanko;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = NO;
@@ -1052,13 +1054,14 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dianars.Tanko;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = NO;
