@@ -17,6 +17,22 @@
 		846127F62F3F9D0B0075B2E4 /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846127F52F3F9D080075B2E4 /* PreviewData.swift */; };
 		846128072F3FBD490075B2E4 /* UserMangaCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846128062F3FBD400075B2E4 /* UserMangaCollection.swift */; };
 		8461282C2F411B820075B2E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 84EF4A2B2EFAE00400EE4B89 /* Assets.xcassets */; };
+		846128932F42167D0075B2E4 /* WidgetDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846128922F4216780075B2E4 /* WidgetDataManager.swift */; };
+		846128942F42176C0075B2E4 /* WidgetDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846128922F4216780075B2E4 /* WidgetDataManager.swift */; };
+		846128D82F436CB40075B2E4 /* WidgetImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846128C52F436CB40075B2E4 /* WidgetImageCache.swift */; };
+		846128D92F436CB40075B2E4 /* WidgetTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846128C62F436CB40075B2E4 /* WidgetTheme.swift */; };
+		846128DA2F436CB40075B2E4 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846128C82F436CB40075B2E4 /* EmptyStateView.swift */; };
+		846128DB2F436CB40075B2E4 /* MangaCardWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846128C92F436CB40075B2E4 /* MangaCardWidget.swift */; };
+		846128DC2F436CB40075B2E4 /* LargeWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846128CB2F436CB40075B2E4 /* LargeWidgetView.swift */; };
+		846128DD2F436CB40075B2E4 /* MediumWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846128CC2F436CB40075B2E4 /* MediumWidgetView.swift */; };
+		846128DE2F436CB40075B2E4 /* SmallWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846128CD2F436CB40075B2E4 /* SmallWidgetView.swift */; };
+		846128DF2F436CB40075B2E4 /* TankoWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846128CE2F436CB40075B2E4 /* TankoWidgetView.swift */; };
+		846128E02F436CB40075B2E4 /* TankoTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846128D32F436CB40075B2E4 /* TankoTimeline.swift */; };
+		846128E12F436CB40075B2E4 /* TankoWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846128D42F436CB40075B2E4 /* TankoWidget.swift */; };
+		846128E22F436CB40075B2E4 /* TankoWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846128D52F436CB40075B2E4 /* TankoWidgetBundle.swift */; };
+		846128E32F436CB40075B2E4 /* TimelineEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846128D62F436CB40075B2E4 /* TimelineEntry.swift */; };
+		846128E42F436CB40075B2E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 846128D02F436CB40075B2E4 /* Assets.xcassets */; };
+		846128E72F4373F40075B2E4 /* ImageDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849759C12F217D210049E62F /* ImageDownloader.swift */; };
 		8497599E2F2000A40049E62F /* URL+List.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8497599D2F2000960049E62F /* URL+List.swift */; };
 		849759A02F20011E0049E62F /* NetworkConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8497599F2F2001180049E62F /* NetworkConstants.swift */; };
 		849759A22F20056C0049E62F /* URL+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849759A12F2005650049E62F /* URL+Search.swift */; };
@@ -133,6 +149,21 @@
 		846127ED2F3F91530075B2E4 /* ReadingManga.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingManga.swift; sourceTree = "<group>"; };
 		846127F52F3F9D080075B2E4 /* PreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewData.swift; sourceTree = "<group>"; };
 		846128062F3FBD400075B2E4 /* UserMangaCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserMangaCollection.swift; sourceTree = "<group>"; };
+		846128922F4216780075B2E4 /* WidgetDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataManager.swift; sourceTree = "<group>"; };
+		846128C52F436CB40075B2E4 /* WidgetImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetImageCache.swift; sourceTree = "<group>"; };
+		846128C62F436CB40075B2E4 /* WidgetTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetTheme.swift; sourceTree = "<group>"; };
+		846128C82F436CB40075B2E4 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
+		846128C92F436CB40075B2E4 /* MangaCardWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaCardWidget.swift; sourceTree = "<group>"; };
+		846128CB2F436CB40075B2E4 /* LargeWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeWidgetView.swift; sourceTree = "<group>"; };
+		846128CC2F436CB40075B2E4 /* MediumWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediumWidgetView.swift; sourceTree = "<group>"; };
+		846128CD2F436CB40075B2E4 /* SmallWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallWidgetView.swift; sourceTree = "<group>"; };
+		846128CE2F436CB40075B2E4 /* TankoWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TankoWidgetView.swift; sourceTree = "<group>"; };
+		846128D02F436CB40075B2E4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		846128D12F436CB40075B2E4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		846128D32F436CB40075B2E4 /* TankoTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TankoTimeline.swift; sourceTree = "<group>"; };
+		846128D42F436CB40075B2E4 /* TankoWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TankoWidget.swift; sourceTree = "<group>"; };
+		846128D52F436CB40075B2E4 /* TankoWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TankoWidgetBundle.swift; sourceTree = "<group>"; };
+		846128D62F436CB40075B2E4 /* TimelineEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineEntry.swift; sourceTree = "<group>"; };
 		8497599D2F2000960049E62F /* URL+List.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+List.swift"; sourceTree = "<group>"; };
 		8497599F2F2001180049E62F /* NetworkConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkConstants.swift; sourceTree = "<group>"; };
 		849759A12F2005650049E62F /* URL+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Search.swift"; sourceTree = "<group>"; };
@@ -217,27 +248,6 @@
 		84FED6552F317A1800950A9F /* FiltersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiltersView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		846127CE2F3F7C570075B2E4 /* Exceptions for "TankoWidget" folder in "TankoWidgetExtension" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 846127BC2F3F7C550075B2E4 /* TankoWidgetExtension */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		846127C32F3F7C550075B2E4 /* TankoWidget */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				846127CE2F3F7C570075B2E4 /* Exceptions for "TankoWidget" folder in "TankoWidgetExtension" target */,
-			);
-			path = TankoWidget;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
-
 /* Begin PBXFrameworksBuildPhase section */
 		846127BA2F3F7C550075B2E4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -273,6 +283,59 @@
 				846127F52F3F9D080075B2E4 /* PreviewData.swift */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		846128912F4216730075B2E4 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				846128922F4216780075B2E4 /* WidgetDataManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		846128C72F436CB40075B2E4 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				846128C52F436CB40075B2E4 /* WidgetImageCache.swift */,
+				846128C62F436CB40075B2E4 /* WidgetTheme.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		846128CA2F436CB40075B2E4 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				846128C82F436CB40075B2E4 /* EmptyStateView.swift */,
+				846128C92F436CB40075B2E4 /* MangaCardWidget.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		846128CF2F436CB40075B2E4 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				846128CA2F436CB40075B2E4 /* Components */,
+				846128CE2F436CB40075B2E4 /* TankoWidgetView.swift */,
+				846128CD2F436CB40075B2E4 /* SmallWidgetView.swift */,
+				846128CC2F436CB40075B2E4 /* MediumWidgetView.swift */,
+				846128CB2F436CB40075B2E4 /* LargeWidgetView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		846128D72F436CB40075B2E4 /* TankoWidget */ = {
+			isa = PBXGroup;
+			children = (
+				846128C72F436CB40075B2E4 /* Helpers */,
+				846128CF2F436CB40075B2E4 /* Views */,
+				846128D02F436CB40075B2E4 /* Assets.xcassets */,
+				846128D12F436CB40075B2E4 /* Info.plist */,
+				846128D32F436CB40075B2E4 /* TankoTimeline.swift */,
+				846128D42F436CB40075B2E4 /* TankoWidget.swift */,
+				846128D52F436CB40075B2E4 /* TankoWidgetBundle.swift */,
+				846128D62F436CB40075B2E4 /* TimelineEntry.swift */,
+			);
+			path = TankoWidget;
 			sourceTree = "<group>";
 		};
 		849759A92F204D520049E62F /* Repository */ = {
@@ -364,7 +427,7 @@
 			isa = PBXGroup;
 			children = (
 				84EF4A2E2EFAE00400EE4B89 /* Tanko */,
-				846127C32F3F7C550075B2E4 /* TankoWidget */,
+				846128D72F436CB40075B2E4 /* TankoWidget */,
 				846127BE2F3F7C550075B2E4 /* Frameworks */,
 				84EF4A1E2EFAC07C00EE4B89 /* Products */,
 			);
@@ -382,6 +445,7 @@
 		84EF4A2E2EFAE00400EE4B89 /* Tanko */ = {
 			isa = PBXGroup;
 			children = (
+				846128912F4216730075B2E4 /* Services */,
 				846127B72F3EFF890075B2E4 /* LoadingView.swift */,
 				84A18AF12F3CBD76008AB07B /* LocalDatabaseCleaner.swift */,
 				84A18ADF2F3B441C008AB07B /* MangaCollectionSyncService.swift */,
@@ -514,9 +578,6 @@
 			);
 			dependencies = (
 			);
-			fileSystemSynchronizedGroups = (
-				846127C32F3F7C550075B2E4 /* TankoWidget */,
-			);
 			name = TankoWidgetExtension;
 			packageProductDependencies = (
 			);
@@ -589,6 +650,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				846128E42F436CB40075B2E4 /* Assets.xcassets in Resources */,
 				8461282C2F411B820075B2E4 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -610,6 +672,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				846127EF2F3F97090075B2E4 /* ReadingManga.swift in Sources */,
+				846128E72F4373F40075B2E4 /* ImageDownloader.swift in Sources */,
+				846128942F42176C0075B2E4 /* WidgetDataManager.swift in Sources */,
+				846128D82F436CB40075B2E4 /* WidgetImageCache.swift in Sources */,
+				846128D92F436CB40075B2E4 /* WidgetTheme.swift in Sources */,
+				846128DA2F436CB40075B2E4 /* EmptyStateView.swift in Sources */,
+				846128DB2F436CB40075B2E4 /* MangaCardWidget.swift in Sources */,
+				846128DC2F436CB40075B2E4 /* LargeWidgetView.swift in Sources */,
+				846128DD2F436CB40075B2E4 /* MediumWidgetView.swift in Sources */,
+				846128DE2F436CB40075B2E4 /* SmallWidgetView.swift in Sources */,
+				846128DF2F436CB40075B2E4 /* TankoWidgetView.swift in Sources */,
+				846128E02F436CB40075B2E4 /* TankoTimeline.swift in Sources */,
+				846128E12F436CB40075B2E4 /* TankoWidget.swift in Sources */,
+				846128E22F436CB40075B2E4 /* TankoWidgetBundle.swift in Sources */,
+				846128E32F436CB40075B2E4 /* TimelineEntry.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -689,6 +765,7 @@
 				846127B82F3EFF8D0075B2E4 /* LoadingView.swift in Sources */,
 				84EF4A312EFAE00400EE4B89 /* TankoApp.swift in Sources */,
 				849759B22F2156850049E62F /* MangaViewModel.swift in Sources */,
+				846128932F42167D0075B2E4 /* WidgetDataManager.swift in Sources */,
 				849759F42F2545C90049E62F /* CoverVM.swift in Sources */,
 				84A18AE02F3B4425008AB07B /* MangaCollectionSyncService.swift in Sources */,
 				84EF9E032F1FA2DD00EC2491 /* Model.swift in Sources */,
@@ -721,6 +798,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = TankoWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 278P6L85U8;
@@ -752,6 +830,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = TankoWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 278P6L85U8;
@@ -914,6 +993,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Tanko/Tanko.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 278P6L85U8;
@@ -954,6 +1034,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Tanko/Tanko.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 278P6L85U8;

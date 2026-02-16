@@ -22,14 +22,40 @@ struct TankoTimeline: TimelineProvider {
         completion(.test)
     }
 
-    func getTimeline(
-        in context: Context,
-        completion: @escaping (Timeline<MangaEntry>) -> Void
-    ) {
-        /*var entries: [MangaEntry] = []
-        
-        for hourOffset in 0 ..< 24 {
-            let date = Calendar.current.date(byAdding: .hour, value: hourOffset, to: Date())!
-            let entry = MangaEntry(date: date, manga: "Manga for \(hourOffset)")*/
+    func getTimeline(in context: Context, completion: @escaping (Timeline<MangaEntry>) -> Void) {
+        Task(priority: .high) {
+            let collection = await WidgetDataManager.shared.load()
+            
+            for manga in collection.mangas {
+                if let url = manga.coverURL {
+                    _ = try? await ImageDownloader.shared.image(for: url)
+                }
+            }
+
+            var entries: [MangaEntry] = []
+            let currentDate = Date()
+
+            for minuteOffset in stride(from: 0, to: 60, by: 5) {
+                let entryDate = Calendar.current.date(
+                    byAdding: .minute,
+                    value: minuteOffset,
+                    to: currentDate
+                ) ?? currentDate
+
+                let entry = MangaEntry(
+                    date: entryDate,
+                    mangas: collection.mangas
+                )
+
+                entries.append(entry)
+            }
+
+            let timeline = Timeline(
+                entries: entries,
+                policy: .atEnd
+            )
+
+            completion(timeline)
+        }
     }
 }
