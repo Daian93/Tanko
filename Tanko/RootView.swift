@@ -12,22 +12,21 @@ struct RootView: View {
     @Environment(SessionManager.self) private var session
     @Environment(\.modelContext) private var context
     @State private var userCollectionVM: UserMangaCollectionViewModel?
-    @State private var isInitialLoading = false
-    @State private var hasLoadedOnce = false
+    @State private var showLoadingOverlay = true
 
     var body: some View {
         Group {
             if session.canAccessApp {
                 if let vm = userCollectionVM {
-                    if isInitialLoading || !hasLoadedOnce {
-                        // Show loading screen during initial sync
+                    if showLoadingOverlay {
                         LoadingView(message: session.isAuthenticated
-                            ? "Sincronizando tu colección..."
-                            : "Cargando tu biblioteca...")
+                                    ? "Sincronizando tu colección..."
+                                    : "Cargando biblioteca...")
+                        .transition(.opacity)
                     } else {
-                        // Show main app
                         MainTabView()
                             .environment(vm)
+                            .transition(.opacity)
                     }
                 } else {
                     ProgressView()
@@ -36,46 +35,42 @@ struct RootView: View {
                 OnboardingView()
             }
         }
-        .animation(.easeInOut(duration: 0.3), value: isInitialLoading)
+        .task(id: session.canAccessApp) {
+            if session.canAccessApp, let vm = userCollectionVM {
+                if session.isAuthenticated {
+                    await vm.synchronize()
+                } else {
+                    await vm.loadCollection()
+                }
+            }
+        }
         .onAppear {
             buildViewModel()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                withAnimation {
+                    showLoadingOverlay = false
+                }
+            }
         }
-        .task(id: session.canAccessApp) {
-            // Initial load/sync when user accesses the app (authenticated OR guest)
-            guard session.canAccessApp, let vm = userCollectionVM else { return }
-            
-            isInitialLoading = true
-            hasLoadedOnce = false
-            
-            // Track when loading started
-            let startTime = Date()
-            
-            if session.isAuthenticated {
-                await vm.synchronize()
-            } else if session.isGuest {
-                await vm.loadCollection()
+    
+        .onChange(of: session.isAuthenticated) { old, newValue in
+            buildViewModel()
+            showLoadingOverlay = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                withAnimation {
+                    showLoadingOverlay = false
+                }
             }
-            
-            // Calculate elapsed time
-            let elapsed = Date().timeIntervalSince(startTime)
-            let minimumDisplayTime: TimeInterval = 1.5 // 1.5 seconds minimum
-            
-            // If loading was too fast, add delay to avoid jarring flash
-            if elapsed < minimumDisplayTime {
-                let remainingTime = minimumDisplayTime - elapsed
-                try? await Task.sleep(nanoseconds: UInt64(remainingTime * 1_000_000_000))
-            }
-            
-            // Hide loading screen after minimum display time
-            withAnimation {
-                isInitialLoading = false
-                hasLoadedOnce = true
+            if newValue {
+                Task {
+                    await userCollectionVM?.synchronize()
+                }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .didLogout)) { _ in
             Task {
                 await LocalDatabaseCleaner.clear(context: context)
-                buildViewModel() // Reinicia con repos locales
+                buildViewModel()
             }
         }
     }
@@ -100,4 +95,9 @@ struct RootView: View {
             syncService: syncService
         )
     }
+}
+
+#Preview {
+    RootView()
+        .withPreviewEnvironment()
 }

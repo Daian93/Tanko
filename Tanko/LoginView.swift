@@ -62,3 +62,11 @@ struct LoginView: View {
         }
     }
 }
+
+#Preview {
+    let session = SessionManager()
+    
+    return LoginView(session: session, context: PreviewHelper.container.mainContext)
+        .environment(session)
+        .modelContainer(PreviewHelper.container)
+}

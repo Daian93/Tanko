@@ -44,24 +44,3 @@ extension AuthorRole {
         }
     }
 }
-
-extension Author {
-    static let test = Author(
-        id: UUID(uuidString: "54BE174C-2FE9-42C8-A842-85D291A6AEDD")!,
-        fullName: "Naoki Urasawa",
-        role: .storyAndArt
-    )
-
-    static let tests: [Author] = [
-        Author(
-            id: UUID(uuidString: "00003F96-C82D-451F-A63C-356FB29550BC")!,
-            fullName: "Shirou Toozaki",
-            role: .story
-        ),
-        Author(
-            id: UUID(uuidString: "00047D82-9599-4F05-A782-F157A49CAE07")!,
-            fullName: "Kousaku Anakubo",
-            role: .storyAndArt
-        ),
-    ]
-}

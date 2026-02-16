@@ -153,9 +153,20 @@ struct OnboardingView: View {
             switch sheet {
             case .login:
                 LoginView(session: session, context: context)
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+                    .presentationCornerRadius(28)
             case .register:
                 RegisterView(session: session)
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+                    .presentationCornerRadius(28)
             }
         }
     }
+}
+
+#Preview {
+    OnboardingView()
+        .withPreviewEnvironment()
 }
