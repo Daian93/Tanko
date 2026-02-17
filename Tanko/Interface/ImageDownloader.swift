@@ -7,26 +7,34 @@
 
 import SwiftUI
 
+#if canImport(UIKit)
+    import UIKit
+    public typealias PlatformImage = UIImage
+#elseif canImport(AppKit)
+    import AppKit
+    public typealias PlatformImage = NSImage
+#endif
+
 public actor ImageDownloader {
     public static let shared = ImageDownloader()
 
     private enum ImageStatus {
-        case downloading(task: Task<UIImage, any Error>)
-        case downloaded(image: UIImage)
+        case downloading(task: Task<PlatformImage, any Error>)
+        case downloaded(image: PlatformImage)
     }
 
     private var cache: [URL: ImageStatus] = [:]
 
-    private func getImage(url: URL) async throws -> UIImage {
+    private func getImage(url: URL) async throws -> PlatformImage {
         let (data, _) = try await URLSession.shared.data(from: url)
-        if let image = UIImage(data: data) {
+        if let image = PlatformImage(data: data) {
             return image
         } else {
             throw URLError(.badServerResponse)
         }
     }
 
-    public func image(for url: URL) async throws -> UIImage {
+    public func image(for url: URL) async throws -> PlatformImage {
         if let status = cache[url] {
             return switch status {
             case .downloading(let task):
@@ -57,11 +65,24 @@ public actor ImageDownloader {
         guard let imageCached = cache[url],
             case .downloaded(let image) = imageCached
         else { return }
-        if let resized = await image.resize(width: 300),
-            let data = resized.pngData()
-        {
-            try data.write(to: getFileURL(url: url), options: .atomic)
-            cache.removeValue(forKey: url)
+        if let resized = await image.resize(width: 300) {
+            #if canImport(UIKit)
+                if let data = resized.pngData() {
+                    try data.write(to: getFileURL(url: url), options: .atomic)
+                    cache.removeValue(forKey: url)
+                }
+            #elseif canImport(AppKit)
+                if let tiffData = resized.tiffRepresentation,
+                    let bitmap = NSBitmapImageRep(data: tiffData),
+                    let data = bitmap.representation(
+                        using: .png,
+                        properties: [:]
+                    )
+                {
+                    try data.write(to: getFileURL(url: url), options: .atomic)
+                    cache.removeValue(forKey: url)
+                }
+            #endif
         }
     }
 

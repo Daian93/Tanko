@@ -22,8 +22,8 @@ struct RegisterView: View {
             Form {
                 Section("Email") {
                     TextField("email@ejemplo.com", text: $vm.email)
-                        .keyboardType(.emailAddress)
-                        .textInputAutocapitalization(.never)
+                        .keyboardTypeCompatible(.emailAddress)
+                        .textInputAutocapitalizationCompatible()
                 }
 
                 Section("Contraseña") {

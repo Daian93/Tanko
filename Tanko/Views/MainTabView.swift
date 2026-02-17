@@ -5,26 +5,41 @@
 //  Created by Diana Rammal Sansón on 21/1/26.
 //
 
-
-import SwiftUI
 import SwiftData
+import SwiftUI
 
-@MainActor let isiPhone = UIDevice.current.userInterfaceIdiom == .phone
+extension View {
+    var isPhone: Bool {
+        #if os(iOS)
+            return UIDevice.current.userInterfaceIdiom == .phone
+        #else
+            return false
+        #endif
+    }
+}
 
 struct MainTabView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(UserMangaCollectionViewModel.self) private var userCollectionVM
-    
+
+    #if os(iOS)
+        @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    #endif
+
     var body: some View {
         TabView {
             Tab("tab.mangas", systemImage: "book.fill") {
-                if !isiPhone {
+                #if os(macOS)
                     ContentViewiPad()
-                } else {
-                    ContentView()
-                }
+                #else
+                    if horizontalSizeClass == .compact {
+                        ContentView()
+                    } else {
+                        ContentViewiPad()
+                    }
+                #endif
             }
-            
+
             Tab("tab.collection", systemImage: "books.vertical.fill") {
                 CollectionView()
             }
@@ -34,16 +49,22 @@ struct MainTabView: View {
             }
 
             Tab("tab.search", systemImage: "magnifyingglass", role: .search) {
-                if !isiPhone {
+                #if os(macOS)
                     SearchViewiPad()
-                } else {
-                    SearchView()
-                }
+                #else
+                    if horizontalSizeClass == .compact {
+                        SearchView()
+                    } else {
+                        SearchViewiPad()
+                    }
+                #endif
             }
         }
-        .tabBarMinimizeBehavior(.onScrollDown)
-        .tabViewStyle(.sidebarAdaptable)
-        .defaultAdaptableTabBarPlacement(.tabBar)
+        #if os(iOS)
+            .tabBarMinimizeBehavior(.onScrollDown)
+            .tabViewStyle(.sidebarAdaptable)
+            .defaultAdaptableTabBarPlacement(.tabBar)
+        #endif
     }
 }
 

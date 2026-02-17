@@ -5,8 +5,8 @@
 //  Created by Diana Rammal Sansón on 23/12/25.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct ContentView: View {
     @Environment(UserMangaCollectionViewModel.self) private var userCollectionVM
@@ -53,7 +53,9 @@ struct ContentView: View {
                                 )
                                 .onAppear {
                                     Task {
-                                        await viewModel.loadNextPageIfNeeded(currentItem: manga)
+                                        await viewModel.loadNextPageIfNeeded(
+                                            currentItem: manga
+                                        )
                                     }
                                 }
                             }
@@ -118,8 +120,6 @@ struct ContentView: View {
     }
 }
 
-import SwiftUI
-
 struct MangaCollectionRow: View {
     let manga: Manga
     let namespace: Namespace.ID
@@ -161,12 +161,17 @@ struct MangaCollectionRow: View {
             .padding(.top, 8)
         }
         .animation(.snappy, value: isCollected)
-        .alert("¿Quitar de la colección?", isPresented: $showDeleteConfirmation) {
-            Button("Cancelar", role: .cancel) { }
+        .alert("¿Quitar de la colección?", isPresented: $showDeleteConfirmation)
+        {
+            Button("Cancelar", role: .cancel) {}
             Button("Quitar", role: .destructive) {
                 Task {
-                    if let userManga = userCollectionVM.mangas.first(where: { $0.mangaID == manga.id }) {
-                        await userCollectionVM.removeFromCollection(mangaID: userManga.mangaID)
+                    if let userManga = userCollectionVM.mangas.first(where: {
+                        $0.mangaID == manga.id
+                    }) {
+                        await userCollectionVM.removeFromCollection(
+                            mangaID: userManga.mangaID
+                        )
                         dismiss()
                     }
                 }
@@ -181,5 +186,3 @@ struct MangaCollectionRow: View {
     ContentView()
         .withPreviewEnvironment()
 }
-
-

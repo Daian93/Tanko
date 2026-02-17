@@ -52,20 +52,21 @@ struct CollectionView: View {
                                         selectedFilter = filter
                                     }
                                 } label: {
+                                    let isSelected = selectedFilter == filter
+                                    let backgroundColor =
+                                        isSelected
+                                        ? Color("TankoPrimary")
+                                        : Color(white: 0.95)
+                                    let textColor =
+                                        isSelected ? Color.white : Color.primary
+
                                     Text(filter.rawValue)
                                         .font(.subheadline.weight(.medium))
                                         .padding(.horizontal, 14)
                                         .padding(.vertical, 8)
-                                        .background(
-                                            selectedFilter == filter
-                                                ? Color("TankoPrimary")
-                                                : Color(.systemGray6)
-                                        )
-                                        .foregroundStyle(
-                                            selectedFilter == filter
-                                                ? .white
-                                                : .primary
-                                        )
+                                        .background(backgroundColor)
+                                        .foregroundStyle(textColor)
+
                                         .clipShape(Capsule())
                                 }
                             }
@@ -111,7 +112,7 @@ struct CollectionView: View {
                 }
             }
         }
-        .fullScreenCover(isPresented: $showOnboarding) {
+        .sheet(isPresented: $showOnboarding) {
             OnboardingView()
         }
         .onChange(of: session.isAuthenticated) { _, isAuth in
@@ -471,9 +472,8 @@ struct CollectionView: View {
                                         .background(
                                             isOwned
                                                 ? Color.green
-                                                : Color(
-                                                    .secondarySystemBackground
-                                                )
+                                                : Color(white: 0.95)
+
                                         )
                                         .foregroundStyle(
                                             isOwned ? .white : .primary
@@ -509,7 +509,7 @@ struct CollectionView: View {
                     .padding(.top)
                 }
                 .navigationTitle("Gestionar Colección")
-                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarTitleDisplayModeCompatible(.inline)
                 .toolbar {
                     Button("Hecho") { dismiss() }
                         .fontWeight(.bold)

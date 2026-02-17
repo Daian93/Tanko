@@ -17,7 +17,7 @@ struct SearchViewiPad: View {
     @Namespace private var namespace
     @FocusState private var isSearchFocused: Bool
     @State private var navigationPath = NavigationPath()
-    
+
     var body: some View {
         NavigationSplitView {
             filtersSidebar
@@ -25,32 +25,45 @@ struct SearchViewiPad: View {
             searchResultsDetail
         }
     }
-    
+
     // MARK: - Filters Sidebar
-    
+
     private var filtersSidebar: some View {
         List {
             Section {
                 // Búsqueda por texto
                 Section(header: Text("Búsqueda por texto").font(.headline)) {
-                    TextField("Título del manga", text: $filtersViewModel.searchTitle)
-                        .textFieldStyle(.roundedBorder)
-                    
-                    TextField("Nombre del autor", text: $filtersViewModel.searchAuthorFirstName)
-                        .textFieldStyle(.roundedBorder)
-                    
-                    TextField("Apellido del autor", text: $filtersViewModel.searchAuthorLastName)
-                        .textFieldStyle(.roundedBorder)
-                    
-                    Toggle("Búsqueda parcial", isOn: $filtersViewModel.containsSearch)
+                    TextField(
+                        "Título del manga",
+                        text: $filtersViewModel.searchTitle
+                    )
+                    .textFieldStyle(.roundedBorder)
+
+                    TextField(
+                        "Nombre del autor",
+                        text: $filtersViewModel.searchAuthorFirstName
+                    )
+                    .textFieldStyle(.roundedBorder)
+
+                    TextField(
+                        "Apellido del autor",
+                        text: $filtersViewModel.searchAuthorLastName
+                    )
+                    .textFieldStyle(.roundedBorder)
+
+                    Toggle(
+                        "Búsqueda parcial",
+                        isOn: $filtersViewModel.containsSearch
+                    )
                 }
-                
+
                 // Géneros
                 DisclosureGroup {
                     ForEach(filtersViewModel.availableGenres) { genre in
                         MultiSelectionRow(
                             title: genre.localized,
-                            isSelected: filtersViewModel.selectedGenres.contains(genre)
+                            isSelected: filtersViewModel.selectedGenres
+                                .contains(genre)
                         ) {
                             toggleGenre(genre)
                         }
@@ -71,13 +84,14 @@ struct SearchViewiPad: View {
                         }
                     }
                 }
-                
+
                 // Temáticas
                 DisclosureGroup {
                     ForEach(filtersViewModel.availableThemes) { theme in
                         MultiSelectionRow(
                             title: theme.localized,
-                            isSelected: filtersViewModel.selectedThemes.contains(theme)
+                            isSelected: filtersViewModel.selectedThemes
+                                .contains(theme)
                         ) {
                             toggleTheme(theme)
                         }
@@ -98,13 +112,14 @@ struct SearchViewiPad: View {
                         }
                     }
                 }
-                
+
                 // Demografía
                 DisclosureGroup {
                     ForEach(filtersViewModel.availableDemographics) { demo in
                         MultiSelectionRow(
                             title: demo.localized,
-                            isSelected: filtersViewModel.selectedDemographics.contains(demo)
+                            isSelected: filtersViewModel.selectedDemographics
+                                .contains(demo)
                         ) {
                             toggleDemographic(demo)
                         }
@@ -114,19 +129,21 @@ struct SearchViewiPad: View {
                         Text("Demografía")
                         Spacer()
                         if !filtersViewModel.selectedDemographics.isEmpty {
-                            Text("\(filtersViewModel.selectedDemographics.count)")
-                                .font(.caption)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 2)
-                                .background(Color.pink)
-                                .clipShape(Capsule())
+                            Text(
+                                "\(filtersViewModel.selectedDemographics.count)"
+                            )
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(Color.pink)
+                            .clipShape(Capsule())
                         }
                     }
                 }
             }
-            
+
             // Botones de acción
             Section {
                 Button {
@@ -140,7 +157,7 @@ struct SearchViewiPad: View {
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
-                
+
                 if filtersViewModel.hasActiveFilters {
                     Button(role: .destructive) {
                         filtersViewModel.resetAllFilters()
@@ -159,32 +176,32 @@ struct SearchViewiPad: View {
         .listStyle(.sidebar)
         .navigationTitle("Filtros")
     }
-    
+
     // MARK: - Search Results Detail
-    
+
     private var searchResultsDetail: some View {
         NavigationStack(path: $navigationPath) {
             Group {
                 switch viewModel.state {
                 case .idle:
                     emptySearchState
-                    
+
                 case .loading:
                     ProgressView("Buscando...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    
+
                 case .loaded:
                     searchResultsList
-                    
+
                 case .empty:
                     noResultsState
-                    
+
                 case .error(let message):
                     errorState(message: message)
                 }
             }
             .navigationTitle("Resultados")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayModeCompatible(.inline)
             .searchable(text: $searchText, prompt: "Buscar manga…")
             .onChange(of: searchText) { _, newValue in
                 performSearch(query: newValue)
@@ -197,9 +214,9 @@ struct SearchViewiPad: View {
             }
         }
     }
-    
+
     // MARK: - Helper Methods
-    
+
     private func toggleGenre(_ genre: Genre) {
         if filtersViewModel.selectedGenres.contains(genre) {
             filtersViewModel.selectedGenres.remove(genre)
@@ -207,7 +224,7 @@ struct SearchViewiPad: View {
             filtersViewModel.selectedGenres.insert(genre)
         }
     }
-    
+
     private func toggleTheme(_ theme: Theme) {
         if filtersViewModel.selectedThemes.contains(theme) {
             filtersViewModel.selectedThemes.remove(theme)
@@ -215,7 +232,7 @@ struct SearchViewiPad: View {
             filtersViewModel.selectedThemes.insert(theme)
         }
     }
-    
+
     private func toggleDemographic(_ demo: Demographic) {
         if filtersViewModel.selectedDemographics.contains(demo) {
             filtersViewModel.selectedDemographics.remove(demo)
@@ -223,61 +240,61 @@ struct SearchViewiPad: View {
             filtersViewModel.selectedDemographics.insert(demo)
         }
     }
-    
+
     private func performSearch(query: String) {
         searchTask?.cancel()
-        
+
         isSearchFocused = false
-        
+
         guard !query.isEmpty else {
             viewModel.reset()
             return
         }
-        
+
         searchTask = Task {
             try? await Task.sleep(nanoseconds: 500_000_000)
             guard !Task.isCancelled else { return }
-            
+
             await viewModel.search(mode: .simple(title: query))
         }
     }
-    
+
     private func applyFilters() {
         navigationPath.removeLast(navigationPath.count)
-        
+
         isSearchFocused = false
-        
+
         let dto = filtersViewModel.createSearchDTO()
         Task {
             await viewModel.search(mode: .advanced(dto: dto))
         }
     }
-    
+
     private func applyCurrentFilters() {
         if !filtersViewModel.hasActiveFilters {
             viewModel.reset()
             searchText = ""
             return
         }
-        
+
         let dto = filtersViewModel.createSearchDTO()
         Task {
             await viewModel.search(mode: .advanced(dto: dto))
         }
     }
-    
+
     // MARK: - Views
-    
+
     private var emptySearchState: some View {
         VStack(spacing: 16) {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 60))
                 .foregroundStyle(.secondary)
-            
+
             Text("Buscar Manga")
                 .font(.title2)
                 .fontWeight(.semibold)
-            
+
             Text("Usa los filtros de la izquierda o escribe en el buscador")
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -285,38 +302,38 @@ struct SearchViewiPad: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
     }
-    
+
     private var noResultsState: some View {
         VStack(spacing: 16) {
             Image(systemName: "book.closed")
                 .font(.system(size: 60))
                 .foregroundStyle(.secondary)
-            
+
             Text("No se encontraron resultados")
                 .font(.title3)
                 .fontWeight(.semibold)
-            
+
             Text("Intenta buscar con otros términos o filtros")
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
     }
-    
+
     private func errorState(message: String) -> some View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.largeTitle)
                 .foregroundStyle(.red)
-            
+
             Text("Error")
                 .font(.headline)
-            
+
             Text(message)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
-            
+
             Button("Reintentar") {
                 Task {
                     let mode: SearchMode
@@ -326,7 +343,7 @@ struct SearchViewiPad: View {
                     } else {
                         mode = .simple(title: searchText)
                     }
-                    
+
                     await viewModel.search(mode: mode)
                 }
             }
@@ -335,13 +352,15 @@ struct SearchViewiPad: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
     }
-    
+
     private var searchResultsList: some View {
         List {
-            ForEach(Array(viewModel.results.enumerated()), id: \.element.id) { index, manga in
+            ForEach(Array(viewModel.results.enumerated()), id: \.element.id) {
+                index,
+                manga in
                 let isFirst = index == 0
                 let isLast = index == viewModel.results.count - 1
-                
+
                 NavigationLink(value: manga) {
                     MangaRow(
                         manga: manga,
@@ -352,7 +371,9 @@ struct SearchViewiPad: View {
                 .listRowSeparator(isFirst ? .hidden : .visible, edges: .top)
                 .listRowSeparator(isLast ? .hidden : .visible, edges: .bottom)
                 .listRowSeparatorTint(AppColors.surface)
-                .listRowInsets(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 15))
+                .listRowInsets(
+                    EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 15)
+                )
                 .onAppear {
                     Task {
                         await viewModel.loadNextPageIfNeeded(currentItem: manga)

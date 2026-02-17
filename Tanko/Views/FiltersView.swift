@@ -42,7 +42,8 @@ struct FiltersView: View {
                         ForEach(filtersViewModel.availableGenres) { genre in
                             MultiSelectionRow(
                                 title: genre.localized,
-                                isSelected: filtersViewModel.selectedGenres.contains(genre)
+                                isSelected: filtersViewModel.selectedGenres
+                                    .contains(genre)
                             ) {
                                 toggleGenre(genre)
                             }
@@ -63,12 +64,13 @@ struct FiltersView: View {
                             }
                         }
                     }
-                    
+
                     DisclosureGroup {
                         ForEach(filtersViewModel.availableThemes) { theme in
                             MultiSelectionRow(
                                 title: theme.localized,
-                                isSelected: filtersViewModel.selectedThemes.contains(theme)
+                                isSelected: filtersViewModel.selectedThemes
+                                    .contains(theme)
                             ) {
                                 toggleTheme(theme)
                             }
@@ -89,12 +91,14 @@ struct FiltersView: View {
                             }
                         }
                     }
-                    
+
                     DisclosureGroup {
-                        ForEach(filtersViewModel.availableDemographics) { demo in
+                        ForEach(filtersViewModel.availableDemographics) {
+                            demo in
                             MultiSelectionRow(
                                 title: demo.localized,
-                                isSelected: filtersViewModel.selectedDemographics.contains(demo)
+                                isSelected: filtersViewModel
+                                    .selectedDemographics.contains(demo)
                             ) {
                                 toggleDemographic(demo)
                             }
@@ -104,14 +108,16 @@ struct FiltersView: View {
                             Text("Demografía")
                             Spacer()
                             if !filtersViewModel.selectedDemographics.isEmpty {
-                                Text("\(filtersViewModel.selectedDemographics.count)")
-                                    .font(.caption)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.white)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 2)
-                                    .background(Color.pink)
-                                    .clipShape(Capsule())
+                                Text(
+                                    "\(filtersViewModel.selectedDemographics.count)"
+                                )
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 2)
+                                .background(Color.pink)
+                                .clipShape(Capsule())
                             }
                         }
                     }
@@ -190,7 +196,7 @@ struct MultiSelectionRow: View {
 
 #Preview {
     let mockFiltersVM = FiltersViewModel()
-    
+
     FiltersView(filtersViewModel: mockFiltersVM) { dto in
         print("Filtros aplicados: \(dto)")
     }

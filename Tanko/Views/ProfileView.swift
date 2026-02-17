@@ -12,144 +12,136 @@ struct ProfileView: View {
     @Environment(SessionManager.self) private var session
     @Environment(AppSettings.self) private var settings
     @Environment(\.modelContext) private var context
+
     @State private var showEmojiPicker = false
     @State private var showOnboarding = false
 
     var body: some View {
         @Bindable var settings = settings
-        
-        /*private var headerView: some View {
-         HStack(spacing: 16) {
-             Circle()
-                 .fill(Color.red.opacity(0.1))
-                 .frame(width: 70, height: 70)
-                 .overlay(
-                     Text(
-                         session.isGuest
-                         ? "👤"
-                         : session.user?.email.prefix(2).uppercased() ?? "TU"
-                     )
-                     .font(.headline)
-                     .foregroundStyle(.red)
-                 )
 
-             VStack(alignment: .leading) {
-                 Text(session.isGuest ? "Modo Invitado" : "Mi Perfil")
-                     .font(.title3.bold())
-
-                 Text("\(userMangas.count) mangas en total")
-                     .font(.caption)
-                     .foregroundStyle(.secondary)
-             }
-             Spacer()
-         }
-         .padding(.horizontal)
-     }*/
         NavigationStack {
-            Form {
-                Section("Personalización") {
-                    HStack {
-                        Spacer()
-                        VStack {
-                            Text(settings.profileEmoji)
-                                .font(.system(size: 80))
-                                .padding()
-                                .background(
-                                    Circle().fill(Color.blue.opacity(0.1))
-                                )
-                                .onTapGesture { showEmojiPicker = true }
+            #if os(macOS)
+                macContent(settings: _settings)
+            #else
+                iosContent(settings: settings)
+            #endif
+        }
+        .sheet(isPresented: $showEmojiPicker) {
+            EmojiPickerView(selectedEmoji: $settings.profileEmoji)
+        }
+    }
 
-                            TextField("Tu nombre", text: $settings.userName)
-                                .multilineTextAlignment(.center)
-                                .font(.headline)
-                                .onChange(of: settings.userName) { oldValue, newValue in
-                                    settings.updateName(newValue)
-                                }
-                        }
-                        Spacer()
-                    }
-                    .padding(.vertical)
+    // MARK: - iOS Layout
+    @ViewBuilder
+    private func iosContent(settings: Bindable<AppSettings>) -> some View {
+        Form {
+            Section("Personalización") {
+                VStack(spacing: 15) {
+                    profileImageSection
+
+                    TextField("Tu nombre", text: settings.userName)
+                        .multilineTextAlignment(.center)
+                        .font(.headline)
                 }
+                .padding(.vertical)
+            }
 
-                Section("App") {
-                    Toggle(isOn: $settings.isDarkMode) {
-                        Label(
-                            "Modo oscuro",
-                            systemImage: settings.isDarkMode
-                                ? "moon.fill" : "sun.max"
-                        )
-                    }
-                    .onChange(of: settings.isDarkMode) { oldValue, newValue in
-                        settings.updateDarkMode(newValue)
-                    }
-                }
-
-                Section {
-                    Section {
-                        Button(role: .destructive) {
-                            handleLogout()
-                        } label: {
-                            Label(
-                                session.isGuest
-                                    ? "Volver al Inicio" : "Cerrar Sesión",
-                                systemImage: session.isGuest
-                                    ? "arrow.left.circle"
-                                    : "rectangle.portrait.and.arrow.right"
-                            )
-                        }
-
-                    }
-                } footer: {
-                    if session.isGuest {
-                        Text(
-                            "Estás como invitado. Crea una cuenta para no perder tus datos al cambiar de dispositivo."
-                        )
-                    }
+            Section("App") {
+                Toggle(isOn: settings.isDarkMode) {
+                    Label(
+                        "Modo oscuro",
+                        systemImage: settings.isDarkMode.wrappedValue
+                            ? "moon.fill" : "sun.max"
+                    )
                 }
             }
-            .navigationTitle("Ajustes")
-            .sheet(isPresented: $showEmojiPicker) {
-                EmojiPickerView(selectedEmoji: $settings.profileEmoji)
+
+            Section {
+                logoutButton
+            } footer: {
+                if session.isGuest {
+                    Text(
+                        "Estás como invitado. Crea una cuenta para no perder tus datos."
+                    )
+                }
             }
-            .onChange(of: settings.profileEmoji) { oldValue, newValue in
-                settings.updateEmoji(newValue)
+        }
+        .navigationTitle("Ajustes")
+    }
+
+    // MARK: - macOS Layout
+    @ViewBuilder
+    private func macContent(settings: Bindable<AppSettings>) -> some View {
+        ScrollView {
+            VStack(spacing: 30) {
+                Text("Ajustes")
+                    .font(.system(size: 30, weight: .bold))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                VStack(spacing: 20) {
+                    profileImageSection
+
+                    TextField("Tu nombre", text: settings.userName)
+                        .textFieldStyle(.roundedBorder)
+                        .multilineTextAlignment(.center)
+                        .font(.title3)
+                        .frame(maxWidth: 250)
+                }
+                .padding(30)
+                .background(Color.secondary.opacity(0.05))
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+
+                VStack(alignment: .leading, spacing: 20) {
+                    Toggle("Modo oscuro", isOn: settings.isDarkMode)
+                        .toggleStyle(.switch)
+
+                    Divider()
+
+                    logoutButton
+                        .buttonStyle(.borderedProminent)
+                }
+                .padding(20)
+
+                if session.isGuest {
+                    Text("Modo invitado: los datos son locales.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
-            .toolbar {
+            .padding(40)
+        }
+    }
 
-                            if session.isGuest {
-                                ToolbarItem(placement: .topBarTrailing) {
-                                    Button {
-                                        withAnimation {
-                                            session.exitGuest()
-                                            showOnboarding = true
-                                        }
-                                    } label: {
-                                        Image(systemName: "rectangle.portrait.and.arrow.right")
-                                            .foregroundStyle(AppColors.primary)
-                                    }
-                                }
-                            }
+    // MARK: - Shared Components
 
-                            if session.isAuthenticated {
-                                ToolbarItem(placement: .topBarTrailing) {
-                                    Button(role: .destructive) {
-                                        withAnimation {
-                                            session.logout()
-                                        }
-                                    } label: {
-                                        Image(systemName: "rectangle.portrait.and.arrow.right")
-                                            .foregroundStyle(AppColors.primary)
-                                    }
-                                }
-                            }
-                        }
+    private var profileImageSection: some View {
+        Text(settings.profileEmoji)
+            .font(.system(size: 80))
+            .padding()
+            .background(Circle().fill(Color.blue.opacity(0.1)))
+            .onTapGesture { showEmojiPicker = true }
+    }
 
+    private var logoutButton: some View {
+        Button(role: .destructive) {
+            handleLogout()
+        } label: {
+            Label(
+                session.isGuest ? "Volver al Inicio" : "Cerrar Sesión",
+                systemImage: session.isGuest
+                    ? "arrow.left.circle" : "rectangle.portrait.and.arrow.right"
+            )
+            .foregroundStyle(.red)
         }
     }
 
     private func handleLogout() {
         withAnimation {
-            session.exitGuest()
+            if session.isGuest {
+                session.exitGuest()
+            } else {
+                session.logout()
+            }
         }
     }
 }

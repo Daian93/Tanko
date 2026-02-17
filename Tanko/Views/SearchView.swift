@@ -16,9 +16,9 @@ struct SearchView: View {
     @State private var showFilters = false
     @State private var searchTask: Task<Void, Never>?
     @Namespace private var namespace
-    
+
     @State private var selectedManga: Manga?
-    
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -32,18 +32,18 @@ struct SearchView: View {
                         ProgressView("Buscando...")
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                case .loaded:
-                    VStack(spacing: 0) {
-                        if filtersViewModel.hasActiveFilters {
-                            activeFiltersChips
-                                .padding(.horizontal)
-                                .padding(.vertical, 8)
-                                .background(Color(.systemGroupedBackground))
+                    case .loaded:
+                        VStack(spacing: 0) {
+                            if filtersViewModel.hasActiveFilters {
+                                activeFiltersChips
+                                    .padding(.horizontal)
+                                    .padding(.vertical, 8)
+                                    .background(Color(white: 0.95))
+                            }
+                            searchResultsList
                         }
-                        searchResultsList
-                    }
 
-                case .empty:
+                    case .empty:
                         noResultsState
 
                     case .error(let message):
@@ -63,13 +63,18 @@ struct SearchView: View {
                 performSearch(query: newValue)
             }
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(
+                    placement: CompatibleToolbarItemPlacement.topBarTrailing
+                        .placement
+                ) {
                     Button {
                         showFilters = true
                     } label: {
                         ZStack(alignment: .topTrailing) {
-                            Image(systemName: "line.3.horizontal.decrease.circle")
-                                .font(.title3)
+                            Image(
+                                systemName: "line.3.horizontal.decrease.circle"
+                            )
+                            .font(.title3)
 
                             if filtersViewModel.hasActiveFilters {
                                 Circle()
@@ -88,83 +93,80 @@ struct SearchView: View {
             }
         }
     }
-    
-    
-    
-    
+
     private func performSearch(query: String) {
         searchTask?.cancel()
-        
+
         guard !query.isEmpty else {
             viewModel.reset()
             return
         }
-        
+
         searchTask = Task {
             try? await Task.sleep(nanoseconds: 500_000_000)
             guard !Task.isCancelled else { return }
-            
+
             await viewModel.search(mode: .simple(title: query))
         }
     }
-    
+
     private func applyFilters(_ dto: CustomSearchDTO) {
         searchText = ""
         searchTask?.cancel()
-        
+
         Task {
             await viewModel.search(mode: .advanced(dto: dto))
         }
     }
-    
+
     private var emptySearchState: some View {
         VStack(spacing: 16) {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 60))
                 .foregroundStyle(.secondary)
-            
+
             Text("Buscar Manga")
                 .font(.title2)
                 .fontWeight(.semibold)
-            
+
             Text("Encuentra tus mangas favoritos")
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
     }
-    
+
     private var noResultsState: some View {
         VStack(spacing: 16) {
             Image(systemName: "book.closed")
                 .font(.system(size: 60))
                 .foregroundStyle(.secondary)
-            
+
             Text("No se encontraron resultados")
                 .font(.title3)
                 .fontWeight(.semibold)
-            
+
             Text("Intenta buscar con otros términos o filtros")
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
     }
-    
+
     private func errorState(message: String) -> some View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.largeTitle)
                 .foregroundStyle(.red)
-            
+
             Text("Error")
                 .font(.headline)
-            
+
             Text(message)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
-            
+
             Button("Reintentar") {
                 Task {
                     let mode: SearchMode
@@ -174,7 +176,7 @@ struct SearchView: View {
                     } else {
                         mode = .simple(title: searchText)
                     }
-                    
+
                     await viewModel.search(mode: mode)
                 }
             }
@@ -183,14 +185,18 @@ struct SearchView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
     }
-    
+
     private var searchResultsList: some View {
         List {
-            ForEach(Array(viewModel.results.enumerated()), id: \.element.id) { index, manga in
-                let isInCollection = collectionVM.isInCollection(mangaID: manga.id)
+            ForEach(Array(viewModel.results.enumerated()), id: \.element.id) {
+                index,
+                manga in
+                let isInCollection = collectionVM.isInCollection(
+                    mangaID: manga.id
+                )
                 let isFirst = index == 0
                 let isLast = index == viewModel.results.count - 1
-                
+
                 NavigationLink(value: manga) {
                     MangaRow(
                         manga: manga,
@@ -202,7 +208,9 @@ struct SearchView: View {
                 .listRowSeparator(isFirst ? .hidden : .visible, edges: .top)
                 .listRowSeparator(isLast ? .hidden : .visible, edges: .bottom)
                 .listRowSeparatorTint(AppColors.surface)
-                .listRowInsets(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 15))
+                .listRowInsets(
+                    EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 15)
+                )
                 .onAppear {
                     Task {
                         await viewModel.loadNextPageIfNeeded(currentItem: manga)
@@ -221,7 +229,7 @@ struct SearchView: View {
             MangaDetailView(manga: manga, namespace: namespace)
         }
     }
-    
+
     private var activeFiltersChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
@@ -229,9 +237,10 @@ struct SearchView: View {
                 Text("Filtros activos:")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                
+
                 // Géneros
-                ForEach(Array(filtersViewModel.selectedGenres), id: \.self) { genre in
+                ForEach(Array(filtersViewModel.selectedGenres), id: \.self) {
+                    genre in
                     FilterChip(
                         title: genre.localized,
                         color: .green,
@@ -241,9 +250,10 @@ struct SearchView: View {
                         }
                     )
                 }
-                
+
                 // Temáticas
-                ForEach(Array(filtersViewModel.selectedThemes), id: \.self) { theme in
+                ForEach(Array(filtersViewModel.selectedThemes), id: \.self) {
+                    theme in
                     FilterChip(
                         title: theme.localized,
                         color: .orange,
@@ -253,9 +263,12 @@ struct SearchView: View {
                         }
                     )
                 }
-                
+
                 // Demografías
-                ForEach(Array(filtersViewModel.selectedDemographics), id: \.self) { demo in
+                ForEach(
+                    Array(filtersViewModel.selectedDemographics),
+                    id: \.self
+                ) { demo in
                     FilterChip(
                         title: demo.localized,
                         color: .pink,
@@ -265,7 +278,7 @@ struct SearchView: View {
                         }
                     )
                 }
-                
+
                 // Botón limpiar todos
                 if filtersViewModel.hasActiveFilters {
                     Button {
@@ -289,14 +302,14 @@ struct SearchView: View {
             .padding(.vertical, 4)
         }
     }
-    
+
     private func applyCurrentFilters() {
         if !filtersViewModel.hasActiveFilters {
             viewModel.reset()
             searchText = ""
             return
         }
-        
+
         let dto = filtersViewModel.createSearchDTO()
         Task {
             await viewModel.search(mode: .advanced(dto: dto))
@@ -309,13 +322,13 @@ struct FilterChip: View {
     let title: LocalizedStringKey
     let color: Color
     let onRemove: () -> Void
-    
+
     var body: some View {
         HStack(spacing: 4) {
             Text(title)
                 .font(.caption)
                 .fontWeight(.medium)
-            
+
             Button(action: onRemove) {
                 Image(systemName: "xmark.circle.fill")
                     .font(.caption)
@@ -333,4 +346,3 @@ struct FilterChip: View {
     SearchView()
         .withPreviewEnvironment()
 }
-

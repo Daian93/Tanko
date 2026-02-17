@@ -5,8 +5,8 @@
 //  Created by Diana Rammal Sansón on 9/2/26.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct LoginView: View {
     @Environment(SessionManager.self) private var session
@@ -16,7 +16,9 @@ struct LoginView: View {
     @State private var vm: LoginViewModel
 
     init(session: SessionManager, context: ModelContext) {
-        _vm = State(wrappedValue: LoginViewModel(session: session, context: context))
+        _vm = State(
+            wrappedValue: LoginViewModel(session: session, context: context)
+        )
     }
 
     var body: some View {
@@ -24,9 +26,9 @@ struct LoginView: View {
             Form {
                 Section("Email") {
                     TextField("email@ejemplo.com", text: $vm.email)
-                        .keyboardType(.emailAddress)
-                        .textInputAutocapitalization(.never)
-                        .textContentType(.username)
+                        .keyboardTypeCompatible(.emailAddress)
+                        .textInputAutocapitalizationCompatible()
+                        .textContentTypeCompatible(.username)
                 }
 
                 Section("Contraseña") {
@@ -65,8 +67,11 @@ struct LoginView: View {
 
 #Preview {
     let session = SessionManager()
-    
-    return LoginView(session: session, context: PreviewHelper.container.mainContext)
-        .environment(session)
-        .modelContainer(PreviewHelper.container)
+
+    return LoginView(
+        session: session,
+        context: PreviewHelper.container.mainContext
+    )
+    .environment(session)
+    .modelContainer(PreviewHelper.container)
 }
