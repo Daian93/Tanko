@@ -34,8 +34,137 @@ struct AddMangaToCollectionView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                // MARK: - Progreso de lectura
+            Group {
+                #if os(macOS)
+                    ScrollView {
+                        VStack(spacing: 20) {
+                            progressSection
+                            if totalVolumes > 0 {
+                                volumesSection
+                                collectionStateSection
+                            }
+                        }
+                        .padding()
+                    }
+                #else
+                    Form {
+                        progressSection
+                        if totalVolumes > 0 {
+                            volumesSection
+                            collectionStateSection
+                        }
+                    }
+                    .scrollDismissesKeyboard(.immediately)
+                #endif
+            }
+            .navigationTitle("Añadir a colección")
+            .navigationBarTitleDisplayModeCompatible(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancelar") {
+                        dismiss()
+                    }
+                }
+
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Añadir") {
+                        Task {
+                            await userMangaCollectionVM.add(
+                                manga: manga,
+                                volumesOwned: Array(volumesOwned).sorted(),
+                                readingVolume: readingVolume == 0
+                                    ? nil : readingVolume,
+                                completeCollection: isCompleteCollection
+                            )
+                            dismiss()
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    // MARK: - Section Views
+
+    private var progressSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            #if os(macOS)
+                Text("Progreso de lectura")
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+
+                VStack(spacing: 8) {
+                    HStack(spacing: 12) {
+                        Spacer()
+
+                        // Botón -
+                        Button {
+                            isTextFieldFocused = false
+                            decrementReading()
+                        } label: {
+                            Image(systemName: "minus.circle.fill")
+                                .font(.system(size: 24))
+                                .foregroundStyle(
+                                    readingVolume > 0 ? Color.red : Color.gray
+                                )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(readingVolume <= 0)
+
+                        // TextField
+                        TextField(
+                            "",
+                            value: $readingVolume,
+                            format: .number,
+                            prompt: Text("0").foregroundColor(.secondary)
+                        )
+                        .multilineTextAlignment(.center)
+                        .font(.title2.bold())
+                        .frame(width: 80)
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        .background(Color(white: 0.95))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .focused($isTextFieldFocused)
+                        .onChange(of: readingVolume) { _, newValue in
+                            readingVolume = min(max(newValue, 0), maxVolume)
+                        }
+
+                        // Botón +
+                        Button {
+                            isTextFieldFocused = false
+                            incrementReading()
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 24))
+                                .foregroundStyle(
+                                    readingVolume < maxVolume
+                                        ? Color.green : Color.gray
+                                )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(readingVolume >= maxVolume)
+
+                        Spacer()
+                    }
+                    .padding(.vertical, 8)
+                }
+                .padding()
+                .background(Color(white: 0.95))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                if totalVolumes > 0 {
+                    Text("De un total de \(totalVolumes) tomos.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Total de volúmenes desconocido.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            #else
+                // iOS: Sección original con Section
                 Section {
                     HStack(spacing: 12) {
                         Spacer()
@@ -55,28 +184,33 @@ struct AddMangaToCollectionView: View {
                         .disabled(readingVolume <= 0)
 
                         // TextField
-                        TextField("0", value: $readingVolume, format: .number)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.center)
-                            .font(.title2.bold())
-                            .frame(width: 80)
-                            .padding(.vertical, 12)
-                            .padding(.horizontal, 16)
-                            .background(Color(.secondarySystemBackground))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                            .focused($isTextFieldFocused)
-                            .onChange(of: readingVolume) { _, newValue in
-                                readingVolume = min(max(newValue, 0), maxVolume)
-                            }
-                            .toolbar {
-                                ToolbarItemGroup(placement: .keyboard) {
-                                    Spacer()
-                                    Button("Listo") {
-                                        isTextFieldFocused = false
-                                    }
-                                    .fontWeight(.semibold)
+                        TextField(
+                            "",
+                            value: $readingVolume,
+                            format: .number,
+                            prompt: Text("0").foregroundColor(.secondary)
+                        )
+                        .keyboardTypeCompatible(.numberPad)
+                        .multilineTextAlignment(.center)
+                        .font(.title2.bold())
+                        .frame(width: 80)
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        .background(Color(white: 0.95))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .focused($isTextFieldFocused)
+                        .onChange(of: readingVolume) { _, newValue in
+                            readingVolume = min(max(newValue, 0), maxVolume)
+                        }
+                        .toolbar {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                Spacer()
+                                Button("Listo") {
+                                    isTextFieldFocused = false
                                 }
+                                .fontWeight(.semibold)
                             }
+                        }
 
                         // Botón +
                         Button {
@@ -105,52 +239,54 @@ struct AddMangaToCollectionView: View {
                         Text("Total de volúmenes desconocido.")
                     }
                 }
+            #endif
+        }
+    }
 
-                // MARK: - Tomos en estantería
-                if totalVolumes > 0 {
-                    Section {
-                        HStack(spacing: 8) {
-                            Button {
-                                selectAllVolumes()
-                            } label: {
-                                Label(
-                                    "Todos",
-                                    systemImage: "checkmark.circle.fill"
-                                )
+    private var volumesSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            #if os(macOS)
+                Text("Tomos en estantería")
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+
+                VStack(spacing: 12) {
+                    HStack(spacing: 8) {
+                        Button {
+                            selectAllVolumes()
+                        } label: {
+                            Label("Todos", systemImage: "checkmark.circle.fill")
                                 .font(.subheadline)
                                 .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(.bordered)
-                            .tint(.green)
-
-                            Button {
-                                clearAllVolumes()
-                            } label: {
-                                Label(
-                                    "Ninguno",
-                                    systemImage: "xmark.circle.fill"
-                                )
-                                .font(.subheadline)
-                                .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(.bordered)
-                            .tint(.red)
-
-                            Button {
-                                invertSelection()
-                            } label: {
-                                Label(
-                                    "Invertir",
-                                    systemImage: "arrow.triangle.2.circlepath"
-                                )
-                                .font(.subheadline)
-                                .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(.bordered)
-                            .tint(.blue)
                         }
-                        .padding(.vertical, 4)
+                        .buttonStyle(.bordered)
+                        .tint(.green)
 
+                        Button {
+                            clearAllVolumes()
+                        } label: {
+                            Label("Ninguno", systemImage: "xmark.circle.fill")
+                                .font(.subheadline)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.red)
+
+                        Button {
+                            invertSelection()
+                        } label: {
+                            Label(
+                                "Invertir",
+                                systemImage: "arrow.triangle.2.circlepath"
+                            )
+                            .font(.subheadline)
+                            .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.blue)
+                    }
+
+                    ScrollView {
                         LazyVGrid(
                             columns: [GridItem(.adaptive(minimum: 44))],
                             spacing: 10
@@ -179,72 +315,165 @@ struct AddMangaToCollectionView: View {
                             }
                         }
                         .padding(.vertical, 8)
-                    } header: {
-                        Text("Tomos en estantería")
-                    } footer: {
+                    }
+                    .frame(maxHeight: 300)
+                }
+                .padding()
+                .background(Color(white: 0.95))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                Text(
+                    "\(volumesOwned.count) de \(totalVolumes) tomos seleccionados"
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            #else
+                // iOS: Sección original con Section
+                Section {
+                    HStack(spacing: 8) {
+                        Button {
+                            selectAllVolumes()
+                        } label: {
+                            Label("Todos", systemImage: "checkmark.circle.fill")
+                                .font(.subheadline)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.green)
+
+                        Button {
+                            clearAllVolumes()
+                        } label: {
+                            Label("Ninguno", systemImage: "xmark.circle.fill")
+                                .font(.subheadline)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.red)
+
+                        Button {
+                            invertSelection()
+                        } label: {
+                            Label(
+                                "Invertir",
+                                systemImage: "arrow.triangle.2.circlepath"
+                            )
+                            .font(.subheadline)
+                            .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.blue)
+                    }
+                    .padding(.vertical, 4)
+
+                    LazyVGrid(
+                        columns: [GridItem(.adaptive(minimum: 44))],
+                        spacing: 10
+                    ) {
+                        ForEach(1...totalVolumes, id: \.self) { number in
+                            let owned = volumesOwned.contains(number)
+                            Button {
+                                toggleVolume(number)
+                            } label: {
+                                Text("\(number)")
+                                    .font(.caption.bold())
+                                    .frame(width: 44, height: 44)
+                                    .background(
+                                        owned
+                                            ? Color.green
+                                            : Color.gray.opacity(0.2)
+                                    )
+                                    .foregroundStyle(owned ? .white : .primary)
+                                    .clipShape(
+                                        RoundedRectangle(cornerRadius: 8)
+                                    )
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.vertical, 8)
+                } header: {
+                    Text("Tomos en estantería")
+                } footer: {
+                    Text(
+                        "\(volumesOwned.count) de \(totalVolumes) tomos seleccionados"
+                    )
+                }
+            #endif
+        }
+    }
+
+    private var collectionStateSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            #if os(macOS)
+                Text("Estado de la colección")
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+
+                HStack {
+                    Label(
+                        "Estado de la colección",
+                        systemImage: "checkmark.seal.fill"
+                    )
+                    .foregroundStyle(.secondary)
+                    Spacer()
+                    if isCompleteCollection {
+                        Text("Completa")
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.green)
+                    } else {
+                        Text("Incompleta")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding()
+                .background(Color(white: 0.95))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                if isCompleteCollection {
+                    Text(
+                        "Tienes todos los \(totalVolumes) tomos en tu estantería."
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                } else {
+                    Text(
+                        "Te faltan \(totalVolumes - volumesOwned.count) tomos para completar la colección."
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+            #else
+                // iOS: Sección original con Section
+                Section {
+                    HStack {
+                        Label(
+                            "Estado de la colección",
+                            systemImage: "checkmark.seal.fill"
+                        )
+                        .foregroundStyle(.secondary)
+                        Spacer()
+                        if isCompleteCollection {
+                            Text("Completa")
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.green)
+                        } else {
+                            Text("Incompleta")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                } footer: {
+                    if isCompleteCollection {
                         Text(
-                            "\(volumesOwned.count) de \(totalVolumes) tomos seleccionados"
+                            "Tienes todos los \(totalVolumes) tomos en tu estantería."
+                        )
+                    } else {
+                        Text(
+                            "Te faltan \(totalVolumes - volumesOwned.count) tomos para completar la colección."
                         )
                     }
                 }
-
-                if totalVolumes > 0 {
-                    Section {
-                        HStack {
-                            Label(
-                                "Estado de la colección",
-                                systemImage: "checkmark.seal.fill"
-                            )
-                            .foregroundStyle(.secondary)
-                            Spacer()
-                            if isCompleteCollection {
-                                Text("Completa")
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.green)
-                            } else {
-                                Text("Incompleta")
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    } footer: {
-                        if isCompleteCollection {
-                            Text(
-                                "Tienes todos los \(totalVolumes) tomos en tu estantería."
-                            )
-                        } else {
-                            Text(
-                                "Te faltan \(totalVolumes - volumesOwned.count) tomos para completar la colección."
-                            )
-                        }
-                    }
-                }
-            }
-            .scrollDismissesKeyboard(.immediately)
-            .navigationTitle("Añadir a colección")
-            .navigationBarTitleDisplayMode(.inline)
-
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar") {
-                        dismiss()
-                    }
-                }
-
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Añadir") {
-                        Task {
-                            await userMangaCollectionVM.add(
-                                manga: manga,
-                                volumesOwned: Array(volumesOwned).sorted(),
-                                readingVolume: readingVolume == 0
-                                    ? nil : readingVolume,
-                                completeCollection: isCompleteCollection
-                            )
-                            dismiss()
-                        }
-                    }
-                }
-            }
+            #endif
         }
     }
 

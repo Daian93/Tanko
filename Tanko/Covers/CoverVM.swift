@@ -9,19 +9,21 @@ import SwiftUI
 
 @Observable @MainActor
 final class CoverVM {
-    var image: UIImage?
-    
+    var image: PlatformImage?
+
     func getImage(cover: URL?) {
         guard let cover else { return }
         do {
             let file = ImageDownloader.shared.getFileURL(url: cover)
             if FileManager.default.fileExists(atPath: file.path()) {
                 let data = try Data(contentsOf: file)
-                image = UIImage(data: data)
+                image = PlatformImage(data: data)
             } else {
                 Task {
                     do {
-                        image = try await ImageDownloader.shared.image(for: cover)
+                        image = try await ImageDownloader.shared.image(
+                            for: cover
+                        )
                     } catch {
                         print(error)
                     }

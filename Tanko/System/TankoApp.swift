@@ -21,6 +21,9 @@ struct TankoApp: App {
                 .environment(mangasVM)
                 .environment(settings)
                 .preferredColorScheme(settings.isDarkMode ? .dark : .light)
+                #if os(macOS)
+                    .buttonStyle(.plain)
+                #endif
         }
         .modelContainer(for: [UserManga.self])
     }

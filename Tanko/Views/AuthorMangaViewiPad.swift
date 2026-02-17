@@ -27,7 +27,7 @@ struct AuthorMangaViewiPad: View {
                         header
                             .padding(.horizontal, 40)
                             .padding(.top, 20)
-                        
+
                         Text("section.mangas_by_author")
                             .font(.headline)
                             .foregroundStyle(.secondary)
@@ -55,7 +55,7 @@ struct AuthorMangaViewiPad: View {
                 }
             }
             .background(AppColors.background.ignoresSafeArea())
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayModeCompatible(.inline)
             .task {
                 await viewModel.loadInitial()
             }
@@ -67,9 +67,11 @@ struct AuthorMangaViewiPad: View {
         let cardHeight = geo.size.height * 0.45
         let cardWidth = cardHeight * 0.7
         let spacing: CGFloat = 40
-        
-        let totalContentWidth = CGFloat(viewModel.mangas.count) * cardWidth +
-                                CGFloat(max(viewModel.mangas.count - 1, 0)) * spacing
+
+        let totalContentWidth =
+            CGFloat(viewModel.mangas.count) * cardWidth + CGFloat(
+                max(viewModel.mangas.count - 1, 0)
+            ) * spacing
 
         let horizontalInset = max((geo.size.width - totalContentWidth) / 2, 60)
 
@@ -86,7 +88,9 @@ struct AuthorMangaViewiPad: View {
                                 height: cardHeight
                             )
                             .task {
-                                await viewModel.loadNextPageIfNeeded(currentItem: manga)
+                                await viewModel.loadNextPageIfNeeded(
+                                    currentItem: manga
+                                )
                             }
                         }
                         .buttonStyle(.plain)
@@ -106,28 +110,28 @@ struct AuthorMangaViewiPad: View {
         .frame(minHeight: geo.size.height * 0.7)
     }
 
-
     // MARK: - Portrait Layout
     private func portraitSection(geo: GeometryProxy) -> some View {
 
         let horizontalPadding: CGFloat = 40
         let spacing: CGFloat = 30
-        let cardWidth = (geo.size.width - (horizontalPadding * 2) - (spacing * 2)) / 3
+        let cardWidth =
+            (geo.size.width - (horizontalPadding * 2) - (spacing * 2)) / 3
 
-            let columns = [
-                GridItem(.fixed(cardWidth), spacing: spacing),
-                GridItem(.fixed(cardWidth), spacing: spacing),
-                GridItem(.fixed(cardWidth), spacing: spacing)
-            ]
+        let columns = [
+            GridItem(.fixed(cardWidth), spacing: spacing),
+            GridItem(.fixed(cardWidth), spacing: spacing),
+            GridItem(.fixed(cardWidth), spacing: spacing),
+        ]
 
-            return LazyVGrid(columns: columns, spacing: 30) {
-                ForEach(viewModel.mangas) { manga in
-                    NavigationLink(value: manga) {
-                        MangaCardPortrait(
-                            manga: manga,
-                            namespace: namespace,
-                            width: cardWidth
-                        )
+        return LazyVGrid(columns: columns, spacing: 30) {
+            ForEach(viewModel.mangas) { manga in
+                NavigationLink(value: manga) {
+                    MangaCardPortrait(
+                        manga: manga,
+                        namespace: namespace,
+                        width: cardWidth
+                    )
                     .task {
                         await viewModel.loadNextPageIfNeeded(currentItem: manga)
                     }
@@ -178,9 +182,7 @@ struct AuthorMangaViewiPad: View {
     }
 }
 
-//
 // MARK: - Portrait Card (cuadrada tipo móvil pero más grande)
-//
 
 struct MangaCardPortrait: View {
     let manga: Manga
@@ -225,17 +227,14 @@ struct MangaCardPortrait: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            
+
             Spacer(minLength: 0)
         }
         .frame(height: width * 1.5)
     }
 }
 
-//
 // MARK: - Landscape Card (vertical centrada)
-//
-
 struct MangaCardLandscape: View {
     let manga: Manga
     let namespace: Namespace.ID
@@ -272,7 +271,7 @@ struct MangaCardLandscape: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            
+
             Spacer(minLength: 0)
         }
         .frame(width: width, height: height + 80)

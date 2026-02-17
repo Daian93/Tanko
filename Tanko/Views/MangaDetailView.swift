@@ -19,8 +19,9 @@ struct MangaDetailView: View {
     let manga: Manga
     @Environment(UserMangaCollectionViewModel.self) private var collectionVM
 
-    @State private var mainImage: UIImage? = nil
-    @State private var backgroundImage: UIImage? = nil
+    @State private var mainImage: PlatformImage? = nil
+    @State private var backgroundImage: PlatformImage? = nil
+
     @State private var isMainLoading = false
     @State private var isBackgroundLoading = false
     @State private var isSynopsisExpanded = false
@@ -40,27 +41,30 @@ struct MangaDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 ZStack(alignment: .bottomLeading) {
-                    AsyncImage(url: manga.mainPicture) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: bannerHeight).opacity(0.5)
+                    AsyncImage(url: manga.mainPicture) { phase in
+                        if let image = phase.image {
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(height: bannerHeight)
+                                .opacity(0.5)
+                                .clipped()
+                        } else {
+                            ZStack {
+                                LinearGradient(
+                                    colors: [
+                                        .gray.opacity(0.2), .gray.opacity(0.4),
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                                Image(systemName: "book.closed")
+                                    .font(.system(size: 60))
+                                    .foregroundStyle(.white.opacity(0.6))
+                            }
+                            .frame(height: bannerHeight)
                             .clipped()
-                    } placeholder: {
-                        ZStack {
-                            LinearGradient(
-                                colors: [
-                                    .gray.opacity(0.2), .gray.opacity(0.4),
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                            Image(systemName: "book.closed")
-                                .font(.system(size: 60))
-                                .foregroundStyle(.white.opacity(0.6))
                         }
-                        .frame(height: bannerHeight)
-                        .clipped()
                     }
 
                     HStack(alignment: .bottom, spacing: 16) {
@@ -123,7 +127,7 @@ struct MangaDetailView: View {
 
                     Divider().frame(height: 45)
 
-                    // 📌 Estado
+                    // Estado
                     VStack(spacing: 4) {
                         Text("section.state")
                             .font(.caption)
@@ -179,7 +183,7 @@ struct MangaDetailView: View {
 
                 VStack(alignment: .leading, spacing: 15) {
 
-                    // 👤 Autores
+                    // Autores
                     VStack(alignment: .leading, spacing: 8) {
                         Text(authorSectionTitle)
                             .font(.subheadline)
@@ -349,7 +353,7 @@ struct MangaDetailView: View {
                             LinearGradient(
                                 colors: [
                                     .clear,
-                                    Color(.systemBackground),
+                                    Color(white: 1.0),
                                 ],
                                 startPoint: .top,
                                 endPoint: .bottom
@@ -416,7 +420,7 @@ struct MangaDetailView: View {
                         LinearGradient(
                             colors: [
                                 .clear,
-                                Color(.systemBackground),
+                                Color(white: 1.0),
                             ],
                             startPoint: .top,
                             endPoint: .bottom
@@ -474,9 +478,12 @@ struct MangaDetailView: View {
             Spacer(minLength: 20)
         }
         .navigationTitle(manga.title)
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayModeCompatible(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(
+                placement: CompatibleToolbarItemPlacement.topBarTrailing
+                    .placement
+            ) {
                 Button {
                     toggleBookmark()
                 } label: {
@@ -640,5 +647,3 @@ struct FlowLayout: Layout {
     MangaDetailView(manga: .test, namespace: namespace)
         .withPreviewEnvironment()
 }
-
-

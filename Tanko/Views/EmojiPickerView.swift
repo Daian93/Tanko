@@ -9,8 +9,10 @@ import SwiftUI
 
 struct EmojiPickerView: View {
     @Binding var selectedEmoji: String
-    
-    private let emojis = ["🙂","😎","🤓","😇","🥳","😺","👾","🐉","🍀","🔥","🌸","🌞","🌙","⭐️"]
+
+    private let emojis = [
+        "🙂", "😎", "🤓", "😇", "🥳", "😺", "👾", "🐉", "🍀", "🔥", "🌸", "🌞", "🌙", "⭐️",
+    ]
 
     private let columns = [GridItem(.adaptive(minimum: 50))]
 
@@ -28,7 +30,10 @@ struct EmojiPickerView: View {
                             Text(emoji)
                                 .font(.system(size: 40))
                                 .frame(width: 50, height: 50)
-                                .background(selectedEmoji == emoji ? Color.blue.opacity(0.2) : Color.clear)
+                                .background(
+                                    selectedEmoji == emoji
+                                        ? Color.blue.opacity(0.2) : Color.clear
+                                )
                                 .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
                         .buttonStyle(.plain)

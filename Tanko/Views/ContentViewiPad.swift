@@ -30,13 +30,16 @@ struct ContentViewiPad: View {
                         let isLandscape = geo.size.width > geo.size.height
                         let minWidth = isLandscape ? 320 : 420
                         let gridItems = [
-                            GridItem(.adaptive(minimum: CGFloat(minWidth)), spacing: 20)
+                            GridItem(
+                                .adaptive(minimum: CGFloat(minWidth)),
+                                spacing: 20
+                            )
                         ]
 
                         ScrollView {
                             VStack(spacing: 32) {
 
-                                // 🌟 BEST MANGAS
+                                // BEST MANGAS
                                 if !bestMangaViewModel.mangas.isEmpty {
                                     VStack(alignment: .leading, spacing: 12) {
                                         Text("content.best")
@@ -49,7 +52,7 @@ struct ContentViewiPad: View {
                                     }
                                 }
 
-                                // 📚 ALL MANGAS
+                                // ALL MANGAS
                                 VStack(alignment: .leading, spacing: 12) {
                                     Text("content.all")
                                         .font(.title3)
@@ -65,11 +68,15 @@ struct ContentViewiPad: View {
                                             MangaCollectionRow(
                                                 manga: manga,
                                                 namespace: namespace,
-                                                userCollectionVM: userCollectionVM
+                                                userCollectionVM:
+                                                    userCollectionVM
                                             )
                                             .onAppear {
                                                 Task {
-                                                    await viewModel.loadNextPageIfNeeded(currentItem: manga)
+                                                    await viewModel
+                                                        .loadNextPageIfNeeded(
+                                                            currentItem: manga
+                                                        )
                                                 }
                                             }
                                         }
@@ -97,7 +104,8 @@ struct ContentViewiPad: View {
                         await viewModel.refresh()
                         await bestMangaViewModel.refresh()
                     }
-                    .sheet(item: $mangasVM.selectedMangaForCollection) { manga in
+                    .sheet(item: $mangasVM.selectedMangaForCollection) {
+                        manga in
                         AddMangaToCollectionView(manga: manga)
                     }
 
@@ -112,7 +120,7 @@ struct ContentViewiPad: View {
                 }
             }
             .navigationTitle("tab.mangas")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayModeCompatible(.inline)
             .background(AppColors.background)
         }
         .task {
@@ -126,7 +134,7 @@ struct ContentViewiPad: View {
         }
     }
 
-    // 🌟 Best Mangas carousel
+    // Best Mangas carousel
     private var featuredCarousel: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 40) {
@@ -151,4 +159,3 @@ struct ContentViewiPad: View {
     ContentViewiPad()
         .withPreviewEnvironment()
 }
-

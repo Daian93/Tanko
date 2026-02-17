@@ -19,7 +19,7 @@ struct AuthorMangaView: View {
 
     private let columns = [
         GridItem(.flexible(), spacing: 20),
-        GridItem(.flexible(), spacing: 20)
+        GridItem(.flexible(), spacing: 20),
     ]
 
     var body: some View {
@@ -37,14 +37,19 @@ struct AuthorMangaView: View {
                     LazyVGrid(columns: columns, spacing: 25) {
                         ForEach(viewModel.mangas) { manga in
                             NavigationLink(value: manga) {
-                                MangaGridCard(manga: manga, namespace: namespace)
-                                    .task {
-                                        await viewModel.loadNextPageIfNeeded(currentItem: manga)
-                                    }
+                                MangaGridCard(
+                                    manga: manga,
+                                    namespace: namespace
+                                )
+                                .task {
+                                    await viewModel.loadNextPageIfNeeded(
+                                        currentItem: manga
+                                    )
+                                }
                             }
                         }
                     }
-                    
+
                     if viewModel.canLoadMore {
                         HStack {
                             Spacer()
@@ -59,7 +64,7 @@ struct AuthorMangaView: View {
             .padding(.horizontal)
         }
         .background(AppColors.background.ignoresSafeArea())
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayModeCompatible(.inline)
         .task {
             await viewModel.loadInitial()
         }
