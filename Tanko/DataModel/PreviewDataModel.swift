@@ -13,10 +13,10 @@ extension UserManga {
         mangaID: 13,
         title: "One Piece",
         coverURL: URL(string: "https://cdn.myanimelist.net/images/manga/2/253146.jpg"),
-        totalVolumes: 0,
-        volumesOwned: Array(1...45),
-        readingVolume: 30,
-        completeCollection: true
+        totalVolumes: nil,
+        volumesOwned: Array(1...5),
+        readingVolume: 5,
+        completeCollection: false
     )
 
     @MainActor static let monster = UserManga(

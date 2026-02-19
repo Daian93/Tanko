@@ -23,7 +23,7 @@ struct ProfileView: View {
             #if os(macOS)
                 macContent(settings: _settings)
             #else
-                iosContent(settings: settings)
+            iosContent(settings: _settings)
             #endif
         }
         .sheet(isPresented: $showEmojiPicker) {

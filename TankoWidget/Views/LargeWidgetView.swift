@@ -23,7 +23,7 @@ struct LargeWidgetView: View {
             ) {
                 ForEach(mangas.prefix(4)) { manga in
                     MangaCardWidget(manga: manga)
-                        .aspectRatio(0.95, contentMode: .fit)
+                        .aspectRatio(0.99, contentMode: .fit)
                 }
             }
             .padding(WidgetTheme.Spacing.cardPadding)
