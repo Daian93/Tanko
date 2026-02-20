@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import WidgetKit
 
 struct MangaCardWidget: View {
     let manga: ReadingManga
@@ -13,8 +14,7 @@ struct MangaCardWidget: View {
     var body: some View {
         ZStack(alignment: .topTrailing) {
             
-            // MARK: Background Cover
-            
+            // MARK: - Background Cover
             GeometryReader { geo in
                 if let image = WidgetImageCache.loadCover(from: manga.coverURL) {
                     Image(uiImage: image)
@@ -22,21 +22,20 @@ struct MangaCardWidget: View {
                         .aspectRatio(contentMode: .fill)
                         .frame(width: geo.size.width, height: geo.size.height)
                         .clipped()
+                        .widgetAccentable()
                 } else {
                     placeholderView
+                        .widgetAccentable()
                 }
             }
             
-            // MARK: Bottom Gradient
-            
+            // MARK: - Bottom Shadow Gradient
             bottomGradient
             
-            // MARK: Info Section
-            
+            // MARK: - Info Section
             infoSection
             
-            // MARK: Progress Badge
-            
+            // MARK: - Progress Badge
             if manga.progress > 0 {
                 progressBadge
             }
@@ -44,7 +43,7 @@ struct MangaCardWidget: View {
         .clipShape(RoundedRectangle(cornerRadius: WidgetTheme.Size.borderRadius))
         .overlay(
             RoundedRectangle(cornerRadius: WidgetTheme.Size.borderRadius)
-                .strokeBorder(.white.opacity(0.1), lineWidth: WidgetTheme.Size.borderWidth)
+                .strokeBorder(.primary.opacity(0.1), lineWidth: WidgetTheme.Size.borderWidth)
         )
     }
     
@@ -55,15 +54,15 @@ struct MangaCardWidget: View {
             .overlay(
                 Image(systemName: "book.closed.fill")
                     .font(.largeTitle)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.secondary)
             )
     }
     
     private var bottomGradient: some View {
         LinearGradient(
             colors: [
-                .black.opacity(0.9),
-                .black.opacity(0.5),
+                .black.opacity(0.8),
+                .black.opacity(0.4),
                 .clear
             ],
             startPoint: .bottom,
@@ -72,7 +71,7 @@ struct MangaCardWidget: View {
     }
     
     private var infoSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             Spacer()
             
             Text(manga.title)
@@ -80,12 +79,14 @@ struct MangaCardWidget: View {
                 .foregroundStyle(.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
+                .widgetAccentable()
             
             progressBar
             
             Text(manga.progressText)
                 .font(.system(size: 9, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.white.opacity(0.8))
+                .widgetAccentable()
         }
         .padding(WidgetTheme.Spacing.cardPadding)
     }
@@ -94,7 +95,7 @@ struct MangaCardWidget: View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
                 Capsule()
-                    .fill(.white.opacity(0.25))
+                    .fill(.white.opacity(0.2))
                     .frame(height: WidgetTheme.Size.progressBarHeight)
                 
                 Capsule()
@@ -103,6 +104,7 @@ struct MangaCardWidget: View {
                         width: geometry.size.width * manga.progress,
                         height: WidgetTheme.Size.progressBarHeight
                     )
+                    .widgetAccentable()
             }
         }
         .frame(height: WidgetTheme.Size.progressBarHeight)
@@ -119,5 +121,6 @@ struct MangaCardWidget: View {
                     .fill(WidgetTheme.progressColor(for: manga.progress))
             )
             .padding(WidgetTheme.Spacing.badgePadding)
+            .widgetAccentable()
     }
 }

@@ -32,7 +32,7 @@ struct MangaDetailView: View {
         collectionVM.isInCollection(mangaID: manga.id)
     }
 
-    let namespace: Namespace.ID
+    let namespace: Namespace.ID?
 
     let bannerHeight: CGFloat = 200
     let coverOverlap: CGFloat = 80

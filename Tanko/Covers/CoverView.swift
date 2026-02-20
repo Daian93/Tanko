@@ -10,11 +10,11 @@ import SwiftUI
 struct CoverView: View {
     let cover: URL?
     var big: Bool
-    let namespace: Namespace.ID
+    let namespace: Namespace.ID?
 
     @State private var coverVM = CoverVM()
 
-    init(cover: URL?, namespace: Namespace.ID, big: Bool = false) {
+    init(cover: URL?, namespace: Namespace.ID?, big: Bool = false) {
         self.cover = cover
         self.namespace = namespace
         self.big = big
@@ -25,50 +25,69 @@ struct CoverView: View {
             if !big {
                 if let image = coverVM.image {
                     #if canImport(UIKit)
-                        Image(uiImage: image)
+                        let imageView = Image(uiImage: image)
                             .resizable()
                             .scaledToFill()
                             .frame(width: 70, height: 100)
                             .clipShape(RoundedRectangle(cornerRadius: 11))
-                            .matchedTransitionSource(
-                                id: cover?.lastPathComponent
-                                    ?? UUID().uuidString,
-                                in: namespace
-                            )
+                        
+                        if let namespace = namespace {
+                            imageView
+                                .matchedTransitionSource(
+                                    id: cover?.lastPathComponent ?? UUID().uuidString,
+                                    in: namespace
+                                )
+                        } else {
+                            imageView
+                        }
                     #elseif canImport(AppKit)
-                        Image(nsImage: image)
+                        let imageView = Image(nsImage: image)
                             .resizable()
                             .scaledToFill()
                             .frame(width: 70, height: 100)
                             .clipShape(RoundedRectangle(cornerRadius: 11))
-                            .matchedTransitionSource(
-                                id: cover?.lastPathComponent
-                                    ?? UUID().uuidString,
-                                in: namespace
-                            )
+                        
+                        if let namespace = namespace {
+                            imageView
+                                .matchedTransitionSource(
+                                    id: cover?.lastPathComponent ?? UUID().uuidString,
+                                    in: namespace
+                                )
+                        } else {
+                            imageView
+                        }
                     #endif
                 } else {
-                    placeholder
-                        .matchedTransitionSource(
-                            id: cover?.lastPathComponent ?? UUID().uuidString,
-                            in: namespace
-                        )
+                    if let namespace = namespace {
+                        placeholder
+                            .matchedTransitionSource(
+                                id: cover?.lastPathComponent ?? UUID().uuidString,
+                                in: namespace
+                            )
+                    } else {
+                        placeholder
+                    }
                 }
             } else {
                 if let image = coverVM.image {
                     #if canImport(UIKit)
-                        Image(uiImage: image)
+                        let imageView = Image(uiImage: image)
                             .resizable()
                             .scaledToFill()
                             .frame(width: 120, height: 160)
                             .clipShape(RoundedRectangle(cornerRadius: 11))
-                            .navigationTransition(
-                                .zoom(
-                                    sourceID: cover?.lastPathComponent
-                                        ?? UUID().uuidString,
-                                    in: namespace
+                        
+                        if let namespace = namespace {
+                            imageView
+                                .navigationTransition(
+                                    .zoom(
+                                        sourceID: cover?.lastPathComponent ?? UUID().uuidString,
+                                        in: namespace
+                                    )
                                 )
-                            )
+                        } else {
+                            imageView
+                        }
                     #elseif canImport(AppKit)
                         Image(nsImage: image)
                             .resizable()
@@ -78,14 +97,17 @@ struct CoverView: View {
                     #endif
                 } else {
                     #if canImport(UIKit)
-                        placeholder
-                            .navigationTransition(
-                                .zoom(
-                                    sourceID: cover?.lastPathComponent
-                                        ?? UUID().uuidString,
-                                    in: namespace
+                        if let namespace = namespace {
+                            placeholder
+                                .navigationTransition(
+                                    .zoom(
+                                        sourceID: cover?.lastPathComponent ?? UUID().uuidString,
+                                        in: namespace
+                                    )
                                 )
-                            )
+                        } else {
+                            placeholder
+                        }
                     #elseif canImport(AppKit)
                         placeholder
                     #endif

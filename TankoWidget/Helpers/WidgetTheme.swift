@@ -13,9 +13,9 @@ enum WidgetTheme {
     
     static let backgroundGradient = LinearGradient(
         colors: [
-            Color(red: 0.85, green: 0.25, blue: 0.3).opacity(0.3),
-            Color(red: 0.7, green: 0.2, blue: 0.25).opacity(0.3),
-            Color(red: 0.55, green: 0.15, blue: 0.2).opacity(0.3)
+            Color(red: 0.5, green: 0.05, blue: 0.1).opacity(0.5),
+            Color(red: 0.4, green: 0.03, blue: 0.08).opacity(0.3),
+            Color(red: 0.25, green: 0.02, blue: 0.05).opacity(0.3)
         ],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
