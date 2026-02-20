@@ -28,7 +28,12 @@ struct CollectionView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
+            VStack(spacing: 0) {
+                if collectionVM.offlineManager.pendingOperationsCount > 0 {
+                    offlineBanner
+                }
+                
+                ScrollView {
                 VStack(spacing: 24) {
                     
                     // MARK: - Estadísticas
@@ -96,6 +101,7 @@ struct CollectionView: View {
                     await collectionVM.loadCollection()
                 }
             }
+            }
         }
         .sheet(isPresented: $showOnboarding) {
             OnboardingView()
@@ -105,6 +111,44 @@ struct CollectionView: View {
                 showOnboarding = false
             }
         }
+    }
+    
+    // MARK: - Offline Banner
+    
+    private var offlineBanner: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "wifi.slash")
+                .font(.title3)
+                .foregroundStyle(.orange)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Operaciones pendientes")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.primary)
+                
+                Text("\(collectionVM.offlineManager.pendingOperationsCount) cambios sin sincronizar")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            
+            Spacer()
+            
+            if collectionVM.offlineManager.isConnected {
+                ProgressView()
+                    .scaleEffect(0.8)
+            } else {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+            }
+        }
+        .padding()
+        .background(Color.orange.opacity(0.1))
+        .overlay(
+            Rectangle()
+                .frame(height: 1)
+                .foregroundStyle(Color.orange.opacity(0.3)),
+            alignment: .bottom
+        )
     }
     
     // MARK: - Filter Button

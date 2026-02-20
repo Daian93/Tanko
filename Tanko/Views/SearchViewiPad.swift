@@ -207,7 +207,7 @@ struct SearchViewiPad: View {
                 performSearch(query: newValue)
             }
             .navigationDestination(for: Manga.self) { manga in
-                MangaDetailView(manga: manga, namespace: namespace)
+                MangaDetailView(manga: manga, namespace: nil)
             }
             .navigationDestination(for: Author.self) { author in
                 AuthorMangaViewiPad(author: author)

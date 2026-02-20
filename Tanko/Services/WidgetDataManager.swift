@@ -24,6 +24,7 @@ final class WidgetDataManager {
 
     // MARK: - SAVE (called from app)
 
+    @MainActor
     func save(_ mangas: [ReadingManga]) {
         guard let fileURL else {
             print("❌ Widget: No se pudo obtener fileURL para App Group")

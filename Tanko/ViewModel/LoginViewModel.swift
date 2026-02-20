@@ -40,7 +40,12 @@ final class LoginViewModel {
             let guestMangas = try await localRepo.getCollection()
             
             if !guestMangas.isEmpty {
-                let remoteRepo = RemoteMangaCollectionRepository(network: Network(), session: session, localRepo: localRepo)
+                let remoteRepo = RemoteMangaCollectionRepository(
+                    network: Network(),
+                    session: session,
+                    localRepo: localRepo
+                )
+                
                 for manga in guestMangas {
                     try? await remoteRepo.add(mangaData: manga)
                 }
@@ -48,11 +53,14 @@ final class LoginViewModel {
                 await LocalDatabaseCleaner.clear(context: context)
             }
             
-            NotificationCenter.default.post(name: .didLogin, object: nil)
+            await MainActor.run {
+                NotificationCenter.default.post(name: .didLogin, object: nil)
+            }
             
         } catch {
             self.error = error.localizedDescription
         }
-        self.isLoading = false
+        
+        isLoading = false
     }
 }

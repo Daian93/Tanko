@@ -24,6 +24,10 @@ struct MainTabView: View {
 
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+        
+        private var isIPad: Bool {
+            UIDevice.current.userInterfaceIdiom == .pad
+        }
     #endif
 
     var body: some View {
@@ -32,10 +36,10 @@ struct MainTabView: View {
                 #if os(macOS)
                     ContentViewiPad()
                 #else
-                    if horizontalSizeClass == .compact {
-                        ContentView()
-                    } else {
+                    if isIPad {
                         ContentViewiPad()
+                    } else {
+                        ContentView()
                     }
                 #endif
             }
@@ -52,10 +56,10 @@ struct MainTabView: View {
                 #if os(macOS)
                     SearchViewiPad()
                 #else
-                    if horizontalSizeClass == .compact {
-                        SearchView()
-                    } else {
+                    if isIPad {
                         SearchViewiPad()
+                    } else {
+                        SearchView()
                     }
                 #endif
             }

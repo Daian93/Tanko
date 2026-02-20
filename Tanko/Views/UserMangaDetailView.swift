@@ -12,10 +12,10 @@ struct UserMangaDetailView: View {
 
     // MARK: - Properties
 
-    @Bindable private var viewModel: UserMangaDetailViewModel
+    @State private var viewModel: UserMangaDetailViewModel
     let namespace: Namespace.ID
     @FocusState private var isTextFieldFocused: Bool
-
+    
     // MARK: - Initialization
 
     init(
@@ -57,7 +57,7 @@ struct UserMangaDetailView: View {
                         isTextFieldFocused: $isTextFieldFocused
                     )
                     .padding()
-                    .background(Color(.systemBackground))
+                    .backgroundStyle(AppColors.surface)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
                     .padding(.horizontal)
@@ -83,7 +83,7 @@ struct UserMangaDetailView: View {
                             totalVolumes: viewModel.totalVolumes
                         )
                         .padding()
-                        .background(Color(.systemBackground))
+                        .backgroundStyle(AppColors.surface)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
                         .padding(.horizontal)
@@ -113,7 +113,7 @@ struct UserMangaDetailView: View {
 
                         stateDisplay
                             .padding()
-                            .background(Color(.systemBackground))
+                            .backgroundStyle(AppColors.surface)
                             .clipShape(RoundedRectangle(cornerRadius: 16))
                             .shadow(
                                 color: .black.opacity(0.05),
@@ -135,7 +135,7 @@ struct UserMangaDetailView: View {
                         .font(.headline)
                         .padding(.horizontal)
 
-                    NavigationLink(value: viewModel.manga) {
+                    NavigationLink(value: viewModel.userManga.mangaID)  {
                         HStack {
                             Label(
                                 "Ver ficha del manga",
@@ -148,6 +148,10 @@ struct UserMangaDetailView: View {
                             if viewModel.isLoadingManga {
                                 ProgressView()
                                     .scaleEffect(0.8)
+                            } else if viewModel.manga == nil {
+                                Image(systemName: "arrow.clockwise")
+                                    .font(.caption.bold())
+                                    .foregroundStyle(.secondary)
                             } else {
                                 Image(systemName: "chevron.right")
                                     .font(.caption.bold())
@@ -159,11 +163,10 @@ struct UserMangaDetailView: View {
                                 ? Color("TankoPrimary") : .secondary
                         )
                         .padding()
-                        .background(Color(.systemBackground))
+                        .backgroundStyle(AppColors.surface)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
                     }
-                    .disabled(viewModel.manga == nil)
                     .buttonStyle(.plain)
                     .padding(.horizontal)
                     .task {
@@ -182,8 +185,21 @@ struct UserMangaDetailView: View {
         }
         .navigationTitle("Editar manga")
         .navigationBarTitleDisplayModeCompatible(.inline)
-        .navigationDestination(for: Manga.self) { manga in
-            MangaDetailView(manga: manga, namespace: nil)
+        .navigationDestination(for: Int.self) { mangaID in
+            if let manga = viewModel.manga {
+                MangaDetailView(manga: manga, namespace: nil)
+            }
+        }
+        .navigationDestination(for: Author.self) { author in
+            #if os(macOS)
+                AuthorMangaViewiPad(author: author)
+            #else
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    AuthorMangaViewiPad(author: author)
+                } else {
+                    AuthorMangaView(author: author)
+                }
+            #endif
         }
     }
 }
