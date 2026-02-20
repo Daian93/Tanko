@@ -28,16 +28,16 @@ struct CollectionView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                if collectionVM.offlineManager.pendingOperationsCount > 0 {
-                    offlineBanner
-                }
-                
-                ScrollView {
+            ScrollView {
                 VStack(spacing: 24) {
                     
+                    // MARK: - Offline Banner
+                    if collectionVM.offlineManager.pendingOperationsCount > 0 {
+                        offlineBanner
+                            .padding(.horizontal)
+                    }
+
                     // MARK: - Estadísticas
-                    
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Estadísticas")
                             .font(.title2.bold())
@@ -47,7 +47,6 @@ struct CollectionView: View {
                     }
                     
                     // MARK: - Filtros
-                    
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
                             ForEach(CollectionFilter.allCases, id: \.self) { filter in
@@ -58,9 +57,7 @@ struct CollectionView: View {
                     }
                     
                     // MARK: - Lista
-                    
                     VStack(spacing: 12) {
-                        
                         if filteredMangas.isEmpty {
                             EmptyStateView(filter: selectedFilter)
                                 .padding(.top, 40)
@@ -93,14 +90,12 @@ struct CollectionView: View {
                     await collectionVM.loadCollection()
                 }
             }
-            
             .refreshable {
                 if session.isAuthenticated {
                     await collectionVM.synchronize()
                 } else {
                     await collectionVM.loadCollection()
                 }
-            }
             }
         }
         .sheet(isPresented: $showOnboarding) {
@@ -142,13 +137,8 @@ struct CollectionView: View {
             }
         }
         .padding()
-        .background(Color.orange.opacity(0.1))
-        .overlay(
-            Rectangle()
-                .frame(height: 1)
-                .foregroundStyle(Color.orange.opacity(0.3)),
-            alignment: .bottom
-        )
+        .background(Color.orange.opacity(0.12))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
     
     // MARK: - Filter Button
@@ -208,55 +198,19 @@ struct CollectionView: View {
         
         @Environment(UserMangaCollectionViewModel.self) private var collectionVM
         @Environment(\.modelContext) private var context
-        @State private var showVolumeManagement = false
         @State private var showDeleteAlert = false
-        @State private var showErrorAlert = false
-        @State private var errorMessage = ""
         
-        private var totalVolumes: Int? {
-            userManga.totalVolumes
-        }
-        
-        private var hasDynamicTotal: Bool {
-            totalVolumes == nil
-        }
-        
-        private var reading: Int {
-            userManga.readingVolume ?? 0
-        }
-        
+        private var totalVolumes: Int? { userManga.totalVolumes }
+        private var hasDynamicTotal: Bool { totalVolumes == nil }
+        private var reading: Int { userManga.readingVolume ?? 0 }
         private var displayTotal: Int {
-            if let total = totalVolumes {
-                return total
-            }
+            if let total = totalVolumes { return total }
             return max(reading, userManga.volumesOwned.max() ?? 0, 1)
         }
-        
-        private var safeReading: Int {
-            if let total = totalVolumes {
-                return min(reading, total)
-            }
-            return reading
-        }
-        
-        private var safeTotal: Int {
-            if let total = totalVolumes {
-                return max(total, 1)
-            }
-            return max(displayTotal, reading, 1)
-        }
-        
-        private var progress: Double {
-            guard safeTotal > 0 else { return 0 }
-            let value = Double(safeReading) / Double(safeTotal)
-            return min(max(value, 0), 1)
-        }
-        
-        private var isCompleted: Bool {
-            guard let total = totalVolumes else { return false }
-            return reading >= total
-        }
-        
+        private var safeReading: Int { min(reading, displayTotal) }
+        private var safeTotal: Int { max(displayTotal, reading, 1) }
+        private var progress: Double { Double(safeReading) / Double(safeTotal) }
+        private var isCompleted: Bool { safeReading >= safeTotal }
         private var progressColor: Color {
             if isCompleted { return .green }
             if progress == 0 { return .gray }
@@ -268,99 +222,72 @@ struct CollectionView: View {
             NavigationLink(value: userManga) {
                 VStack(alignment: .leading, spacing: 14) {
                     
-                    // MARK: Top Section
-                    
                     HStack(spacing: 14) {
-                    
-                    CoverView(
-                        cover: userManga.coverURL,
-                        namespace: namespace,
-                        big: false
-                    )
-                    .frame(width: 70, height: 100)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    
-                    VStack(alignment: .leading, spacing: 8) {
+                        CoverView(
+                            cover: userManga.coverURL,
+                            namespace: namespace,
+                            big: false
+                        )
+                        .frame(width: 70, height: 100)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
                         
-                        Text(userManga.title)
-                            .font(.system(size: 16, weight: .semibold))
-                            .lineLimit(2)
-                        
-                        VStack(alignment: .leading, spacing: 6) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(userManga.title)
+                                .font(.system(size: 16, weight: .semibold))
+                                .lineLimit(2)
                             
-                            HStack {
-                                Text("Progreso")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                
-                                Spacer()
-                                
-                                if hasDynamicTotal {
-                                    Text("\(reading)+")
-                                        .font(.caption.weight(.medium))
-                                        .foregroundStyle(progressColor)
-                                } else {
-                                    Text("\(reading)/\(displayTotal)")
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack {
+                                    Text("Progreso")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    Spacer()
+                                    Text(hasDynamicTotal ? "\(reading)+" : "\(reading)/\(displayTotal)")
                                         .font(.caption.weight(.medium))
                                         .foregroundStyle(progressColor)
                                 }
-                            }
-                            
-                            if hasDynamicTotal {
- 
-                                ProgressView(value: min(Double(reading) / max(Double(displayTotal), 1), 1.0))
-                                    .tint(progressColor)
-                                    .scaleEffect(y: 2.2)
-                            } else {
-                                ProgressView(value: Double(safeReading), total: Double(safeTotal))
+                                
+                                ProgressView(value: hasDynamicTotal ? min(Double(reading)/Double(displayTotal), 1.0) : Double(safeReading), total: Double(safeTotal))
                                     .tint(progressColor)
                                     .scaleEffect(y: 2.2)
                                     .animation(.easeInOut, value: progress)
                             }
-                        }
-                        
-                        // Owned badge
-                        HStack {
-                            Label(
-                                "\(userManga.volumesOwned.count) tomos",
-                                systemImage: "books.vertical.fill"
-                            )
-                            .font(.caption2)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.green.opacity(0.1))
-                            .foregroundStyle(.green)
-                            .clipShape(Capsule())
                             
-                            if isCompleted {
-                                Label(
-                                    "Completo",
-                                    systemImage: "checkmark.seal.fill"
-                                )
-                                .font(.caption2)
-                                .foregroundStyle(.green)
+                            HStack {
+                                Label("\(userManga.volumesOwned.count) tomos", systemImage: "books.vertical.fill")
+                                    .font(.caption2)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Color.green.opacity(0.1))
+                                    .foregroundStyle(.green)
+                                    .clipShape(Capsule())
+                                
+                                if isCompleted {
+                                    Label("Completo", systemImage: "checkmark.seal.fill")
+                                        .font(.caption2)
+                                        .foregroundStyle(.green)
+                                }
                             }
                         }
+                        
+                        Spacer()
                     }
-                    
-                    Spacer()
                 }
-            }
-            .padding()
-            .background(Color("TankoCardSurface"))
-            .clipShape(RoundedRectangle(cornerRadius: 18))
-            .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
-            .overlay(alignment: .topTrailing) {
-                Button {
-                    showDeleteAlert = true
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(AppColors.primary)
-                        .font(.title2)
-                        .padding(16)
+                .padding()
+                .background(Color("TankoCardSurface"))
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
+                .overlay(alignment: .topTrailing) {
+                    Button {
+                        showDeleteAlert = true
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(AppColors.primary)
+                            .font(.title2)
+                            .padding(16)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
-            }
             }
             .buttonStyle(.plain)
             .alert(
@@ -368,18 +295,12 @@ struct CollectionView: View {
                 isPresented: $showDeleteAlert,
                 actions: {
                     Button("Eliminar", role: .destructive) {
-                        showDeleteAlert = false
-                        Task {
-                            try? await Task.sleep(nanoseconds: 100_000_000)
-                            await collectionVM.remove(userManga)
-                        }
+                        Task { await collectionVM.remove(userManga) }
                     }
                     Button("Cancelar", role: .cancel) {}
                 },
                 message: {
-                    Text(
-                        "¿Estás seguro que quieres eliminar este manga de tu colección?"
-                    )
+                    Text("¿Estás seguro que quieres eliminar este manga de tu colección?")
                 }
             )
         }
@@ -387,7 +308,6 @@ struct CollectionView: View {
 }
 
 extension CollectionView {
-
     private var filteredMangas: [UserManga] {
         switch selectedFilter {
 
@@ -416,48 +336,30 @@ extension CollectionView {
 
         case .completados:
             return userMangas.filter {
-                // Solo mangas con total definido pueden estar "completados"
                 guard let total = $0.totalVolumes, total > 0 else { return false }
                 return ($0.readingVolume ?? 0) >= total
             }
         }
     }
-
-    // MARK: - Stats Grid
-
+    
     private var statsGrid: some View {
         let readingCount = userMangas.filter {
             guard let total = $0.totalVolumes else { return false }
             let reading = $0.readingVolume ?? 0
             return reading > 0 && reading < total
         }.count
-
+        
         let completeCount = userMangas.filter { $0.completeCollection }.count
-
-        let totalVolumesOwned = userMangas.reduce(0) {
-            $0 + $1.volumesOwned.count
-        }
-
+        let totalVolumesOwned = userMangas.reduce(0) { $0 + $1.volumesOwned.count }
+        
         return HStack {
-            StatItem(
-                label: "Total",
-                value: "\(userMangas.count)",
-                icon: "books.vertical"
-            )
+            StatItem(label: "Total", value: "\(userMangas.count)", icon: "books.vertical")
             Divider().frame(height: 40)
             StatItem(label: "Leyendo", value: "\(readingCount)", icon: "book")
             Divider().frame(height: 40)
-            StatItem(
-                label: "Tomos",
-                value: "\(totalVolumesOwned)",
-                icon: "square.stack.3d.up"
-            )
+            StatItem(label: "Tomos", value: "\(totalVolumesOwned)", icon: "square.stack.3d.up")
             Divider().frame(height: 40)
-            StatItem(
-                label: "Completos",
-                value: "\(completeCount)",
-                icon: "checkmark.seal"
-            )
+            StatItem(label: "Completos", value: "\(completeCount)", icon: "checkmark.seal")
         }
         .padding()
         .background(Color("TankoCardSurface"))
@@ -490,7 +392,6 @@ struct EmptyStateView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-
             Image(systemName: "books.vertical")
                 .font(.system(size: 48))
                 .foregroundStyle(.gray.opacity(0.4))
