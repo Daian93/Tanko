@@ -19,6 +19,9 @@ final class UserMangaCollectionViewModel {
     private var isLoading = false
     private let syncService: MangaCollectionSyncService
     
+    // ✅ Gestor de operaciones offline
+    let offlineManager: OfflineOperationsManager
+    
     init(
         context: ModelContext,
         repository: MangaCollectionRepository,
@@ -27,6 +30,7 @@ final class UserMangaCollectionViewModel {
         self.modelContext = context
         self.repository = repository
         self.syncService = syncService
+        self.offlineManager = OfflineOperationsManager(context: context)
     }
     
     func synchronize() async {
@@ -40,6 +44,16 @@ final class UserMangaCollectionViewModel {
         
         do {
             print("🔄 Iniciando sincronización...")
+            
+            // ✅ PRIMERO: Procesar operaciones pendientes offline
+            if let remoteRepo = repository as? RemoteMangaCollectionRepository {
+                let result = await offlineManager.processQueue(using: remoteRepo)
+                if result.total > 0 {
+                    print("📤 Operaciones offline procesadas: \(result.processed)/\(result.total)")
+                }
+            }
+            
+            // SEGUNDO: Sincronización bidireccional normal
             try await syncService.sync()
             print("✅ Sincronización completada. Recargando datos...")
             await reloadFromLocalDatabase()
@@ -122,24 +136,63 @@ final class UserMangaCollectionViewModel {
             updatedAt: newUserManga.updatedAt
         )
         
-        do {
-            try await repository.add(mangaData: syncData)
-            print("✅ Manga added to server")
-        } catch {
-            print("⚠️ Failed to add to server, saved locally: \(error)")
+        if offlineManager.isConnected {
+            do {
+                try await repository.add(mangaData: syncData)
+                print("✅ Manga added to server")
+            } catch {
+                print("⚠️ Failed to add to server, enqueueing: \(error)")
+                offlineManager.enqueue(
+                    action: .add,
+                    mangaID: newUserManga.mangaID,
+                    mangaTitle: newUserManga.title,
+                    mangaData: syncData
+                )
+            }
+        } else {
+            print("📴 Offline - Enqueueing add operation for: \(newUserManga.title)")
+            offlineManager.enqueue(
+                action: .add,
+                mangaID: newUserManga.mangaID,
+                mangaTitle: newUserManga.title,
+                mangaData: syncData
+            )
         }
     }
     
     func remove(_ manga: UserManga) async {
         let idToRemove = manga.mangaID
+        let syncData = manga.asSyncData
         
-        try? await repository.remove(manga)
-        
+        // Primero elimina localmente
         modelContext.delete(manga)
         self.mangas.removeAll { $0.mangaID == idToRemove }
-        
         try? modelContext.save()
         updateWidget()
+        
+        // ✅ Intenta eliminar del servidor o encola si no hay conexión
+        if offlineManager.isConnected {
+            do {
+                try await repository.remove(manga)
+                print("✅ Manga deleted from server: \(manga.title)")
+            } catch {
+                print("⚠️ Failed to delete from server, enqueueing: \(error)")
+                offlineManager.enqueue(
+                    action: .delete,
+                    mangaID: idToRemove,
+                    mangaTitle: manga.title,
+                    mangaData: syncData
+                )
+            }
+        } else {
+            print("📴 Offline - Enqueueing delete operation for: \(manga.title)")
+            offlineManager.enqueue(
+                action: .delete,
+                mangaID: idToRemove,
+                mangaTitle: manga.title,
+                mangaData: syncData
+            )
+        }
     }
     
     func isInCollection(mangaID: Int) -> Bool {
@@ -154,40 +207,57 @@ final class UserMangaCollectionViewModel {
     
     func updateRemote(_ userManga: UserManga) async {
         let syncData = userManga.asSyncData
-        do {
-            try await repository.add(mangaData: syncData)
-            print("✅ Synced with server")
-            updateWidget()
-        } catch {
-            print("⚠️ Failed to sync, data saved locally: \(error)")
+        
+        if offlineManager.isConnected {
+            do {
+                try await repository.add(mangaData: syncData)
+                print("✅ Synced with server")
+                updateWidget()
+            } catch {
+                print("⚠️ Failed to sync, enqueueing update: \(error)")
+                offlineManager.enqueue(
+                    action: .update,
+                    mangaID: userManga.mangaID,
+                    mangaTitle: userManga.title,
+                    mangaData: syncData
+                )
+            }
+        } else {
+            print("📴 Offline - Enqueueing update operation for: \(userManga.title)")
+            offlineManager.enqueue(
+                action: .update,
+                mangaID: userManga.mangaID,
+                mangaTitle: userManga.title,
+                mangaData: syncData
+            )
         }
     }
     
     private func updateWidget() {
-        let readingMangas: [ReadingManga] = mangas.compactMap { manga in
-            // Solo incluir mangas que están siendo leídos
-            guard let readingVolume = manga.readingVolume, readingVolume > 0 else {
-                return nil
+        Task { @MainActor in
+            let readingMangas: [ReadingManga] = mangas.compactMap { manga in
+                guard let readingVolume = manga.readingVolume, readingVolume > 0 else {
+                    return nil
+                }
+                
+                if let total = manga.totalVolumes, readingVolume >= total {
+                    return nil
+                }
+                
+                print("📚 Widget - Añadiendo manga: \(manga.title)")
+                print("🖼️ Cover URL: \(manga.coverURL?.absoluteString ?? "nil")")
+                
+                return ReadingManga(
+                    id: manga.mangaID,
+                    title: manga.title,
+                    coverURL: manga.coverURL,
+                    readingVolume: readingVolume,
+                    totalVolumes: manga.totalVolumes
+                )
             }
             
-            // Si tiene total de volúmenes, verificar que no esté completo
-            if let total = manga.totalVolumes, readingVolume >= total {
-                return nil
-            }
-            
-            print("📚 Widget - Añadiendo manga: \(manga.title)")
-            print("🖼️ Cover URL: \(manga.coverURL?.absoluteString ?? "nil")")
-            
-            return ReadingManga(
-                id: manga.mangaID,
-                title: manga.title,
-                coverURL: manga.coverURL,
-                readingVolume: readingVolume,
-                totalVolumes: manga.totalVolumes
-            )
+            print("📊 Total mangas para widget: \(readingMangas.count)")
+            WidgetDataManager.shared.save(readingMangas)
         }
-        
-        print("📊 Total mangas para widget: \(readingMangas.count)")
-        WidgetDataManager.shared.save(readingMangas)
     }
 }

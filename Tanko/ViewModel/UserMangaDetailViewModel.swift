@@ -76,7 +76,8 @@ final class UserMangaDetailViewModel {
         guard let definedTotal = userManga.totalVolumes, definedTotal > 0 else {
             return false
         }
-        return readingVolume >= definedTotal
+
+        return volumesOwned.count == definedTotal
     }
     
     /// Texto del footer del total de volúmenes

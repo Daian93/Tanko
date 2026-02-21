@@ -25,6 +25,6 @@ struct TankoApp: App {
                     .buttonStyle(.plain)
                 #endif
         }
-        .modelContainer(for: [UserManga.self])
+        .modelContainer(for: [UserManga.self, PendingOperation.self])
     }
 }

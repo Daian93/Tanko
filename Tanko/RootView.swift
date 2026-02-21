@@ -36,41 +36,36 @@ struct RootView: View {
             }
         }
         .task(id: session.canAccessApp) {
-            if session.canAccessApp, let vm = userCollectionVM {
-                if session.isAuthenticated {
-                    await vm.synchronize()
-                } else {
-                    await vm.loadCollection()
+            if session.canAccessApp {
+                buildViewModel()
+    
+                try? await Task.sleep(nanoseconds: 100_000_000) 
+                if let vm = userCollectionVM {
+                    if session.isAuthenticated {
+                        await vm.synchronize()
+                    } else {
+                        await vm.loadCollection()
+                    }
                 }
-            }
-        }
-        .onAppear {
-            buildViewModel()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                withAnimation {
-                    showLoadingOverlay = false
+        
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                await MainActor.run {
+                    withAnimation {
+                        showLoadingOverlay = false
+                    }
                 }
             }
         }
     
-        .onChange(of: session.isAuthenticated) { old, newValue in
-            buildViewModel()
+        .onChange(of: session.isAuthenticated) { _, newValue in
             showLoadingOverlay = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                withAnimation {
-                    showLoadingOverlay = false
-                }
-            }
-            if newValue {
-                Task {
-                    await userCollectionVM?.synchronize()
-                }
-            }
+            buildViewModel()
         }
         .onReceive(NotificationCenter.default.publisher(for: .didLogout)) { _ in
-            Task {
+            Task { @MainActor in
                 await LocalDatabaseCleaner.clear(context: context)
                 buildViewModel()
+                showLoadingOverlay = true
             }
         }
     }

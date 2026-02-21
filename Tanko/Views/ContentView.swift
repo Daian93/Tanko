@@ -85,7 +85,7 @@ struct ContentView: View {
             .navigationTitle("tab.mangas")
             .background(AppColors.background)
             .navigationDestination(for: Manga.self) { manga in
-                MangaDetailView(manga: manga, namespace: namespace)
+                MangaDetailView(manga: manga, namespace: nil)
             }
             .navigationDestination(for: Author.self) { author in
                 AuthorMangaView(author: author)
