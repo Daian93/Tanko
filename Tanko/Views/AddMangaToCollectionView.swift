@@ -17,6 +17,7 @@ struct AddMangaToCollectionView: View {
 
     @State private var volumesOwned: Set<Int> = []
     @State private var readingVolume: Int = 0
+    @State private var isAdding: Bool = false
     @FocusState private var isTextFieldFocused: Bool
 
     private var totalVolumes: Int {
@@ -68,6 +69,9 @@ struct AddMangaToCollectionView: View {
 
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Añadir") {
+                        guard !isAdding else { return }
+                        isAdding = true
+                        
                         Task {
                             await userMangaCollectionVM.add(
                                 manga: manga,
@@ -79,6 +83,7 @@ struct AddMangaToCollectionView: View {
                             dismiss()
                         }
                     }
+                    .disabled(isAdding)
                 }
             }
         }

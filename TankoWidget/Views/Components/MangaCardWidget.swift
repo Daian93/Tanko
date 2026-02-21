@@ -12,39 +12,41 @@ struct MangaCardWidget: View {
     let manga: ReadingManga
     
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            
-            // MARK: - Background Cover
-            GeometryReader { geo in
-                if let image = WidgetImageCache.loadCover(from: manga.coverURL) {
-                    Image(uiImage: image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: geo.size.width, height: geo.size.height)
-                        .clipped()
-                        .widgetAccentable()
-                } else {
-                    placeholderView
-                        .widgetAccentable()
+        Link(destination: URL(string: "tanko://manga/\(manga.id)")!) {
+            ZStack(alignment: .topTrailing) {
+                
+                // MARK: - Background Cover
+                GeometryReader { geo in
+                    if let image = WidgetImageCache.loadCover(from: manga.coverURL) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: geo.size.width, height: geo.size.height)
+                            .clipped()
+                            .widgetAccentable()
+                    } else {
+                        placeholderView
+                            .widgetAccentable()
+                    }
+                }
+                
+                // MARK: - Bottom Shadow Gradient
+                bottomGradient
+                
+                // MARK: - Info Section
+                infoSection
+                
+                // MARK: - Progress Badge
+                if manga.progress > 0 {
+                    progressBadge
                 }
             }
-            
-            // MARK: - Bottom Shadow Gradient
-            bottomGradient
-            
-            // MARK: - Info Section
-            infoSection
-            
-            // MARK: - Progress Badge
-            if manga.progress > 0 {
-                progressBadge
-            }
+            .clipShape(RoundedRectangle(cornerRadius: WidgetTheme.Size.borderRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: WidgetTheme.Size.borderRadius)
+                    .strokeBorder(.primary.opacity(0.1), lineWidth: WidgetTheme.Size.borderWidth)
+            )
         }
-        .clipShape(RoundedRectangle(cornerRadius: WidgetTheme.Size.borderRadius))
-        .overlay(
-            RoundedRectangle(cornerRadius: WidgetTheme.Size.borderRadius)
-                .strokeBorder(.primary.opacity(0.1), lineWidth: WidgetTheme.Size.borderWidth)
-        )
     }
     
     // MARK: - Subviews

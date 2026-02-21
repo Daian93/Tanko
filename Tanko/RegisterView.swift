@@ -19,40 +19,119 @@ struct RegisterView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Email") {
-                    TextField("email@ejemplo.com", text: $vm.email)
-                        .keyboardTypeCompatible(.emailAddress)
-                        .textInputAutocapitalizationCompatible()
-                }
-
-                Section("Contraseña") {
-                    SecureField("Mínimo 8 caracteres", text: $vm.password)
-                }
-
-                if let error = vm.error {
-                    Text(error)
-                        .foregroundStyle(AppColors.primary)
-                        .font(.footnote)
-                        .padding(.top, 4)
-                }
-            }
-            .navigationTitle("Crear cuenta")
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        Task {
-                            await vm.register()
-                            if vm.error == nil { dismiss() }
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Header con icono
+                    VStack(spacing: 16) {
+                        ZStack {
+                            Circle()
+                                .fill(Color("TankoPrimary").opacity(0.1))
+                                .frame(width: 80, height: 80)
+                            
+                            Image(systemName: "person.badge.plus.fill")
+                                .font(.system(size: 50))
+                                .foregroundStyle(Color("TankoPrimary"))
                         }
-                    } label: {
-                        if vm.isLoading {
-                            ProgressView()
-                        } else {
-                            Text("Crear")
-                        }
+                        
+                        Text("Crear cuenta")
+                            .font(.title.bold())
+                        
+                        Text("Crea una cuenta para guardar tu colección en la nube")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
                     }
-                    .disabled(!vm.isFormValid || vm.isLoading)
+                    .padding(.top, 20)
+                    
+                    // Formulario
+                    VStack(spacing: 16) {
+                        // Email
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Email")
+                                .font(.subheadline.bold())
+                                .foregroundStyle(.secondary)
+                            
+                            TextField("email@ejemplo.com", text: $vm.email)
+                                .keyboardTypeCompatible(.emailAddress)
+                                .textInputAutocapitalizationCompatible()
+                                .padding()
+                                .background(AppColors.surface)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+                        
+                        // Password
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Contraseña")
+                                .font(.subheadline.bold())
+                                .foregroundStyle(.secondary)
+                            
+                            SecureField("Mínimo 8 caracteres", text: $vm.password)
+                                .padding()
+                                .background(AppColors.surface)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                            
+                            Text("Usa al menos 8 caracteres con mayúsculas, minúsculas y números")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        
+                        // Error message
+                        if let error = vm.error {
+                            HStack(spacing: 8) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundStyle(AppColors.primary)
+                                
+                                Text(error)
+                                    .font(.footnote)
+                                    .foregroundStyle(AppColors.primary)
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(AppColors.primary.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+                        
+                        // Register button
+                        Button {
+                            Task {
+                                await vm.register()
+                                if vm.error == nil { dismiss() }
+                            }
+                        } label: {
+                            HStack {
+                                if vm.isLoading {
+                                    ProgressView()
+                                        .tint(.white)
+                                } else {
+                                    Text("Crear cuenta")
+                                        .fontWeight(.semibold)
+                                }
+                            }
+                            .frame(maxWidth: 120)
+                            .padding()
+                            .background(
+                                vm.isFormValid && !vm.isLoading
+                                    ? Color("TankoPrimary")
+                                    : Color.gray
+                            )
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+                        .disabled(!vm.isFormValid || vm.isLoading)
+                        .padding(.top, 8)
+                    }
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 40)
+            }
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancelar") {
+                        dismiss()
+                    }
                 }
             }
         }

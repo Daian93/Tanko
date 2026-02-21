@@ -18,6 +18,7 @@ private let pillColumns: [GridItem] = [
 struct MangaDetailView: View {
     let manga: Manga
     @Environment(UserMangaCollectionViewModel.self) private var collectionVM
+    @Environment(\.dismiss) private var dismiss
 
     @State private var mainImage: PlatformImage? = nil
     @State private var backgroundImage: PlatformImage? = nil
@@ -27,12 +28,15 @@ struct MangaDetailView: View {
     @State private var isSynopsisExpanded = false
     @State private var isBackgroundExpanded = false
     @State private var showAddSheet = false
+    @State private var showDeleteAlert = false
+    @State private var mangaToDelete: UserManga?
 
     private var isInCollection: Bool {
         collectionVM.isInCollection(mangaID: manga.id)
     }
 
     let namespace: Namespace.ID?
+    var navigationPath: Binding<NavigationPath>?
 
     let bannerHeight: CGFloat = 200
     let coverOverlap: CGFloat = 80
@@ -503,6 +507,21 @@ struct MangaDetailView: View {
             AddMangaToCollectionView(manga: manga)
                 .environment(collectionVM)
         }
+        .alert(
+            "Eliminar de la colección",
+            isPresented: $showDeleteAlert,
+            presenting: mangaToDelete
+        ) { manga in
+            Button("Cancelar", role: .cancel) {
+                mangaToDelete = nil
+            }
+            
+            Button("Eliminar", role: .destructive) {
+                confirmDelete()
+            }
+        } message: { manga in
+            Text("¿Estás seguro de que quieres eliminar '\(manga.title)' de tu colección?")
+        }
     }
 
     private func toggleBookmark() {
@@ -510,13 +529,30 @@ struct MangaDetailView: View {
             if let existing = collectionVM.mangas.first(where: {
                 $0.mangaID == manga.id
             }) {
-                Task {
-                    await collectionVM.remove(existing)
-                }
+                mangaToDelete = existing
+                showDeleteAlert = true
             }
         } else {
             showAddSheet = true
         }
+    }
+    
+    private func confirmDelete() {
+        guard let mangaToDelete = mangaToDelete else { return }
+        
+        Task {
+            await collectionVM.remove(mangaToDelete)
+            
+            await MainActor.run {
+                if let navigationPath = navigationPath {
+                    navigationPath.wrappedValue = NavigationPath()
+                } else {
+                    dismiss()
+                }
+            }
+        }
+        
+        self.mangaToDelete = nil
     }
 
 }

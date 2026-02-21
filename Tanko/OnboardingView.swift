@@ -153,14 +153,26 @@ struct OnboardingView: View {
             switch sheet {
             case .login:
                 LoginView(session: session, context: context)
+                    #if os(iOS)
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
                     .presentationCornerRadius(28)
+                    #endif
+                    #if os(macOS)
+                    .frame(minWidth: 450, idealWidth: 500, maxWidth: 550)
+                    .frame(minHeight: 500, idealHeight: 550, maxHeight: 600)
+                    #endif
             case .register:
                 RegisterView(session: session)
+                    #if os(iOS)
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
                     .presentationCornerRadius(28)
+                    #endif
+                    #if os(macOS)
+                    .frame(minWidth: 450, idealWidth: 500, maxWidth: 550)
+                    .frame(minHeight: 550, idealHeight: 600, maxHeight: 650)
+                    #endif
             }
         }
     }

@@ -41,6 +41,7 @@
 		8489A0E92F452F8700640A60 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 84B32A1E2F30E71B00F28131 /* Localizable.xcstrings */; };
 		8489A1062F48BBC800640A60 /* OfflineOperationsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8489A1052F48BBBF00640A60 /* OfflineOperationsManager.swift */; };
 		8489A1082F48BBEE00640A60 /* PendingOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8489A1072F48BBE500640A60 /* PendingOperation.swift */; };
+		8489A10B2F49269200640A60 /* NavigationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8489A10A2F49245300640A60 /* NavigationRouter.swift */; };
 		8497599E2F2000A40049E62F /* URL+List.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8497599D2F2000960049E62F /* URL+List.swift */; };
 		849759A02F20011E0049E62F /* NetworkConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8497599F2F2001180049E62F /* NetworkConstants.swift */; };
 		849759A22F20056C0049E62F /* URL+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849759A12F2005650049E62F /* URL+Search.swift */; };
@@ -181,6 +182,8 @@
 		8489A0E72F45211100640A60 /* UserMangaDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserMangaDetailViewModel.swift; sourceTree = "<group>"; };
 		8489A1052F48BBBF00640A60 /* OfflineOperationsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineOperationsManager.swift; sourceTree = "<group>"; };
 		8489A1072F48BBE500640A60 /* PendingOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingOperation.swift; sourceTree = "<group>"; };
+		8489A1092F49217900640A60 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8489A10A2F49245300640A60 /* NavigationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRouter.swift; sourceTree = "<group>"; };
 		8497599D2F2000960049E62F /* URL+List.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+List.swift"; sourceTree = "<group>"; };
 		8497599F2F2001180049E62F /* NetworkConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkConstants.swift; sourceTree = "<group>"; };
 		849759A12F2005650049E62F /* URL+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Search.swift"; sourceTree = "<group>"; };
@@ -470,6 +473,8 @@
 		84EF4A2E2EFAE00400EE4B89 /* Tanko */ = {
 			isa = PBXGroup;
 			children = (
+				8489A1092F49217900640A60 /* Info.plist */,
+				8489A10A2F49245300640A60 /* NavigationRouter.swift */,
 				846128912F4216730075B2E4 /* Services */,
 				846127B72F3EFF890075B2E4 /* LoadingView.swift */,
 				84A18AF12F3CBD76008AB07B /* LocalDatabaseCleaner.swift */,
@@ -771,6 +776,7 @@
 				84EF9E0F2F1FAE1700EC2491 /* URLRequest.swift in Sources */,
 				84EF9DE62F1EF24600EC2491 /* AuthorDTO.swift in Sources */,
 				84A18A8E2F380977008AB07B /* AuthorViewModel.swift in Sources */,
+				8489A10B2F49269200640A60 /* NavigationRouter.swift in Sources */,
 				8489A0E82F45211B00640A60 /* UserMangaDetailViewModel.swift in Sources */,
 				84A18A942F3925B0008AB07B /* SessionManager.swift in Sources */,
 				84A18AD42F3A24B9008AB07B /* RegisterView.swift in Sources */,
@@ -1038,6 +1044,7 @@
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Tanko/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1080,6 +1087,7 @@
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Tanko/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

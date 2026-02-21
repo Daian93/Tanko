@@ -17,6 +17,7 @@ struct CollectionView: View {
     @Namespace private var namespace
     
     @State private var selectedFilter: CollectionFilter = .todo
+    @State private var router = NavigationRouter.shared
     
     enum CollectionFilter: String, CaseIterable {
         case todo = "Todos"
@@ -27,7 +28,7 @@ struct CollectionView: View {
     }
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $router.collectionPath) {
             ScrollView {
                 VStack(spacing: 24) {
                     
@@ -80,7 +81,8 @@ struct CollectionView: View {
                 UserMangaDetailView(
                     userManga: userManga,
                     collectionVM: collectionVM,
-                    namespace: namespace
+                    namespace: namespace,
+                    navigationPath: $router.collectionPath
                 )
             }
             .task {

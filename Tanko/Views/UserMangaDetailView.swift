@@ -14,6 +14,7 @@ struct UserMangaDetailView: View {
 
     @State private var viewModel: UserMangaDetailViewModel
     let namespace: Namespace.ID
+    @Binding var navigationPath: NavigationPath
     @FocusState private var isTextFieldFocused: Bool
     
     // MARK: - Initialization
@@ -21,13 +22,15 @@ struct UserMangaDetailView: View {
     init(
         userManga: UserManga,
         collectionVM: UserMangaCollectionViewModel,
-        namespace: Namespace.ID
+        namespace: Namespace.ID,
+        navigationPath: Binding<NavigationPath>
     ) {
         self.viewModel = UserMangaDetailViewModel(
             userManga: userManga,
             collectionVM: collectionVM
         )
         self.namespace = namespace
+        self._navigationPath = navigationPath
     }
 
     // MARK: - Body
@@ -187,7 +190,11 @@ struct UserMangaDetailView: View {
         .navigationBarTitleDisplayModeCompatible(.inline)
         .navigationDestination(for: Int.self) { mangaID in
             if let manga = viewModel.manga {
-                MangaDetailView(manga: manga, namespace: nil)
+                MangaDetailView(
+                    manga: manga,
+                    namespace: nil,
+                    navigationPath: $navigationPath
+                )
             }
         }
         .navigationDestination(for: Author.self) { author in
@@ -208,13 +215,15 @@ struct UserMangaDetailView: View {
 
 #Preview {
     @Previewable @Namespace var namespace
+    @Previewable @State var path = NavigationPath()
     let collectionVM = PreviewHelper.makeCollectionVM()
     
-    NavigationStack {
+    NavigationStack(path: $path) {
         UserMangaDetailView(
             userManga: .monster,
             collectionVM: collectionVM,
-            namespace: namespace
+            namespace: namespace,
+            navigationPath: $path
         )
     }
     .withPreviewEnvironment()

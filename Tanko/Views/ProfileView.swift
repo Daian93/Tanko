@@ -51,7 +51,7 @@ struct ProfileView: View {
                     Label(
                         "Modo oscuro",
                         systemImage: settings.isDarkMode.wrappedValue
-                            ? "moon.fill" : "sun.max"
+                            ? "moon.fill" : "moon"
                     )
                 }
             }
