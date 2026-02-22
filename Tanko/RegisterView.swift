@@ -55,7 +55,7 @@ struct RegisterView: View {
                                 .keyboardTypeCompatible(.emailAddress)
                                 .textInputAutocapitalizationCompatible()
                                 .padding()
-                                .background(AppColors.surface)
+                                .background(.surface)
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         
@@ -67,7 +67,7 @@ struct RegisterView: View {
                             
                             SecureField("Mínimo 8 caracteres", text: $vm.password)
                                 .padding()
-                                .background(AppColors.surface)
+                                .background(.surface)
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                             
                             Text("Usa al menos 8 caracteres con mayúsculas, minúsculas y números")
@@ -79,15 +79,15 @@ struct RegisterView: View {
                         if let error = vm.error {
                             HStack(spacing: 8) {
                                 Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundStyle(AppColors.primary)
+                                    .foregroundStyle(.tankoPrimary)
                                 
                                 Text(error)
                                     .font(.footnote)
-                                    .foregroundStyle(AppColors.primary)
+                                    .foregroundStyle(.tankoPrimary)
                             }
                             .padding()
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(AppColors.primary.opacity(0.1))
+                            .background(.tankoPrimary.opacity(0.1))
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         

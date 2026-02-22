@@ -48,7 +48,7 @@ struct MangaGridCard: View {
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .lineLimit(1)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(.textPrimary)
 
                 HStack(spacing: 4) {
                     Image(systemName: "star.fill")
@@ -56,7 +56,7 @@ struct MangaGridCard: View {
                     Text(manga.formattedScore)
                 }
                 .font(.caption)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(.textSecondary)
             }
             .frame(width: cardSize, alignment: .leading)
         }

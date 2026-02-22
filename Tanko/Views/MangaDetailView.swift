@@ -117,7 +117,7 @@ struct MangaDetailView: View {
                     VStack(spacing: 4) {
                         Text("section.score")
                             .font(.caption)
-                            .foregroundStyle(AppColors.textSecondary)
+                            .foregroundStyle(.textSecondary)
 
                         Text(manga.formattedScore)
                             .font(.title2)
@@ -135,7 +135,7 @@ struct MangaDetailView: View {
                     VStack(spacing: 4) {
                         Text("section.state")
                             .font(.caption)
-                            .foregroundStyle(AppColors.textSecondary)
+                            .foregroundStyle(.textSecondary)
 
                         Text(manga.status.localized)
                             .font(.headline)
@@ -153,7 +153,7 @@ struct MangaDetailView: View {
                     VStack(spacing: 4) {
                         Text("section.chapters")
                             .font(.caption)
-                            .foregroundStyle(AppColors.textSecondary)
+                            .foregroundStyle(.textSecondary)
 
                         Text(manga.chapters.map(String.init) ?? "—")
                             .font(.headline)
@@ -168,7 +168,7 @@ struct MangaDetailView: View {
                     VStack(spacing: 4) {
                         Text("section.volumes")
                             .font(.caption)
-                            .foregroundStyle(AppColors.textSecondary)
+                            .foregroundStyle(.textSecondary)
 
                         Text(manga.volumes.map(String.init) ?? "—")
                             .font(.headline)
@@ -201,7 +201,7 @@ struct MangaDetailView: View {
                                             .font(.subheadline)
                                             .fontWeight(.medium)
                                             .foregroundStyle(
-                                                AppColors.textSecondary
+                                                .textSecondary
                                             )
 
                                         Image(systemName: author.role.icon)
@@ -211,14 +211,14 @@ struct MangaDetailView: View {
                                             .foregroundStyle(.white)
                                             .frame(width: 18, height: 18)
                                             .background(
-                                                AppColors.primary.gradient
+                                                .tankoPrimary.gradient
                                             )
                                             .clipShape(Circle())
                                     }
                                     .padding(.leading, 4)
                                     .padding(.trailing, 2)
                                     .padding(.vertical, 4)
-                                    .background(AppColors.primary.opacity(0.1))
+                                    .background(.tankoPrimary.opacity(0.1))
                                     .clipShape(Capsule())
                                 }
 
@@ -266,7 +266,7 @@ struct MangaDetailView: View {
 
                         Text(manga.publicationYear)
                             .font(.subheadline)
-                            .foregroundStyle(AppColors.textSecondary)
+                            .foregroundStyle(.textSecondary)
                     }
                     .accessibilityLabel(
                         "section.published: \(manga.publicationYear)"
@@ -472,7 +472,7 @@ struct MangaDetailView: View {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
                             .foregroundStyle(.white)
-                            .background(AppColors.primary.gradient)
+                            .background(.tankoPrimary.gradient)
                             .clipShape(Circle())
                     }
                 }
@@ -497,7 +497,7 @@ struct MangaDetailView: View {
                     )
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(
-                        isInCollection ? AppColors.primary : .primary
+                        isInCollection ?.tankoPrimary : .primary
                     )
                 }
                 .animation(.easeInOut(duration: 0.2), value: isInCollection)
@@ -508,7 +508,7 @@ struct MangaDetailView: View {
                 .environment(collectionVM)
         }
         .alert(
-            "Eliminar de la colección",
+            "Quitar de la colección",
             isPresented: $showDeleteAlert,
             presenting: mangaToDelete
         ) { manga in
@@ -516,11 +516,11 @@ struct MangaDetailView: View {
                 mangaToDelete = nil
             }
             
-            Button("Eliminar", role: .destructive) {
+            Button("Quitar", role: .destructive) {
                 confirmDelete()
             }
         } message: { manga in
-            Text("¿Estás seguro de que quieres eliminar '\(manga.title)' de tu colección?")
+            Text("¿Estás seguro de que quieres quitar '\(manga.title)' de tu colección?")
         }
     }
 

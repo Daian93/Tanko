@@ -370,7 +370,7 @@ struct SearchViewiPad: View {
                 }
                 .listRowSeparator(isFirst ? .hidden : .visible, edges: .top)
                 .listRowSeparator(isLast ? .hidden : .visible, edges: .bottom)
-                .listRowSeparatorTint(AppColors.surface)
+                .listRowSeparatorTint(.surface)
                 .listRowInsets(
                     EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 15)
                 )

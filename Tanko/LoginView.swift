@@ -29,12 +29,12 @@ struct LoginView: View {
                     VStack(spacing: 16) {
                         ZStack {
                             Circle()
-                                .fill(Color("TankoPrimary").opacity(0.1))
+                                .fill(.tankoPrimary.opacity(0.1))
                                 .frame(width: 80, height: 80)
                             
                             Image(systemName: "person.circle.fill")
                                 .font(.system(size: 50))
-                                .foregroundStyle(Color("TankoPrimary"))
+                                .foregroundStyle(.tankoPrimary)
                         }
                         
                         Text("Iniciar sesión")
@@ -42,7 +42,7 @@ struct LoginView: View {
                         
                         Text("Accede a tu cuenta para sincronizar tu colección")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.tankoSecondary)
                             .multilineTextAlignment(.center)
                     }
                     .padding(.top, 15)
@@ -53,14 +53,14 @@ struct LoginView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Email")
                                 .font(.subheadline.bold())
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.tankoSecondary)
                             
                             TextField("email@ejemplo.com", text: $vm.email)
                                 .keyboardTypeCompatible(.emailAddress)
                                 .textInputAutocapitalizationCompatible()
                                 .textContentTypeCompatible(.username)
                                 .padding()
-                                .background(AppColors.surface)
+                                .background(.surface)
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         
@@ -68,12 +68,12 @@ struct LoginView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Contraseña")
                                 .font(.subheadline.bold())
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.tankoSecondary)
                             
                             SecureField("Mínimo 8 caracteres", text: $vm.password)
                                 .textContentType(.password)
                                 .padding()
-                                .background(AppColors.surface)
+                                .background(.surface)
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         
@@ -81,15 +81,15 @@ struct LoginView: View {
                         if let error = vm.error {
                             HStack(spacing: 8) {
                                 Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundStyle(AppColors.primary)
+                                    .foregroundStyle(.tankoPrimary)
                                 
                                 Text(error)
                                     .font(.footnote)
-                                    .foregroundStyle(AppColors.primary)
+                                    .foregroundStyle(.tankoPrimary)
                             }
                             .padding()
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(AppColors.primary.opacity(0.1))
+                            .background(.tankoPrimary.opacity(0.1))
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         
@@ -113,10 +113,10 @@ struct LoginView: View {
                             .padding()
                             .background(
                                 vm.isFormValid && !vm.isLoading
-                                    ? Color("TankoPrimary")
+                                ? .tankoPrimary
                                     : Color.gray
                             )
-                            .foregroundStyle(AppColors.background)
+                            .foregroundStyle(.tankoBackground)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         .disabled(!vm.isFormValid || vm.isLoading)

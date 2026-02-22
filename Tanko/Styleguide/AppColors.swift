@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-enum AppColors {
-    static let primary = Color("TankoPrimary")
-    static let secondary = Color("TankoSecondary")
-    static let background = Color("TankoBackground")
-    static let surface = Color("TankoCardSurface")
-    static let textPrimary = Color("TankoTextPrimary")
-    static let textSecondary = Color("TankoTextSecondary")
+extension ShapeStyle where Self == Color {
+    static var tankoPrimary: Color { Color("TankoMainPrimary") }
+    static var tankoSecondary: Color { Color("TankoMainSecondary") }
+    static var tankoBackground: Color { Color("TankoMainBackground") }
+    static var surface: Color { Color("TankoCardSurface") }
+    static var textPrimary: Color { Color("TankoTextPrimary") }
+    static var textSecondary: Color { Color("TankoTextSecondary") }
 }

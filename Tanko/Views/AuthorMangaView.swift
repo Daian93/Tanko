@@ -54,7 +54,7 @@ struct AuthorMangaView: View {
                         HStack {
                             Spacer()
                             ProgressView()
-                                .tint(AppColors.primary)
+                                .tint(.tankoPrimary)
                             Spacer()
                         }
                         .padding(.vertical)
@@ -63,7 +63,7 @@ struct AuthorMangaView: View {
             }
             .padding(.horizontal)
         }
-        .background(AppColors.background.ignoresSafeArea())
+        .backgroundStyle(.tankoBackground)
         .navigationBarTitleDisplayModeCompatible(.inline)
         .task {
             await viewModel.loadInitial()
@@ -88,14 +88,14 @@ struct AuthorMangaView: View {
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
-                .foregroundStyle(AppColors.primary)
-                .background(AppColors.primary.opacity(0.1))
+                .foregroundStyle(.tankoPrimary)
+                .background(.tankoPrimary.opacity(0.1))
                 .clipShape(Capsule())
             }
             Spacer()
         }
         .padding()
-        .background(AppColors.surface)
+        .background(.surface)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: 2)
     }

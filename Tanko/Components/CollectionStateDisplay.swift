@@ -17,7 +17,7 @@ struct CollectionStateDisplay: View {
     var body: some View {
         HStack {
             Label("Estado de la colección", systemImage: "checkmark.seal.fill")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.tankoSecondary)
             Spacer()
             if isCompleteCollection {
                 Text("Completa")
@@ -25,7 +25,7 @@ struct CollectionStateDisplay: View {
                     .foregroundStyle(.green)
             } else {
                 Text("Incompleta")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.tankoSecondary)
             }
         }
     }

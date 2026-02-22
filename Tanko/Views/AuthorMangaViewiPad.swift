@@ -54,7 +54,7 @@ struct AuthorMangaViewiPad: View {
                     }
                 }
             }
-            .background(AppColors.background.ignoresSafeArea())
+            .background(.background)
             .navigationBarTitleDisplayModeCompatible(.inline)
             .task {
                 await viewModel.loadInitial()
@@ -168,15 +168,15 @@ struct AuthorMangaViewiPad: View {
                 }
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
-                .foregroundStyle(AppColors.primary)
-                .background(AppColors.primary.opacity(0.1))
+                .foregroundStyle(.tankoPrimary)
+                .background(.tankoPrimary.opacity(0.1))
                 .clipShape(Capsule())
             }
 
             Spacer()
         }
         .padding(30)
-        .background(AppColors.surface)
+        .background(.surface)
         .clipShape(RoundedRectangle(cornerRadius: 24))
         .shadow(color: .black.opacity(0.25), radius: 8, y: 3)
     }
@@ -215,7 +215,7 @@ struct MangaCardPortrait: View {
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .lineLimit(2)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
 
                 HStack(spacing: 3) {
@@ -258,7 +258,7 @@ struct MangaCardLandscape: View {
                 Text(manga.title)
                     .font(.headline)
                     .lineLimit(2)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
 
                 HStack(spacing: 4) {
@@ -278,13 +278,13 @@ struct MangaCardLandscape: View {
     }
 
     private func placeholderView(w: CGFloat, h: CGFloat) -> some View {
-        AppColors.surface
+        Color.surface
             .frame(width: w, height: h)
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .overlay(
                 Image(systemName: "book")
                     .font(.largeTitle)
-                    .foregroundStyle(AppColors.primary)
+                    .foregroundStyle(.tankoPrimary)
             )
     }
 }

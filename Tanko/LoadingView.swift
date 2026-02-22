@@ -22,8 +22,8 @@ struct LoadingView: View {
             // Background gradient
             LinearGradient(
                 colors: [
-                    Color("TankoPrimary").opacity(0.8),
-                    Color("TankoSecondary").opacity(0.6)
+                    .tankoPrimary.opacity(0.8),
+                    .tankoSecondary.opacity(0.6)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing

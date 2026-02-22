@@ -25,9 +25,9 @@ struct OnboardingView: View {
             // Background gradient
             LinearGradient(
                 colors: [
-                    Color("TankoPrimary").opacity(0.9),
-                    Color("TankoSecondary").opacity(0.7),
-                    Color("TankoPrimary").opacity(0.6)
+                    .tankoPrimary.opacity(0.9),
+                    .tankoSecondary.opacity(0.7),
+                    .tankoPrimary.opacity(0.6)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -101,7 +101,7 @@ struct OnboardingView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
                         .background(.white)
-                        .foregroundStyle(Color("TankoPrimary"))
+                        .foregroundStyle(.tankoPrimary)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
                     }

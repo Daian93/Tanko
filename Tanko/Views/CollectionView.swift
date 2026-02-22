@@ -76,7 +76,7 @@ struct CollectionView: View {
                 .padding(.vertical)
             }
             .navigationTitle("Mi Biblioteca")
-            .backgroundStyle(AppColors.primary)
+            .backgroundStyle(.tankoPrimary)
             .navigationDestination(for: UserManga.self) { userManga in
                 UserMangaDetailView(
                     userManga: userManga,
@@ -284,7 +284,7 @@ struct CollectionView: View {
                         showDeleteAlert = true
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(AppColors.primary)
+                            .foregroundStyle(.tankoPrimary)
                             .font(.title2)
                             .padding(16)
                     }
@@ -293,16 +293,16 @@ struct CollectionView: View {
             }
             .buttonStyle(.plain)
             .alert(
-                "Eliminar manga",
+                "Quitar de la colección",
                 isPresented: $showDeleteAlert,
                 actions: {
-                    Button("Eliminar", role: .destructive) {
+                    Button("Quitar", role: .destructive) {
                         Task { await collectionVM.remove(userManga) }
                     }
                     Button("Cancelar", role: .cancel) {}
                 },
                 message: {
-                    Text("¿Estás seguro que quieres eliminar este manga de tu colección?")
+                    Text("¿Estás seguro de que quieres quitar '\(userManga.title)' de tu colección?")
                 }
             )
         }

@@ -12,7 +12,7 @@ import SwiftUI
 final class NavigationRouter {
     static let shared = NavigationRouter()
     
-    var selectedTabTag: Int = 1
+    var selectedTabTag: Int = 0
     
     var collectionPath = NavigationPath()
     

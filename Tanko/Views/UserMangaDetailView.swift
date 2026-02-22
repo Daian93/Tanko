@@ -60,7 +60,7 @@ struct UserMangaDetailView: View {
                         isTextFieldFocused: $isTextFieldFocused
                     )
                     .padding()
-                    .backgroundStyle(AppColors.surface)
+                    .backgroundStyle(.surface)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
                     .padding(.horizontal)
@@ -86,7 +86,7 @@ struct UserMangaDetailView: View {
                             totalVolumes: viewModel.totalVolumes
                         )
                         .padding()
-                        .backgroundStyle(AppColors.surface)
+                        .backgroundStyle(.surface)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
                         .padding(.horizontal)
@@ -116,7 +116,7 @@ struct UserMangaDetailView: View {
 
                         stateDisplay
                             .padding()
-                            .backgroundStyle(AppColors.surface)
+                            .backgroundStyle(.surface)
                             .clipShape(RoundedRectangle(cornerRadius: 16))
                             .shadow(
                                 color: .black.opacity(0.05),
@@ -166,7 +166,7 @@ struct UserMangaDetailView: View {
                                 ? Color("TankoPrimary") : .secondary
                         )
                         .padding()
-                        .backgroundStyle(AppColors.surface)
+                        .backgroundStyle(.surface)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
                     }

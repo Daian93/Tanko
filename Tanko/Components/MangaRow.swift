@@ -27,20 +27,20 @@ struct MangaRow: View {
                 HStack() {
                     Text(manga.title)
                         .font(.headline)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(.textPrimary)
                         .lineLimit(2)
                     
                     Spacer()
                     
                     if isInCollection {
                         Image(systemName: "bookmark.fill")
-                            .foregroundStyle(AppColors.primary)
+                            .foregroundStyle(.primary)
                             .padding(.trailing, 2)
                     }
                 }
                 Text(manga.authorNames)
                     .font(.subheadline)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(.textSecondary)
                     .lineLimit(1)
 
                 Spacer(minLength: 20)
@@ -52,7 +52,7 @@ struct MangaRow: View {
                             .font(.subheadline)
                         Text(manga.formattedScore)
                             .font(.subheadline)
-                            .foregroundStyle(AppColors.textSecondary)
+                            .foregroundStyle(.textSecondary)
                     }
 
                     Spacer()
@@ -70,7 +70,7 @@ struct MangaRow: View {
         }
         .padding()
         .background(
-            showBackground ? AppColors.surface : Color.clear,
+            showBackground ? .surface : Color.clear,
             in: .rect(cornerRadius: 16)
         )
     }

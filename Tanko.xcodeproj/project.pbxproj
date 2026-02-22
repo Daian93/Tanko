@@ -42,6 +42,9 @@
 		8489A1062F48BBC800640A60 /* OfflineOperationsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8489A1052F48BBBF00640A60 /* OfflineOperationsManager.swift */; };
 		8489A1082F48BBEE00640A60 /* PendingOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8489A1072F48BBE500640A60 /* PendingOperation.swift */; };
 		8489A10B2F49269200640A60 /* NavigationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8489A10A2F49245300640A60 /* NavigationRouter.swift */; };
+		8489A1112F49DB2400640A60 /* Tanko.icon in Resources */ = {isa = PBXBuildFile; fileRef = 8489A1102F49DB2400640A60 /* Tanko.icon */; };
+		8489A1452F4B18CD00640A60 /* MangaCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8489A1442F4B18CD00640A60 /* MangaCarousel.swift */; };
+		8489A1472F4B18D500640A60 /* MangaCollectionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8489A1462F4B18D500640A60 /* MangaCollectionRow.swift */; };
 		8497599E2F2000A40049E62F /* URL+List.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8497599D2F2000960049E62F /* URL+List.swift */; };
 		849759A02F20011E0049E62F /* NetworkConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8497599F2F2001180049E62F /* NetworkConstants.swift */; };
 		849759A22F20056C0049E62F /* URL+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849759A12F2005650049E62F /* URL+Search.swift */; };
@@ -182,8 +185,11 @@
 		8489A0E72F45211100640A60 /* UserMangaDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserMangaDetailViewModel.swift; sourceTree = "<group>"; };
 		8489A1052F48BBBF00640A60 /* OfflineOperationsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineOperationsManager.swift; sourceTree = "<group>"; };
 		8489A1072F48BBE500640A60 /* PendingOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingOperation.swift; sourceTree = "<group>"; };
-		8489A1092F49217900640A60 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8489A1092F49217900640A60 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8489A10A2F49245300640A60 /* NavigationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRouter.swift; sourceTree = "<group>"; };
+		8489A1102F49DB2400640A60 /* Tanko.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = Tanko.icon; sourceTree = "<group>"; };
+		8489A1442F4B18CD00640A60 /* MangaCarousel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaCarousel.swift; sourceTree = "<group>"; };
+		8489A1462F4B18D500640A60 /* MangaCollectionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaCollectionRow.swift; sourceTree = "<group>"; };
 		8497599D2F2000960049E62F /* URL+List.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+List.swift"; sourceTree = "<group>"; };
 		8497599F2F2001180049E62F /* NetworkConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkConstants.swift; sourceTree = "<group>"; };
 		849759A12F2005650049E62F /* URL+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Search.swift"; sourceTree = "<group>"; };
@@ -393,6 +399,7 @@
 		849759B32F2164630049E62F /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				84EF4A2C2EFAE00400EE4B89 /* ContentView.swift */,
 				84D432DE2F44CCAF00143763 /* UserMangaDetailView.swift */,
 				846127B52F3EF29F0075B2E4 /* SearchViewiPad.swift */,
 				84CF6EE32F3D44C400F2E6B5 /* AuthorMangaViewiPad.swift */,
@@ -403,7 +410,6 @@
 				84A18A8B2F380912008AB07B /* AuthorMangaView.swift */,
 				84FED6552F317A1800950A9F /* FiltersView.swift */,
 				849759BB2F216B180049E62F /* MainTabView.swift */,
-				84EF4A2C2EFAE00400EE4B89 /* ContentView.swift */,
 				849759CB2F24EBCF0049E62F /* ContentViewiPad.swift */,
 				849759CD2F2522EF0049E62F /* ListEmptyView.swift */,
 				849759B92F21650F0049E62F /* MangaDetailView.swift */,
@@ -415,6 +421,8 @@
 		849759B42F21646A0049E62F /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				8489A1462F4B18D500640A60 /* MangaCollectionRow.swift */,
+				8489A1442F4B18CD00640A60 /* MangaCarousel.swift */,
 				8489A0E52F450F1C00640A60 /* UserMangaDetailHeader.swift */,
 				8489A0E32F450EDC00640A60 /* CollectionStateDisplay.swift */,
 				8489A0E12F450EAB00640A60 /* VolumeSelectorGrid.swift */,
@@ -473,7 +481,6 @@
 		84EF4A2E2EFAE00400EE4B89 /* Tanko */ = {
 			isa = PBXGroup;
 			children = (
-				8489A1092F49217900640A60 /* Info.plist */,
 				8489A10A2F49245300640A60 /* NavigationRouter.swift */,
 				846128912F4216730075B2E4 /* Services */,
 				846127B72F3EFF890075B2E4 /* LoadingView.swift */,
@@ -500,7 +507,9 @@
 				84CF6EE72F3E458900F2E6B5 /* Mocks */,
 				84EF4A322EFAE01B00EE4B89 /* System */,
 				84EF4A2B2EFAE00400EE4B89 /* Assets.xcassets */,
+				8489A1102F49DB2400640A60 /* Tanko.icon */,
 				84B32A1E2F30E71B00F28131 /* Localizable.xcstrings */,
+				8489A1092F49217900640A60 /* Info.plist */,
 			);
 			path = Tanko;
 			sourceTree = "<group>";
@@ -692,6 +701,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				84B32A1F2F30E71B00F28131 /* Localizable.xcstrings in Resources */,
+				8489A1112F49DB2400640A60 /* Tanko.icon in Resources */,
 				84EF4A2F2EFAE00400EE4B89 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -764,6 +774,7 @@
 				849759AB2F204D5F0049E62F /* NetworkRepository.swift in Sources */,
 				849759CE2F2522FC0049E62F /* ListEmptyView.swift in Sources */,
 				849759BA2F2165130049E62F /* MangaDetailView.swift in Sources */,
+				8489A1452F4B18CD00640A60 /* MangaCarousel.swift in Sources */,
 				849759C82F218E730049E62F /* SearchViewModel.swift in Sources */,
 				84A18AF22F3CBD7C008AB07B /* LocalDatabaseCleaner.swift in Sources */,
 				84EF9DE82F1EF25B00EC2491 /* UserMangaCollectionDTO.swift in Sources */,
@@ -816,6 +827,7 @@
 				84A18AD82F3A37DC008AB07B /* MangaCollectionRepository.swift in Sources */,
 				84EF9DE42F1EF0D400EC2491 /* UserDTO.swift in Sources */,
 				84FED6542F31798200950A9F /* FiltersViewModel.swift in Sources */,
+				8489A1472F4B18D500640A60 /* MangaCollectionRow.swift in Sources */,
 				84A18AD22F3A242B008AB07B /* LoginView.swift in Sources */,
 				84A18AEE2F3C957C008AB07B /* ProfileView.swift in Sources */,
 				84EF9DF22F1EF36600EC2491 /* Manga.swift in Sources */,
@@ -1033,7 +1045,7 @@
 		84EF4A292EFAC07D00EE4B89 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = Tanko;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Tanko/Tanko.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -1076,7 +1088,7 @@
 		84EF4A2A2EFAC07D00EE4B89 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = Tanko;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Tanko/Tanko.entitlements;
 				CODE_SIGN_STYLE = Automatic;

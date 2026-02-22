@@ -23,7 +23,7 @@ struct ContentViewiPad: View {
                 case .loading:
                     ProgressView("content.loading")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(AppColors.background)
+                        .background(.tankoBackground)
 
                 case .loaded:
                     GeometryReader { geo in
@@ -44,7 +44,7 @@ struct ContentViewiPad: View {
                                     VStack(alignment: .leading, spacing: 12) {
                                         Text("content.best")
                                             .font(.title3)
-                                            .foregroundStyle(AppColors.primary)
+                                            .foregroundStyle(.tankoPrimary)
                                             .bold()
                                             .padding(.horizontal)
 
@@ -56,7 +56,7 @@ struct ContentViewiPad: View {
                                 VStack(alignment: .leading, spacing: 12) {
                                     Text("content.all")
                                         .font(.title3)
-                                        .foregroundStyle(AppColors.primary)
+                                        .foregroundStyle(.tankoPrimary)
                                         .bold()
                                         .padding(.horizontal)
 
@@ -91,7 +91,7 @@ struct ContentViewiPad: View {
                                 }
                             }
                             .padding(.vertical)
-                            .background(AppColors.background)
+                            .background(.tankoBackground)
                         }
                     }
                     .navigationDestination(for: Manga.self) { manga in
@@ -116,12 +116,12 @@ struct ContentViewiPad: View {
                         description: Text("content.empty.description")
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(AppColors.background)
+                    .background(.tankoBackground)
                 }
             }
             .navigationTitle("tab.mangas")
             .navigationBarTitleDisplayModeCompatible(.inline)
-            .background(AppColors.background)
+            .background(.tankoBackground)
         }
         .task {
             await viewModel.getMangas()
