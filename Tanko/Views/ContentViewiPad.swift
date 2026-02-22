@@ -10,7 +10,9 @@ import SwiftUI
 struct ContentViewiPad: View {
     @Environment(UserMangaCollectionViewModel.self) private var userCollectionVM
     @Environment(MangaViewModel.self) private var viewModel
+    
     @State private var bestMangaViewModel = BestMangaViewModel()
+    
     @Namespace private var namespace
 
     var body: some View {
@@ -20,26 +22,22 @@ struct ContentViewiPad: View {
             Group {
                 switch viewModel.state {
 
+                // MARK: - LOADING
                 case .loading:
-                    ProgressView("content.loading")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(.tankoBackground)
+                    MangaLoadingView()
 
+                // MARK: - LOADED
                 case .loaded:
                     GeometryReader { geo in
                         let isLandscape = geo.size.width > geo.size.height
                         let minWidth = isLandscape ? 320 : 420
                         let gridItems = [
-                            GridItem(
-                                .adaptive(minimum: CGFloat(minWidth)),
-                                spacing: 20
-                            )
+                            GridItem(.adaptive(minimum: CGFloat(minWidth)), spacing: 20)
                         ]
 
                         ScrollView {
                             VStack(spacing: 32) {
 
-                                // BEST MANGAS
                                 if !bestMangaViewModel.mangas.isEmpty {
                                     VStack(alignment: .leading, spacing: 12) {
                                         Text("content.best")
@@ -48,11 +46,13 @@ struct ContentViewiPad: View {
                                             .bold()
                                             .padding(.horizontal)
 
-                                        featuredCarousel
+                                        MangaCarousel(
+                                            mangas: bestMangaViewModel.mangas,
+                                            namespace: namespace
+                                        )
                                     }
                                 }
 
-                                // ALL MANGAS
                                 VStack(alignment: .leading, spacing: 12) {
                                     Text("content.all")
                                         .font(.title3)
@@ -60,23 +60,18 @@ struct ContentViewiPad: View {
                                         .bold()
                                         .padding(.horizontal)
 
-                                    LazyVGrid(
-                                        columns: gridItems,
-                                        spacing: 20
-                                    ) {
+                                    LazyVGrid(columns: gridItems, spacing: 20) {
                                         ForEach(viewModel.mangas) { manga in
                                             MangaCollectionRow(
                                                 manga: manga,
                                                 namespace: namespace,
-                                                userCollectionVM:
-                                                    userCollectionVM
+                                                userCollectionVM: userCollectionVM
                                             )
                                             .onAppear {
                                                 Task {
-                                                    await viewModel
-                                                        .loadNextPageIfNeeded(
-                                                            currentItem: manga
-                                                        )
+                                                    await viewModel.loadNextPageIfNeeded(
+                                                        currentItem: manga
+                                                    )
                                                 }
                                             }
                                         }
@@ -84,44 +79,54 @@ struct ContentViewiPad: View {
                                     .padding(.horizontal)
                                 }
 
-                                // ⏳ Infinite scroll
                                 if viewModel.canLoadMore {
-                                    ProgressView()
-                                        .padding()
+                                    ProgressView().padding()
                                 }
                             }
                             .padding(.vertical)
                             .background(.tankoBackground)
                         }
+                        .refreshable {
+                            await viewModel.refresh()
+                            await bestMangaViewModel.refresh()
+                        }
                     }
-                    .navigationDestination(for: Manga.self) { manga in
-                        MangaDetailView(manga: manga, namespace: nil)
-                    }
-                    .navigationDestination(for: Author.self) { author in
-                        AuthorMangaViewiPad(author: author)
-                    }
-                    .refreshable {
+
+                // MARK: - EMPTY
+                case .empty:
+                    MangaEmptyView {
                         await viewModel.refresh()
                         await bestMangaViewModel.refresh()
                     }
-                    .sheet(item: $mangasVM.selectedMangaForCollection) {
-                        manga in
-                        AddMangaToCollectionView(manga: manga)
-                    }
 
-                case .empty:
-                    ContentUnavailableView(
-                        "content.empty.title",
-                        systemImage: "book.closed",
-                        description: Text("content.empty.description")
-                    )
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(.tankoBackground)
+                // MARK: - ERROR
+                case .error(let message):
+                    MangaErrorView(message: message) {
+                        await viewModel.refresh()
+                        await bestMangaViewModel.refresh()
+                    }
                 }
             }
             .navigationTitle("tab.mangas")
             .navigationBarTitleDisplayModeCompatible(.inline)
             .background(.tankoBackground)
+            .navigationDestination(for: Manga.self) { manga in
+                MangaDetailView(manga: manga, namespace: nil)
+            }
+            .navigationDestination(for: MangaNavigation.self) { nav in
+                switch nav {
+                case .withTransition(let manga):
+                    MangaDetailView(manga: manga, namespace: namespace)
+                case .withoutTransition(let manga):
+                    MangaDetailView(manga: manga, namespace: nil)
+                }
+            }
+            .navigationDestination(for: Author.self) { author in
+                AuthorMangaViewiPad(author: author)
+            }
+            .sheet(item: $mangasVM.selectedMangaForCollection) { manga in
+                AddMangaToCollectionView(manga: manga)
+            }
         }
         .task {
             await viewModel.getMangas()
@@ -132,26 +137,6 @@ struct ContentViewiPad: View {
         } message: {
             Text(viewModel.errorMsg)
         }
-    }
-
-    // Best Mangas carousel
-    private var featuredCarousel: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            LazyHStack(spacing: 40) {
-                ForEach(bestMangaViewModel.mangas) { manga in
-                    NavigationLink(value: manga) {
-                        MangaCard(manga: manga, namespace: namespace)
-                            .frame(width: 280)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .scrollTargetLayout()
-        }
-        .defaultScrollAnchor(.center)
-        .scrollTargetBehavior(.viewAligned)
-        .scrollClipDisabled()
-        .contentMargins(.horizontal, 60, for: .scrollContent)
     }
 }
 

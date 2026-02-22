@@ -13,31 +13,36 @@ struct MangaRow: View {
 
     var isInCollection: Bool = false
     var onBookmarkTap: (() -> Void)? = nil
-
     var showBackground: Bool = true
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
+
+            // Manga cover with matched geometry effect for smooth transition to detail view
             CoverView(cover: manga.mainPicture, namespace: namespace)
                 .frame(width: 70, height: 100)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
                 .shadow(radius: 2)
 
             VStack(alignment: .leading, spacing: 6) {
-                HStack() {
+                HStack {
+                    // Manga title
                     Text(manga.title)
                         .font(.headline)
                         .foregroundStyle(.textPrimary)
                         .lineLimit(2)
-                    
+
                     Spacer()
-                    
+
+                    // Bookmark icon if manga is in user's collection, tappable to trigger bookmark action
                     if isInCollection {
-                        Image(systemName: "bookmark.fill")
-                            .foregroundStyle(.primary)
+                        Image(systemName: "bookmark.plus")
+                            .foregroundStyle(.tankoPrimary)
                             .padding(.trailing, 2)
                     }
                 }
+
+                // Manga authors
                 Text(manga.authorNames)
                     .font(.subheadline)
                     .foregroundStyle(.textSecondary)
@@ -46,17 +51,14 @@ struct MangaRow: View {
                 Spacer(minLength: 20)
 
                 HStack {
-                    HStack(spacing: 4) {
-                        Image(systemName: "star.fill")
-                            .foregroundStyle(.yellow)
-                            .font(.subheadline)
-                        Text(manga.formattedScore)
-                            .font(.subheadline)
-                            .foregroundStyle(.textSecondary)
-                    }
+                    // Manga score/
+                    MangaRatingView(score: manga.formattedScore)
+                        .font(.subheadline)
+                        .foregroundStyle(.textSecondary)
 
                     Spacer()
 
+                    // Manga status
                     Text(manga.status.localized)
                         .font(.caption)
                         .bold()
@@ -78,6 +80,6 @@ struct MangaRow: View {
 
 #Preview() {
     @Previewable @Namespace var namespace
-    MangaRow(manga: .test, namespace: namespace)
+    MangaRow(manga: .test, namespace: namespace, isInCollection: true)
         .frame(height: 100)
 }

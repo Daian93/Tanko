@@ -36,7 +36,7 @@ struct AuthorMangaView: View {
 
                     LazyVGrid(columns: columns, spacing: 25) {
                         ForEach(viewModel.mangas) { manga in
-                            NavigationLink(value: manga) {
+                            NavigationLink(value: MangaNavigation.withoutTransition(manga)) {
                                 MangaGridCard(
                                     manga: manga,
                                     namespace: namespace

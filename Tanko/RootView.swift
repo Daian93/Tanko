@@ -87,7 +87,8 @@ struct RootView: View {
         userCollectionVM = UserMangaCollectionViewModel(
             context: context,
             repository: repo,
-            syncService: syncService
+            syncService: syncService,
+            isAuthenticated: session.isAuthenticated
         )
     }
 }

@@ -158,12 +158,12 @@ struct UserMangaDetailView: View {
                             } else {
                                 Image(systemName: "chevron.right")
                                     .font(.caption.bold())
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(.tankoSecondary)
                             }
                         }
                         .foregroundStyle(
                             viewModel.manga != nil
-                                ? Color("TankoPrimary") : .secondary
+                            ? .tankoPrimary : .tankoSecondary
                         )
                         .padding()
                         .backgroundStyle(.surface)

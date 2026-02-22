@@ -18,7 +18,7 @@ struct MangaGridCard: View {
         VStack(alignment: .leading, spacing: 6) {
             ZStack(alignment: .topTrailing) {
 
-                // Imagen de portada
+                // Manga main picture with placeholder
                 AsyncImage(url: manga.mainPicture) { image in
                     image
                         .resizable()
@@ -37,12 +37,12 @@ struct MangaGridCard: View {
                 }
                 .matchedGeometryEffect(id: "cover-\(manga.id)", in: namespace)
 
-                // Estado arriba a la derecha
-                statusBadge
+                // Manga status
+                MangaStatusBadge(status: manga.status)
                     .padding(6)
             }
 
-            // Título y puntuación debajo del cuadrado
+            // Title and score under the cover
             VStack(alignment: .leading, spacing: 4) {
                 Text(manga.title)
                     .font(.subheadline)
@@ -50,27 +50,12 @@ struct MangaGridCard: View {
                     .lineLimit(1)
                     .foregroundStyle(.textPrimary)
 
-                HStack(spacing: 4) {
-                    Image(systemName: "star.fill")
-                        .foregroundStyle(.yellow)
-                    Text(manga.formattedScore)
-                }
-                .font(.caption)
-                .foregroundStyle(.textSecondary)
+                MangaRatingView(score: manga.formattedScore)
+                    .font(.caption)
+                    .foregroundStyle(.textSecondary)
             }
             .frame(width: cardSize, alignment: .leading)
         }
-    }
-
-    private var statusBadge: some View {
-        Text(manga.status.localized)
-            .font(.caption2)
-            .bold()
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(manga.status.color)
-            .foregroundStyle(.white)
-            .clipShape(Capsule())
     }
 }
 
@@ -79,4 +64,3 @@ struct MangaGridCard: View {
     MangaGridCard(manga: .test, namespace: namespace)
         .padding()
 }
-

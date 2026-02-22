@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-// MARK: - Volume Selection Grid
-
 struct VolumeSelectionGrid: View {
     @Binding var volumesOwned: Set<Int>
     let totalVolumes: Int
@@ -17,12 +15,12 @@ struct VolumeSelectionGrid: View {
     
     var body: some View {
         VStack(spacing: 12) {
-            // Botones de acción rápida
+            // Fast actions buttons
             HStack(spacing: 8) {
                 Button {
                     selectAllVolumes()
                 } label: {
-                    Label("Todos", systemImage: "checkmark.circle.fill")
+                    Label("volume.all", systemImage: "checkmark.circle.fill")
                         .font(.subheadline)
                         .frame(maxWidth: .infinity)
                 }
@@ -32,7 +30,7 @@ struct VolumeSelectionGrid: View {
                 Button {
                     clearAllVolumes()
                 } label: {
-                    Label("Ninguno", systemImage: "xmark.circle.fill")
+                    Label("volume.none", systemImage: "xmark.circle.fill")
                         .font(.subheadline)
                         .frame(maxWidth: .infinity)
                 }
@@ -42,15 +40,13 @@ struct VolumeSelectionGrid: View {
                 Button {
                     invertSelection()
                 } label: {
-                    Label("Invertir", systemImage: "arrow.triangle.2.circlepath")
+                    Label("volume.invert", systemImage: "arrow.triangle.2.circlepath")
                         .font(.subheadline)
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
                 .tint(.blue)
             }
-            
-            // Grid de volúmenes
             #if os(macOS)
             ScrollView {
                 volumeGrid
@@ -64,6 +60,7 @@ struct VolumeSelectionGrid: View {
         }
     }
     
+    // Volume grid view
     private var volumeGrid: some View {
         LazyVGrid(columns: columns, spacing: 10) {
             ForEach(1...totalVolumes, id: \.self) { number in
@@ -83,6 +80,8 @@ struct VolumeSelectionGrid: View {
         }
     }
     
+    // MARK: - Actions
+    // Toggle a single volume's owned status
     private func toggleVolume(_ number: Int) {
         if volumesOwned.contains(number) {
             volumesOwned.remove(number)
@@ -91,14 +90,17 @@ struct VolumeSelectionGrid: View {
         }
     }
     
+    // Select all volumes as owned
     private func selectAllVolumes() {
         volumesOwned = Set(1...totalVolumes)
     }
     
+    // Deselect all volumes
     private func clearAllVolumes() {
         volumesOwned.removeAll()
     }
     
+    // Invert the selection of owned volumes
     private func invertSelection() {
         let allVolumes = Set(1...totalVolumes)
         volumesOwned = allVolumes.subtracting(volumesOwned)

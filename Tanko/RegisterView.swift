@@ -25,12 +25,12 @@ struct RegisterView: View {
                     VStack(spacing: 16) {
                         ZStack {
                             Circle()
-                                .fill(Color("TankoPrimary").opacity(0.1))
+                                .fill(.tankoPrimary.opacity(0.1))
                                 .frame(width: 80, height: 80)
                             
                             Image(systemName: "person.badge.plus.fill")
                                 .font(.system(size: 50))
-                                .foregroundStyle(Color("TankoPrimary"))
+                                .foregroundStyle(.tankoPrimary)
                         }
                         
                         Text("Crear cuenta")
@@ -111,7 +111,7 @@ struct RegisterView: View {
                             .padding()
                             .background(
                                 vm.isFormValid && !vm.isLoading
-                                    ? Color("TankoPrimary")
+                                ? .tankoPrimary
                                     : Color.gray
                             )
                             .foregroundStyle(.white)

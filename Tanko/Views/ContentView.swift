@@ -8,11 +8,25 @@
 import SwiftData
 import SwiftUI
 
+// Used for navigation when we want to specify whether to use the transition or not
+enum MangaNavigation: Hashable {
+    case withTransition(Manga)
+    case withoutTransition(Manga)
+    
+    var manga: Manga {
+        switch self {
+        case .withTransition(let m), .withoutTransition(let m): return m
+        }
+    }
+}
+
 struct ContentView: View {
     @Environment(UserMangaCollectionViewModel.self) private var userCollectionVM
     @Environment(MangaViewModel.self) private var viewModel
     @Environment(\.modelContext) private var modelContext
+    
     @State private var bestMangaViewModel = BestMangaViewModel()
+    
     @Namespace private var namespace
 
     var body: some View {
@@ -21,11 +35,12 @@ struct ContentView: View {
         NavigationStack {
             Group {
                 switch viewModel.state {
-                case .loading:
-                    ProgressView("content.loading")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(.tankoBackground)
 
+                // MARK: - LOADING
+                case .loading:
+                    MangaLoadingView()
+
+                // MARK: - LOADED
                 case .loaded:
                     ScrollView {
                         LazyVStack(spacing: 20) {
@@ -35,8 +50,8 @@ struct ContentView: View {
                                     .foregroundStyle(.tankoPrimary)
                                     .bold()
                                     .padding(.horizontal)
-                                
-                                // Carousel of best mangas
+
+                                // Carousel with best mangas
                                 MangaCarousel(
                                     mangas: bestMangaViewModel.mangas,
                                     namespace: namespace
@@ -48,8 +63,8 @@ struct ContentView: View {
                                     .bold()
                                     .padding(.horizontal)
                             }
-                            
-                            // All mangas list with infinite scrolling
+
+                            // List with all mangas
                             ForEach(viewModel.mangas) { manga in
                                 MangaCollectionRow(
                                     manga: manga,
@@ -70,27 +85,40 @@ struct ContentView: View {
                             }
                         }
                         .padding(.vertical)
-                        .background(.tankoBackground)
                     }
+                    .background(.tankoBackground)
                     .refreshable {
                         await viewModel.refresh()
                         await bestMangaViewModel.refresh()
                     }
 
+                // MARK: - EMPTY
                 case .empty:
-                    ContentUnavailableView(
-                        "content.empty.title",
-                        systemImage: "book.closed",
-                        description: Text("content.empty.description")
-                    )
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(.tankoBackground)
+                    MangaEmptyView {
+                        await viewModel.refresh()
+                        await bestMangaViewModel.refresh()
+                    }
+
+                // MARK: - ERROR
+                case .error(let message):
+                    MangaErrorView(message: message) {
+                        await viewModel.refresh()
+                        await bestMangaViewModel.refresh()
+                    }
                 }
             }
             .navigationTitle("tab.mangas")
             .background(.tankoBackground)
             .navigationDestination(for: Manga.self) { manga in
                 MangaDetailView(manga: manga, namespace: namespace)
+            }
+            .navigationDestination(for: MangaNavigation.self) { nav in
+                switch nav {
+                case .withTransition(let manga):
+                    MangaDetailView(manga: manga, namespace: namespace)
+                case .withoutTransition(let manga):
+                    MangaDetailView(manga: manga, namespace: nil)
+                }
             }
             .navigationDestination(for: Author.self) { author in
                 AuthorMangaView(author: author)

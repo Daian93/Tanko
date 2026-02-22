@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-// MARK: - Collection State Display
-
 struct CollectionStateDisplay: View {
     let volumesOwned: Int
     let totalVolumes: Int
@@ -16,25 +14,28 @@ struct CollectionStateDisplay: View {
     
     var body: some View {
         HStack {
-            Label("Estado de la colección", systemImage: "checkmark.seal.fill")
+            Label("collection.state", systemImage: "checkmark.seal.fill")
                 .foregroundStyle(.tankoSecondary)
             Spacer()
             if isCompleteCollection {
-                Text("Completa")
+                Text("collection.complete")
                     .fontWeight(.semibold)
                     .foregroundStyle(.green)
             } else {
-                Text("Incompleta")
+                Text("collection.incomplete")
                     .foregroundStyle(.tankoSecondary)
             }
         }
     }
     
-    var footerText: String {
+    // Footer text showing how many volumes are owned vs total
+    var footerText: LocalizedStringKey {
         if isCompleteCollection {
-            return "Tienes todos los \(totalVolumes) tomos en tu estantería."
+            return "collection.all.volumes.owned \(totalVolumes)"
         } else {
-            return "Te faltan \(totalVolumes - volumesOwned) tomos para completar la colección."
+            return "collection.not.all.volumes.owned \(totalVolumes - volumesOwned)"
         }
     }
 }
+
+

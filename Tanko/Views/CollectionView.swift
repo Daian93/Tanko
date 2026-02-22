@@ -33,7 +33,7 @@ struct CollectionView: View {
                 VStack(spacing: 24) {
                     
                     // MARK: - Offline Banner
-                    if collectionVM.offlineManager.pendingOperationsCount > 0 {
+                    if collectionVM.hasPendingOperations {
                         offlineBanner
                             .padding(.horizontal)
                     }
@@ -114,32 +114,33 @@ struct CollectionView: View {
     
     private var offlineBanner: some View {
         HStack(spacing: 12) {
-            Image(systemName: "wifi.slash")
+            Image(systemName: collectionVM.offlineManager.isConnected ? "arrow.triangle.2.circlepath" : "wifi.slash")
                 .font(.title3)
-                .foregroundStyle(.orange)
+                .foregroundStyle(collectionVM.offlineManager.isConnected ? .blue : .orange)
             
             VStack(alignment: .leading, spacing: 4) {
-                Text("Operaciones pendientes")
+                Text(collectionVM.offlineManager.isConnected ? "Sincronizando..." : "Sin conexión")
                     .font(.subheadline.bold())
                     .foregroundStyle(.primary)
                 
-                Text("\(collectionVM.offlineManager.pendingOperationsCount) cambios sin sincronizar")
+                Text("\(collectionVM.offlineManager.pendingOperationsCount) cambios pendientes")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
             
             Spacer()
             
-            if collectionVM.offlineManager.isConnected {
-                ProgressView()
-                    .scaleEffect(0.8)
-            } else {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.orange)
-            }
+            Image(systemName: collectionVM.offlineManager.isConnected
+                  ? "checkmark.circle.fill"
+                  : "exclamationmark.triangle.fill")
+                .foregroundStyle(collectionVM.offlineManager.isConnected ? .blue : .orange)
         }
         .padding()
-        .background(Color.orange.opacity(0.12))
+        .background(
+            collectionVM.offlineManager.isConnected
+                ? Color.blue.opacity(0.10)
+                : Color.orange.opacity(0.12)
+        )
         .clipShape(RoundedRectangle(cornerRadius: 14))
     }
     
@@ -152,7 +153,7 @@ struct CollectionView: View {
             }
         } label: {
             let isSelected = selectedFilter == filter
-            let backgroundColor = isSelected ? Color("TankoPrimary") : Color(white: 0.95)
+            let backgroundColor = isSelected ? .tankoPrimary : Color(white: 0.95)
             let textColor = isSelected ? Color.white : Color.primary
             
             Text(filter.rawValue)
@@ -177,7 +178,7 @@ struct CollectionView: View {
             VStack(spacing: 4) {
                 Image(systemName: icon)
                     .font(.caption)
-                    .foregroundStyle(Color("TankoPrimary"))
+                    .foregroundStyle(.tankoPrimary)
                 
                 Text(value)
                     .font(.headline)
@@ -217,7 +218,7 @@ struct CollectionView: View {
             if isCompleted { return .green }
             if progress == 0 { return .gray }
             if progress < 0.5 { return .orange }
-            return Color("TankoSecondary")
+            return .tankoSecondary
         }
         
         var body: some View {

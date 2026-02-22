@@ -18,7 +18,7 @@ struct ReadingProgressEditor: View {
         HStack(spacing: 12) {
             Spacer()
             
-            // Botón -
+            // Button -
             Button {
                 isTextFieldFocused = false
                 decrementReading()
@@ -34,12 +34,12 @@ struct ReadingProgressEditor: View {
             .buttonStyle(.plain)
             .disabled(readingVolume <= 0)
             
-            // TextField
+            // TextField with number formatting and keyboard type
             TextField(
                 "",
                 value: $readingVolume,
                 format: .number,
-                prompt: Text("0").foregroundColor(.secondary)
+                prompt: Text("0").foregroundColor(.tankoSecondary)
             )
             #if os(iOS)
             .keyboardTypeCompatible(.numberPad)
@@ -49,7 +49,7 @@ struct ReadingProgressEditor: View {
             .frame(width: 80)
             .padding(.vertical, 12)
             .padding(.horizontal, 16)
-            .background(Color(white: 0.95))
+            .background(.surface)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .focused($isTextFieldFocused)
             .onChange(of: readingVolume) { _, newValue in
@@ -59,7 +59,7 @@ struct ReadingProgressEditor: View {
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
-                    Button("Listo") {
+                    Button("reading.done") {
                         isTextFieldFocused = false
                     }
                     .fontWeight(.semibold)
@@ -67,7 +67,7 @@ struct ReadingProgressEditor: View {
             }
             #endif
             
-            // Botón +
+            // Button +
             Button {
                 isTextFieldFocused = false
                 incrementReading()
@@ -88,6 +88,7 @@ struct ReadingProgressEditor: View {
         .padding(.vertical, 8)
     }
     
+    // MARK: - Helper Methods
     private func incrementReading() {
         guard readingVolume < maxVolume else { return }
         readingVolume += 1

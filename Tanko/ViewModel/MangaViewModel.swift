@@ -7,10 +7,11 @@
 
 import SwiftUI
 
-enum MangaViewState {
+enum MangaViewState: Equatable {
     case loading
     case loaded
     case empty
+    case error(String)
 }
 
 @Observable @MainActor

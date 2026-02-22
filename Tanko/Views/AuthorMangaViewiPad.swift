@@ -56,6 +56,9 @@ struct AuthorMangaViewiPad: View {
             }
             .background(.background)
             .navigationBarTitleDisplayModeCompatible(.inline)
+            .navigationDestination(for: Manga.self) { manga in
+                MangaDetailView(manga: manga, namespace: namespace)
+            }
             .task {
                 await viewModel.loadInitial()
             }

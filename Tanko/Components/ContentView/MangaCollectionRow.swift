@@ -23,12 +23,13 @@ struct MangaCollectionRow: View {
         let isCollected = userCollectionVM.isInCollection(mangaID: manga.id)
 
         ZStack(alignment: .topTrailing) {
-            NavigationLink(value: manga) {
+            NavigationLink(value: MangaNavigation.withTransition(manga)) {
                 MangaRow(manga: manga, namespace: namespace)
                     .padding(.horizontal)
             }
             .buttonStyle(.plain)
 
+            // Button to add/remove from collection
             Button {
                 if isCollected {
                     showDeleteConfirmation = true
@@ -45,6 +46,7 @@ struct MangaCollectionRow: View {
             .padding(.top, 12)
         }
         .animation(.snappy, value: isCollected)
+        // Confirmation alert for removing manga from collection
         .alert("Quitar de la colección", isPresented: $showDeleteConfirmation) {
             Button("Cancelar", role: .cancel) {}
             Button("Quitar", role: .destructive) {

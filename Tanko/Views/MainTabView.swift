@@ -23,6 +23,7 @@ struct MainTabView: View {
     @Environment(UserMangaCollectionViewModel.self) private var userCollectionVM
 
     @State private var router = NavigationRouter.shared
+
     @Query private var allUserMangas: [UserManga]
 
     #if os(iOS)
@@ -35,7 +36,7 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $router.selectedTabTag) {
-            Tab("tab.mangas", systemImage: "book.fill", value: 0) {
+            Tab("tab.mangas", systemImage: "book.closed.fill", value: 0) {
                 #if os(macOS)
                     ContentViewiPad()
                 #else
@@ -79,19 +80,7 @@ struct MainTabView: View {
             .defaultAdaptableTabBarPlacement(.tabBar)
         #endif
         .onOpenURL { url in
-            handleDeepLink(url)
-        }
-    }
-
-    private func handleDeepLink(_ url: URL) {
-        guard url.scheme == "tanko",
-            url.host == "manga",
-            let idString = url.pathComponents.last,
-            let mangaID = Int(idString)
-        else { return }
-
-        if let manga = allUserMangas.first(where: { $0.mangaID == mangaID }) {
-            router.navigateToMangaDetail(manga)
+            router.handleDeepLink(url, userMangas: allUserMangas)
         }
     }
 }

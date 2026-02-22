@@ -16,6 +16,7 @@ struct UserMangaDetailHeader: View {
     
     var body: some View {
         HStack(alignment: .center, spacing: 16) {
+            // Manga cover with transition
             CoverView(cover: coverURL, namespace: namespace, big: true)
                 .frame(width: 120, height: 180)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -36,4 +37,12 @@ struct UserMangaDetailHeader: View {
         }
         .frame(height: 180)
     }
+}
+
+#Preview {
+    UserMangaDetailHeader(
+        coverURL: URL(string: "https://cdn.myanimelist.net/images/manga/3/258224l.jpg"),
+        title: "Monster",
+        namespace: nil
+    )
 }

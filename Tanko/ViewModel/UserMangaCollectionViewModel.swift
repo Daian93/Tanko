@@ -19,18 +19,30 @@ final class UserMangaCollectionViewModel {
     private var isLoading = false
     private let syncService: MangaCollectionSyncService
     
-    // ✅ Gestor de operaciones offline
+    let isAuthenticated: Bool
     let offlineManager: OfflineOperationsManager
+    var hasPendingOperations: Bool {
+        isAuthenticated && offlineManager.pendingOperationsCount > 0
+    }
     
     init(
         context: ModelContext,
         repository: MangaCollectionRepository,
-        syncService: MangaCollectionSyncService
+        syncService: MangaCollectionSyncService,
+        isAuthenticated: Bool = false
     ) {
         self.modelContext = context
         self.repository = repository
         self.syncService = syncService
+        self.isAuthenticated = isAuthenticated
         self.offlineManager = OfflineOperationsManager(context: context)
+        
+        if isAuthenticated {
+            offlineManager.onConnectionRestored = { [weak self] in
+                guard let self else { return }
+                await self.synchronize()
+            }
+        }
     }
     
     func synchronize() async {
@@ -45,7 +57,6 @@ final class UserMangaCollectionViewModel {
         do {
             print("🔄 Iniciando sincronización...")
             
-            // ✅ PRIMERO: Procesar operaciones pendientes offline
             if let remoteRepo = repository as? RemoteMangaCollectionRepository {
                 let result = await offlineManager.processQueue(using: remoteRepo)
                 if result.total > 0 {
@@ -53,7 +64,6 @@ final class UserMangaCollectionViewModel {
                 }
             }
             
-            // SEGUNDO: Sincronización bidireccional normal
             try await syncService.sync()
             print("✅ Sincronización completada. Recargando datos...")
             await reloadFromLocalDatabase()
@@ -125,6 +135,8 @@ final class UserMangaCollectionViewModel {
         try? modelContext.save()
         updateWidget()
         
+        guard isAuthenticated else { return }
+        
         let syncData = MangaSyncData(
             mangaID: newUserManga.mangaID,
             title: newUserManga.title,
@@ -164,13 +176,13 @@ final class UserMangaCollectionViewModel {
         let idToRemove = manga.mangaID
         let syncData = manga.asSyncData
         
-        // Primero elimina localmente
         modelContext.delete(manga)
         self.mangas.removeAll { $0.mangaID == idToRemove }
         try? modelContext.save()
         updateWidget()
         
-        // ✅ Intenta eliminar del servidor o encola si no hay conexión
+        guard isAuthenticated else { return }
+        
         if offlineManager.isConnected {
             do {
                 try await repository.remove(manga)
@@ -206,6 +218,12 @@ final class UserMangaCollectionViewModel {
     }
     
     func updateRemote(_ userManga: UserManga) async {
+        guard isAuthenticated else {
+            try? modelContext.save()
+            updateWidget()
+            return
+        }
+        
         let syncData = userManga.asSyncData
         
         if offlineManager.isConnected {
