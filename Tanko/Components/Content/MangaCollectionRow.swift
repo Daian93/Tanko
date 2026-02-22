@@ -47,9 +47,9 @@ struct MangaCollectionRow: View {
         }
         .animation(.snappy, value: isCollected)
         // Confirmation alert for removing manga from collection
-        .alert("Quitar de la colección", isPresented: $showDeleteConfirmation) {
-            Button("Cancelar", role: .cancel) {}
-            Button("Quitar", role: .destructive) {
+        .alert("collection.remove", isPresented: $showDeleteConfirmation) {
+            Button("button.cancel", role: .cancel) {}
+            Button("button.remove", role: .destructive) {
                 Task {
                     if let userManga = userCollectionVM.mangas.first(where: {
                         $0.mangaID == manga.id
@@ -62,7 +62,7 @@ struct MangaCollectionRow: View {
                 }
             }
         } message: {
-            Text("¿Estás seguro de que quieres quitar '\(manga.title)' de tu colección?")
+            Text("collection.remove.text '\(manga.title)'")
         }
     }
 }

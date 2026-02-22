@@ -13,18 +13,20 @@ import SwiftUI
 final class UserMangaCollectionViewModel {
     private let modelContext: ModelContext
     private let repository: MangaCollectionRepository
-    
+
     var mangas: [UserManga] = []
     private var isSyncing = false
     private var isLoading = false
     private let syncService: MangaCollectionSyncService
-    
+
     let isAuthenticated: Bool
     let offlineManager: OfflineOperationsManager
+
+    var isAddingManga: Bool = false
     var hasPendingOperations: Bool {
         isAuthenticated && offlineManager.pendingOperationsCount > 0
     }
-    
+
     init(
         context: ModelContext,
         repository: MangaCollectionRepository,
@@ -36,7 +38,7 @@ final class UserMangaCollectionViewModel {
         self.syncService = syncService
         self.isAuthenticated = isAuthenticated
         self.offlineManager = OfflineOperationsManager(context: context)
-        
+
         if isAuthenticated {
             offlineManager.onConnectionRestored = { [weak self] in
                 guard let self else { return }
@@ -44,26 +46,30 @@ final class UserMangaCollectionViewModel {
             }
         }
     }
-    
+
     func synchronize() async {
         guard !isSyncing else {
             print("⚠️ Sincronización ya en progreso")
             return
         }
         isSyncing = true
-        
+
         defer { isSyncing = false }
-        
+
         do {
             print("🔄 Iniciando sincronización...")
-            
+
             if let remoteRepo = repository as? RemoteMangaCollectionRepository {
-                let result = await offlineManager.processQueue(using: remoteRepo)
+                let result = await offlineManager.processQueue(
+                    using: remoteRepo
+                )
                 if result.total > 0 {
-                    print("📤 Operaciones offline procesadas: \(result.processed)/\(result.total)")
+                    print(
+                        "📤 Operaciones offline procesadas: \(result.processed)/\(result.total)"
+                    )
                 }
             }
-            
+
             try await syncService.sync()
             print("✅ Sincronización completada. Recargando datos...")
             await reloadFromLocalDatabase()
@@ -75,50 +81,54 @@ final class UserMangaCollectionViewModel {
             print("❌ Error during synchronization: \(error)")
         }
     }
-    
+
     func loadCollection() async {
         guard !isLoading else {
             print("⚠️ Carga ya en progreso")
             return
         }
         isLoading = true
-        
+
         defer { isLoading = false }
-        
+
         do {
             _ = try await repository.getCollection()
             await reloadFromLocalDatabase()
-            
+
         } catch NetworkError.cancelled {
             print("⚠️ Load cancelled")
         } catch {
             print("❌ Error loading collection: \(error)")
         }
     }
-    
+
     // MARK: - Private helper to reload from local database
     private func reloadFromLocalDatabase() async {
         do {
             let descriptor = FetchDescriptor<UserManga>(
                 sortBy: [SortDescriptor(\UserManga.title)]
             )
-            
+
             self.mangas = try modelContext.fetch(descriptor)
             print("✅ Local collection updated: \(mangas.count) mangas")
-            
+
             // Update widget after reloading
             updateWidget()
         } catch {
             print("❌ Error reloading from local database: \(error)")
         }
     }
-    
+
     func add(
         manga: Manga,
         volumesOwned: [Int],
         readingVolume: Int?,
         completeCollection: Bool
     ) async {
+        guard !isAddingManga else { return }
+        isAddingManga = true
+        defer { isAddingManga = false }
+
         let newUserManga = UserManga(
             mangaID: manga.id,
             title: manga.title,
@@ -129,14 +139,14 @@ final class UserMangaCollectionViewModel {
             completeCollection: completeCollection,
             updatedAt: .now
         )
-        
+
         modelContext.insert(newUserManga)
-        self.mangas.append(newUserManga)
+        mangas.append(newUserManga)
         try? modelContext.save()
         updateWidget()
-        
+
         guard isAuthenticated else { return }
-        
+
         let syncData = MangaSyncData(
             mangaID: newUserManga.mangaID,
             title: newUserManga.title,
@@ -147,7 +157,7 @@ final class UserMangaCollectionViewModel {
             completeCollection: newUserManga.completeCollection,
             updatedAt: newUserManga.updatedAt
         )
-        
+
         if offlineManager.isConnected {
             do {
                 try await repository.add(mangaData: syncData)
@@ -162,7 +172,9 @@ final class UserMangaCollectionViewModel {
                 )
             }
         } else {
-            print("📴 Offline - Enqueueing add operation for: \(newUserManga.title)")
+            print(
+                "📴 Offline - Enqueueing add operation for: \(newUserManga.title)"
+            )
             offlineManager.enqueue(
                 action: .add,
                 mangaID: newUserManga.mangaID,
@@ -171,18 +183,18 @@ final class UserMangaCollectionViewModel {
             )
         }
     }
-    
+
     func remove(_ manga: UserManga) async {
         let idToRemove = manga.mangaID
         let syncData = manga.asSyncData
-        
+
         modelContext.delete(manga)
         self.mangas.removeAll { $0.mangaID == idToRemove }
         try? modelContext.save()
         updateWidget()
-        
+
         guard isAuthenticated else { return }
-        
+
         if offlineManager.isConnected {
             do {
                 try await repository.remove(manga)
@@ -206,26 +218,26 @@ final class UserMangaCollectionViewModel {
             )
         }
     }
-    
+
     func isInCollection(mangaID: Int) -> Bool {
         mangas.contains(where: { $0.mangaID == mangaID })
     }
-    
+
     func removeFromCollection(mangaID: Int) async {
         if let manga = mangas.first(where: { $0.mangaID == mangaID }) {
             await remove(manga)
         }
     }
-    
+
     func updateRemote(_ userManga: UserManga) async {
         guard isAuthenticated else {
             try? modelContext.save()
             updateWidget()
             return
         }
-        
+
         let syncData = userManga.asSyncData
-        
+
         if offlineManager.isConnected {
             do {
                 try await repository.add(mangaData: syncData)
@@ -241,7 +253,9 @@ final class UserMangaCollectionViewModel {
                 )
             }
         } else {
-            print("📴 Offline - Enqueueing update operation for: \(userManga.title)")
+            print(
+                "📴 Offline - Enqueueing update operation for: \(userManga.title)"
+            )
             offlineManager.enqueue(
                 action: .update,
                 mangaID: userManga.mangaID,
@@ -250,21 +264,22 @@ final class UserMangaCollectionViewModel {
             )
         }
     }
-    
+
     private func updateWidget() {
         Task { @MainActor in
             let readingMangas: [ReadingManga] = mangas.compactMap { manga in
-                guard let readingVolume = manga.readingVolume, readingVolume > 0 else {
+                guard let readingVolume = manga.readingVolume, readingVolume > 0
+                else {
                     return nil
                 }
-                
+
                 if let total = manga.totalVolumes, readingVolume >= total {
                     return nil
                 }
-                
+
                 print("📚 Widget - Añadiendo manga: \(manga.title)")
                 print("🖼️ Cover URL: \(manga.coverURL?.absoluteString ?? "nil")")
-                
+
                 return ReadingManga(
                     id: manga.mangaID,
                     title: manga.title,
@@ -273,7 +288,7 @@ final class UserMangaCollectionViewModel {
                     totalVolumes: manga.totalVolumes
                 )
             }
-            
+
             print("📊 Total mangas para widget: \(readingMangas.count)")
             WidgetDataManager.shared.save(readingMangas)
         }

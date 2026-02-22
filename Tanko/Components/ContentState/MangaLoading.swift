@@ -1,5 +1,5 @@
 //
-//  MangaLoadingView.swift
+//  MangaLoading.swift
 //  Tanko
 //
 //  Created by Diana Rammal Sansón on 22/2/26.
