@@ -5,12 +5,13 @@
 //  Created by Diana Rammal Sansón on 11/2/26.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct ProfileView: View {
     @Environment(SessionManager.self) private var session
     @Environment(AppSettings.self) private var settings
+    @Environment(UserMangaCollectionViewModel.self) private var collectionVM
 
     @State private var showEmojiPicker = false
 
@@ -19,9 +20,9 @@ struct ProfileView: View {
 
         NavigationStack {
             #if os(macOS)
-            macContent(settings: _settings)
+                macContent(settings: _settings)
             #else
-            iosContent(settings: _settings)
+                iosContent(settings: _settings)
             #endif
         }
         .sheet(isPresented: $showEmojiPicker) {
@@ -31,12 +32,15 @@ struct ProfileView: View {
     }
 }
 
+// MARK: - iOS Layout
+
 extension ProfileView {
 
     @ViewBuilder
     func iosContent(settings: Bindable<AppSettings>) -> some View {
         Form {
 
+            // Header with username and emoji
             Section("profile.personalization") {
                 ProfileHeaderSection(
                     userName: settings.userName,
@@ -45,10 +49,35 @@ extension ProfileView {
                 )
             }
 
-            Section("profile.appearance") {
-                AppearanceSection(isDarkMode: settings.isDarkMode)
+            // Stats of the collection (only if there are mangas)
+            if !collectionVM.mangas.isEmpty {
+                Section("profile.stats") {
+                    ProfileStatsSection(stats: collectionVM.collectionStats)
+                }
             }
 
+            // Appearance settings (theme + language)
+            Section("profile.appearance") {
+                AppearanceSection(
+                    isDarkMode: settings.isDarkMode,
+                    appLanguage: settings.appLanguage
+                )
+                .onChange(of: settings.appLanguage.wrappedValue) { _, new in
+                    settings.wrappedValue.updateLanguage(new)
+                }
+            }
+
+            // Contact and support options
+            Section("profile.support") {
+                ContactSection()
+            }
+
+            // App version and logout
+            Section {
+                AppVersionSection()
+            }
+
+            // Cerrar sesión
             Section {
                 LogoutSection(
                     isGuest: session.isGuest,
@@ -64,55 +93,123 @@ extension ProfileView {
     }
 }
 
+// MARK: - macOS Layout
+
 extension ProfileView {
+
     @ViewBuilder
     func macContent(settings: Bindable<AppSettings>) -> some View {
         ScrollView {
-            VStack(spacing: 40) {
+            VStack(alignment: .leading, spacing: 24) {
 
                 Text("profile.title")
                     .font(.system(size: 30, weight: .bold))
                     .frame(maxWidth: .infinity, alignment: .leading)
 
+                // Header
                 ProfileHeaderSection(
                     userName: settings.userName,
                     emoji: settings.profileEmoji.wrappedValue,
                     onTapEmoji: { showEmojiPicker = true }
                 )
-                .padding(30)
-                .background(.tankoSecondary.opacity(0.05))
-                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .macCard()
 
-                VStack(alignment: .leading, spacing: 20) {
-                    AppearanceSection(isDarkMode: settings.isDarkMode)
-                    Divider()
-                    LogoutSection(
-                        isGuest: session.isGuest,
-                        action: handleLogout
+                // Stats
+                if !collectionVM.mangas.isEmpty {
+                    macSection(title: "profile.stats") {
+                        ProfileStatsSection(stats: collectionVM.collectionStats)
+                    }
+                }
+
+                // Apariencia
+                macSection(title: "profile.appearance") {
+                    AppearanceSection(
+                        isDarkMode: settings.isDarkMode,
+                        appLanguage: settings.appLanguage
                     )
+                    .onChange(of: settings.appLanguage.wrappedValue) { _, new in
+                        settings.wrappedValue.updateLanguage(new)
+                    }
                 }
-                .padding(20)
 
-                if session.isGuest {
-                    Text("profile.guest.text")
-                        .font(.caption)
-                        .foregroundStyle(.tankoSecondary)
+                // Soporte
+                macSection(title: "profile.support") {
+                    ContactSection()
                 }
+
+                // Versión + Logout
+                VStack(alignment: .leading, spacing: 12) {
+                    AppVersionSection()
+                    Divider()
+                    // Logout destacado en color tankoPrimary
+                    Button(action: handleLogout) {
+                        HStack(spacing: 10) {
+                            Image(systemName: session.isGuest
+                                  ? "arrow.left.circle.fill"
+                                  : "rectangle.portrait.and.arrow.right.fill")
+                                .font(.system(size: 16, weight: .semibold))
+                            Text(session.isGuest ? "logout.guest" : "logout.user")
+                                .fontWeight(.semibold)
+                            Spacer()
+                        }
+                        .foregroundStyle(.tankoPrimary)
+                        .padding(.vertical, 4)
+                    }
+                    .buttonStyle(.plain)
+
+                    if session.isGuest {
+                        Text("profile.guest.text")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .macCard()
             }
-            .padding(40)
+            .padding(32)
+            .frame(maxWidth: .infinity) // ✅ Ocupa todo el ancho
         }
     }
+
+    // MARK: - Mac Card Helper
+
+    @ViewBuilder
+    private func macSection<Content: View>(
+        title: LocalizedStringKey,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(.secondary)
+            content()
+        }
+        .macCard()
+    }
 }
+
+// MARK: - Mac Card ViewModifier
+
+private extension View {
+    func macCard() -> some View {
+        self
+            .padding(20)
+            .frame(maxWidth: .infinity, alignment: .leading) // ✅ Alarga hasta los bordes
+            .background(.tankoSecondary.opacity(0.05))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+}
+
+// MARK: - Actions
 
 extension ProfileView {
 
     private func handleLogout() {
-        let wasGuest = session.isGuest
-
-        if wasGuest {
-            session.exitGuest()
-        } else {
-            session.logout()
+        withAnimation(.easeInOut(duration: 0.2)) {
+            if session.isGuest {
+                session.exitGuest()
+            } else {
+                session.logout()
+            }
         }
     }
 }

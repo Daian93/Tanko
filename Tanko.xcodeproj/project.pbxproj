@@ -117,6 +117,9 @@
 		84B1F1DF2F4C7B50004EF8E5 /* ProfileHeaderSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B1F1DE2F4C7B4C004EF8E5 /* ProfileHeaderSection.swift */; };
 		84B1F1E12F4C7FC0004EF8E5 /* AppearanceSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B1F1E02F4C7FA1004EF8E5 /* AppearanceSection.swift */; };
 		84B1F1E32F4C8005004EF8E5 /* LogoutSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B1F1E22F4C7FFC004EF8E5 /* LogoutSection.swift */; };
+		84B1F1EB2F4CA017004EF8E5 /* ProfileStatsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B1F1EA2F4CA00D004EF8E5 /* ProfileStatsSection.swift */; };
+		84B1F1ED2F4CA03F004EF8E5 /* AppVersionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B1F1EC2F4CA03C004EF8E5 /* AppVersionSection.swift */; };
+		84B1F1EF2F4CA08F004EF8E5 /* ContactSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B1F1EE2F4CA088004EF8E5 /* ContactSection.swift */; };
 		84B32A1F2F30E71B00F28131 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 84B32A1E2F30E71B00F28131 /* Localizable.xcstrings */; };
 		84CF6EE42F3D44CF00F2E6B5 /* AuthorMangaViewiPad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CF6EE32F3D44C400F2E6B5 /* AuthorMangaViewiPad.swift */; };
 		84CF6EE92F3E459500F2E6B5 /* PreviewHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CF6EE82F3E459000F2E6B5 /* PreviewHelpers.swift */; };
@@ -285,6 +288,9 @@
 		84B1F1DE2F4C7B4C004EF8E5 /* ProfileHeaderSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileHeaderSection.swift; sourceTree = "<group>"; };
 		84B1F1E02F4C7FA1004EF8E5 /* AppearanceSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSection.swift; sourceTree = "<group>"; };
 		84B1F1E22F4C7FFC004EF8E5 /* LogoutSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoutSection.swift; sourceTree = "<group>"; };
+		84B1F1EA2F4CA00D004EF8E5 /* ProfileStatsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStatsSection.swift; sourceTree = "<group>"; };
+		84B1F1EC2F4CA03C004EF8E5 /* AppVersionSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionSection.swift; sourceTree = "<group>"; };
+		84B1F1EE2F4CA088004EF8E5 /* ContactSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSection.swift; sourceTree = "<group>"; };
 		84B32A1E2F30E71B00F28131 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		84CF6EE32F3D44C400F2E6B5 /* AuthorMangaViewiPad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorMangaViewiPad.swift; sourceTree = "<group>"; };
 		84CF6EE82F3E459000F2E6B5 /* PreviewHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewHelpers.swift; sourceTree = "<group>"; };
@@ -646,6 +652,9 @@
 		84B1F1DD2F4C7B41004EF8E5 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
+				84B1F1EE2F4CA088004EF8E5 /* ContactSection.swift */,
+				84B1F1EC2F4CA03C004EF8E5 /* AppVersionSection.swift */,
+				84B1F1EA2F4CA00D004EF8E5 /* ProfileStatsSection.swift */,
 				84B1F1DE2F4C7B4C004EF8E5 /* ProfileHeaderSection.swift */,
 				84B1F1E02F4C7FA1004EF8E5 /* AppearanceSection.swift */,
 				84B1F1E22F4C7FFC004EF8E5 /* LogoutSection.swift */,
@@ -958,6 +967,8 @@
 				84A18A962F3925F2008AB07B /* KeychainService.swift in Sources */,
 				84A18ADA2F3A381C008AB07B /* LocalMangaCollectionRepository.swift in Sources */,
 				84A18AE62F3BB071008AB07B /* AuthValidator.swift in Sources */,
+				84B1F1EB2F4CA017004EF8E5 /* ProfileStatsSection.swift in Sources */,
+				84B1F1EF2F4CA08F004EF8E5 /* ContactSection.swift in Sources */,
 				84A18AF82F3CD29B008AB07B /* AppSettings.swift in Sources */,
 				849759C22F217D260049E62F /* ImageDownloader.swift in Sources */,
 				8489A14C2F4B58DC00640A60 /* MangaEmptyView.swift in Sources */,
@@ -1014,6 +1025,7 @@
 				8489A0E02F450E7A00640A60 /* ReadingProgressEditor.swift in Sources */,
 				84A18AE42F3BACA8008AB07B /* RegisterViewModel.swift in Sources */,
 				849759C42F217D7D0049E62F /* UIImage.swift in Sources */,
+				84B1F1ED2F4CA03F004EF8E5 /* AppVersionSection.swift in Sources */,
 				8489A0E62F450F1E00640A60 /* UserMangaDetailHeader.swift in Sources */,
 				8489A0E22F450EB200640A60 /* VolumeSelectorGrid.swift in Sources */,
 				84CF6EE42F3D44CF00F2E6B5 /* AuthorMangaViewiPad.swift in Sources */,

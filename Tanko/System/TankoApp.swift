@@ -21,6 +21,8 @@ struct TankoApp: App {
                 .environment(mangasVM)
                 .environment(settings)
                 .preferredColorScheme(settings.isDarkMode ? .dark : .light)
+                .environment(\.locale, settings.locale)
+                .id(settings.appLanguage.rawValue)
                 #if os(macOS)
                     .buttonStyle(.plain)
                 #endif
