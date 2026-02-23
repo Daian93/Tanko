@@ -27,7 +27,7 @@ struct UserMangaDetailView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 5) {
                 // Header with cover and title
                 UserMangaDetailHeader(
                     coverURL: viewModel.userManga.coverURL,
@@ -46,7 +46,9 @@ struct UserMangaDetailView: View {
                     maxVolume: viewModel.maxVolume,
                     isCompleteCollection: viewModel.isCompleteCollection,
                     onSave: { viewModel.saveChanges() },
-                    infoLink: { MangaInfoLink(viewModel: viewModel) }
+                    infoLink: { MangaInfoLink(viewModel: viewModel) },
+                    readingFooter: viewModel.readingProgressFooter,
+                    volumesFooter: viewModel.volumesFooter
                 )
             }
         }

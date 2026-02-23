@@ -11,15 +11,19 @@ struct EditMangaContentView: View {
     @Binding var volumesOwned: Set<Int>
     @Binding var readingVolume: Int
     @FocusState.Binding var isTextFieldFocused: Bool
+    
     let totalVolumes: Int
     let maxVolume: Int
     let isCompleteCollection: Bool
     let onSave: () -> Void
     let infoLink: () -> MangaInfoLink
 
+    var readingFooter: LocalizedStringKey? = nil
+    var volumesFooter: String? = nil
+
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
+            VStack(spacing: 5) {
                 sections(usingCardStyle: true)
 
                 infoLink()
@@ -41,6 +45,7 @@ struct EditMangaContentView: View {
                 readingVolume: $readingVolume,
                 maxVolume: maxVolume,
                 isTextFieldFocused: $isTextFieldFocused,
+                footer: readingFooter,
                 totalVolumes: totalVolumes
             )
             .onChange(of: readingVolume) { _, _ in onSave() }
@@ -53,7 +58,8 @@ struct EditMangaContentView: View {
             ) {
                 VolumesContent(
                     volumesOwned: $volumesOwned,
-                    totalVolumes: totalVolumes
+                    totalVolumes: totalVolumes,
+                    footer: volumesFooter
                 )
                 .onChange(of: volumesOwned) { _, _ in onSave() }
             }

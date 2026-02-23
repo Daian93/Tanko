@@ -10,6 +10,11 @@ import SwiftUI
 struct VolumesContent: View {
     @Binding var volumesOwned: Set<Int>
     let totalVolumes: Int
+    var footer: String? = nil
+
+    var footerText: String {
+        footer ?? "\(volumesOwned.count) / \(totalVolumes)"
+    }
 
     var body: some View {
         VStack(spacing: 12) {
@@ -18,7 +23,7 @@ struct VolumesContent: View {
                 totalVolumes: totalVolumes
             )
 
-            Text("volume.footer \(volumesOwned.count) \(totalVolumes)")
+            Text(footerText)
                 .font(.caption)
                 .foregroundStyle(.tankoSecondary)
         }
