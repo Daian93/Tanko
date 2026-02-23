@@ -222,8 +222,8 @@ struct SearchViewiPad: View {
             .onChange(of: searchText) { _, newValue in
                 performSearch(query: newValue)
             }
-            .navigationDestination(for: Manga.self) { manga in
-                MangaDetailView(manga: manga, namespace: nil)
+            .navigationDestination(for: MangaNavigation.self) { nav in
+                MangaDetailView(manga: nav.manga, namespace: nil)
             }
             .navigationDestination(for: Author.self) { author in
                 AuthorMangaViewiPad(author: author)
@@ -259,18 +259,21 @@ struct SearchViewiPad: View {
 
     private func performSearch(query: String) {
         searchTask?.cancel()
-
         isSearchFocused = false
 
         guard !query.isEmpty else {
             viewModel.reset()
+            filtersViewModel.resetAllFilters()
             return
+        }
+
+        if filtersViewModel.hasActiveFilters {
+            filtersViewModel.resetAllFilters()
         }
 
         searchTask = Task {
             try? await Task.sleep(nanoseconds: 500_000_000)
             guard !Task.isCancelled else { return }
-
             await viewModel.search(mode: .simple(title: query))
         }
     }
@@ -387,7 +390,7 @@ struct SearchViewiPad: View {
                 let isFirst = index == 0
                 let isLast = index == viewModel.results.count - 1
 
-                NavigationLink(value: manga) {
+                NavigationLink(value: MangaNavigation.withoutTransition(manga)) {
                     MangaRow(
                         manga: manga,
                         namespace: namespace,

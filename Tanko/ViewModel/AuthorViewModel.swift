@@ -114,4 +114,24 @@ final class AuthorViewModel {
     var canLoadMore: Bool {
         hasMorePages
     }
+
+    // MARK: - Layout helpers (iPad)
+
+    func landscapeCardHeight(for geoHeight: CGFloat) -> CGFloat {
+        geoHeight * 0.45
+    }
+
+    func landscapeHorizontalInset(geoWidth: CGFloat, cardWidth: CGFloat, spacing: CGFloat = 40) -> CGFloat {
+        let totalContentWidth = CGFloat(mangas.count) * cardWidth
+            + CGFloat(max(mangas.count - 1, 0)) * spacing
+        return max((geoWidth - totalContentWidth) / 2, 60)
+    }
+
+    func portraitCardWidth(geoWidth: CGFloat, horizontalPadding: CGFloat = 40, spacing: CGFloat = 30, columns: Int = 3) -> CGFloat {
+        (geoWidth - (horizontalPadding * 2) - (spacing * CGFloat(columns - 1))) / CGFloat(columns)
+    }
+
+    func portraitGridColumns(cardWidth: CGFloat, spacing: CGFloat = 30) -> [GridItem] {
+        Array(repeating: GridItem(.fixed(cardWidth), spacing: spacing), count: 3)
+    }
 }

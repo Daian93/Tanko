@@ -42,12 +42,17 @@ final class NavigationRouter {
 
     // Navigate to the search tab with a specific filter.
     func navigateToSearch(filter: CustomSearchDTO) {
-        // First reset the pending filter to ensure the search view updates even if the same filter is used again
         pendingSearchFilter = nil
+        // Primero cambiamos de tab, luego seteamos el filtro
+        // En macOS necesitamos más tiempo para que SearchViewiPad se monte
+        selectedTabTag = 3
         Task { @MainActor in
+            #if os(macOS)
+            try? await Task.sleep(for: .milliseconds(200))
+            #else
             try? await Task.sleep(for: .milliseconds(50))
+            #endif
             pendingSearchFilter = filter
-            selectedTabTag = 3
         }
     }
 }

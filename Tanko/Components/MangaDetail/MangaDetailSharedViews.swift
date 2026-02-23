@@ -15,7 +15,7 @@ struct TagPill: View {
 
     var body: some View {
         Text(text)
-            .font(.subheadline)
+            .font(.caption)
             .bold()
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
@@ -25,7 +25,7 @@ struct TagPill: View {
     }
 }
 
-// MARK: - FilterablePill (tappable → navega a Search)
+// MARK: - FilterablePill
 
 struct FilterablePill: View {
     let text: String
@@ -51,8 +51,18 @@ struct FilterablePill: View {
                 Capsule()
                     .stroke(color.opacity(0.3), lineWidth: 1)
             )
+            .contentShape(Capsule())
         }
         .buttonStyle(.plain)
+        #if os(macOS)
+        .onHover { hovering in
+            if hovering {
+                NSCursor.pointingHand.push()
+            } else {
+                NSCursor.pop()
+            }
+        }
+        #endif
     }
 }
 

@@ -12,20 +12,20 @@ struct AuthorMangaView: View {
     @State private var viewModel: AuthorViewModel
     @Namespace private var namespace
 
-    init(author: Author) {
-        self.author = author
-        _viewModel = State(initialValue: AuthorViewModel(author: author))
-    }
-
     private let columns = [
         GridItem(.flexible(), spacing: 20),
         GridItem(.flexible(), spacing: 20),
     ]
 
+    init(author: Author) {
+        self.author = author
+        _viewModel = State(initialValue: AuthorViewModel(author: author))
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                header
+                AuthorHeader(author: author, large: false)
                     .padding(.top, 20)
 
                 VStack(alignment: .leading, spacing: 16) {
@@ -37,15 +37,10 @@ struct AuthorMangaView: View {
                     LazyVGrid(columns: columns, spacing: 25) {
                         ForEach(viewModel.mangas) { manga in
                             NavigationLink(value: MangaNavigation.withoutTransition(manga)) {
-                                MangaGridCard(
-                                    manga: manga,
-                                    namespace: namespace
-                                )
-                                .task {
-                                    await viewModel.loadNextPageIfNeeded(
-                                        currentItem: manga
-                                    )
-                                }
+                                MangaGridCard(manga: manga, namespace: namespace)
+                                    .task {
+                                        await viewModel.loadNextPageIfNeeded(currentItem: manga)
+                                    }
                             }
                         }
                     }
@@ -53,8 +48,7 @@ struct AuthorMangaView: View {
                     if viewModel.canLoadMore {
                         HStack {
                             Spacer()
-                            ProgressView()
-                                .tint(.tankoPrimary)
+                            ProgressView().tint(.tankoPrimary)
                             Spacer()
                         }
                         .padding(.vertical)
@@ -69,38 +63,10 @@ struct AuthorMangaView: View {
             await viewModel.loadInitial()
         }
     }
-
-    private var header: some View {
-        HStack(alignment: .center, spacing: 16) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(author.fullName)
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .tracking(-0.5)
-
-                HStack(spacing: 6) {
-                    Image(systemName: author.role.icon)
-                        .font(.caption2)
-                    Text(author.role.localized)
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .textCase(.uppercase)
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .foregroundStyle(.tankoPrimary)
-                .background(.tankoPrimary.opacity(0.1))
-                .clipShape(Capsule())
-            }
-            Spacer()
-        }
-        .padding()
-        .background(.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: 2)
-    }
 }
 
 #Preview {
-    AuthorMangaView(author: .test)
+    NavigationStack {
+        AuthorMangaView(author: .test)
+    }
 }

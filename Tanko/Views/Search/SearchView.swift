@@ -16,13 +16,13 @@ struct SearchView: View {
     @State private var filtersViewModel = FiltersViewModel()
     @State private var showFilters = false
     @State private var searchTask: Task<Void, Never>?
-    @State private var selectedManga: Manga?
     @State private var router = NavigationRouter.shared
-    
+    @State private var navigationPath = NavigationPath()
+
     @Namespace private var namespace
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             VStack(spacing: 0) {
                 Group {
                     switch viewModel.state {
@@ -54,8 +54,8 @@ struct SearchView: View {
                 }
             }
             .navigationTitle("Buscar")
-            .navigationDestination(item: $selectedManga) { manga in
-                MangaDetailView(manga: manga, namespace: namespace)
+            .navigationDestination(for: MangaNavigation.self) { nav in
+                MangaDetailView(manga: nav.manga, namespace: namespace)
             }
             .navigationDestination(for: Author.self) { author in
                 AuthorMangaView(author: author)
@@ -107,22 +107,6 @@ struct SearchView: View {
         }
     }
 
-    private func performSearch(query: String) {
-        searchTask?.cancel()
-
-        guard !query.isEmpty else {
-            viewModel.reset()
-            return
-        }
-
-        searchTask = Task {
-            try? await Task.sleep(nanoseconds: 500_000_000)
-            guard !Task.isCancelled else { return }
-
-            await viewModel.search(mode: .simple(title: query))
-        }
-    }
-
     private func applyFilters(_ dto: CustomSearchDTO) {
         searchText = ""
         searchTask?.cancel()
@@ -134,9 +118,26 @@ struct SearchView: View {
     private func applyPendingFilter(_ dto: CustomSearchDTO) {
         searchText = ""
         searchTask?.cancel()
+        navigationPath = NavigationPath()
         filtersViewModel.applyFromDTO(dto)
         Task {
             await viewModel.search(mode: .advanced(dto: dto))
+        }
+    }
+
+    private func performSearch(query: String) {
+        searchTask?.cancel()
+
+        guard !query.isEmpty else {
+            viewModel.reset()
+            filtersViewModel.resetAllFilters()
+            return
+        }
+
+        searchTask = Task {
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            guard !Task.isCancelled else { return }
+            await viewModel.search(mode: .simple(title: query))
         }
     }
 
@@ -218,7 +219,7 @@ struct SearchView: View {
                 let isFirst = index == 0
                 let isLast = index == viewModel.results.count - 1
 
-                NavigationLink(value: manga) {
+                NavigationLink(value: MangaNavigation.withoutTransition(manga)) {
                     MangaRow(
                         manga: manga,
                         namespace: namespace,
@@ -297,7 +298,7 @@ struct SearchView: View {
                     )
                 }
 
-                // Botón limpiar todos
+                // Button to clear all filters
                 if filtersViewModel.hasActiveFilters {
                     Button {
                         filtersViewModel.resetAllFilters()
