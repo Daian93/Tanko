@@ -7,6 +7,7 @@
 
 import Foundation
 
+// Defines the interface for managing the user's manga collection, abstracting away the underlying storage mechanism (e.g., local database, cloud sync).
 @MainActor
 protocol MangaCollectionRepository: Sendable {
     func getCollection() async throws -> [MangaSyncData]

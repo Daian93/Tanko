@@ -10,28 +10,28 @@ import SwiftUI
 
 struct AddMangaToCollectionView: View {
     let manga: Manga
-    
+
     @Environment(\.dismiss) private var dismiss
-    @Environment(UserMangaCollectionViewModel.self)
-    private var collectionVM
-    
+    @Environment(UserMangaCollectionViewModel.self) private var collectionVM
+
     @State private var volumesOwned: Set<Int> = []
     @State private var readingVolume: Int = 0
-    
+    @State private var isAdding = false
+
     @FocusState private var isTextFieldFocused: Bool
-    
+
     private var totalVolumes: Int {
         max(manga.volumes ?? 0, 0)
     }
-    
+
     private var maxVolume: Int {
         totalVolumes > 0 ? totalVolumes : 999
     }
-    
+
     private var isCompleteCollection: Bool {
         totalVolumes > 0 && volumesOwned.count == totalVolumes
     }
-    
+
     var body: some View {
         NavigationStack {
             AddMangaContentView(
@@ -49,7 +49,9 @@ struct AddMangaToCollectionView: View {
                     Button("button.cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("button.add") {
+                    Button {
+                        guard !isAdding else { return }
+                        isAdding = true
                         Task {
                             await collectionVM.add(
                                 manga: manga,
@@ -59,8 +61,13 @@ struct AddMangaToCollectionView: View {
                             )
                             dismiss()
                         }
+                    } label: {
+                        HStack(spacing: 4) {
+                            if isAdding { ProgressView().scaleEffect(0.8) }
+                            Text("button.add")
+                        }
                     }
-                    .disabled(collectionVM.isAddingManga)
+                    .disabled(isAdding)
                 }
             }
         }

@@ -10,6 +10,7 @@ import SwiftData
 
 @MainActor
 enum PreviewHelper {
+    // Container that is shared across all previews to maintain consistent state
     static let container: ModelContainer = {
             let config = ModelConfiguration(isStoredInMemoryOnly: true)
             let container = try! ModelContainer(for: UserManga.self, configurations: config)
@@ -23,6 +24,7 @@ enum PreviewHelper {
             return container
         }()
 
+    // Factory method to create a fully configured UserMangaCollectionViewModel for previews
     static func makeCollectionVM() -> UserMangaCollectionViewModel {
         let context = container.mainContext
         let local = LocalMangaCollectionRepository(context: context)

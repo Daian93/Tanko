@@ -1,5 +1,5 @@
 //
-//  MangaEmpty.swift
+//  MangaEmptyView.swift
 //  Tanko
 //
 //  Created by Diana Rammal Sansón on 22/2/26.
@@ -14,16 +14,16 @@ struct MangaEmptyView: View {
         ScrollView {
             VStack(spacing: 24) {
                 ContentUnavailableView(
-                    "content.empty.title",
-                    systemImage: "book.closed",
-                    description: Text("content.empty.description")
+                    "empty.title",
+                    systemImage: "book.closed.fill",
+                    description: Text("empty.description")
                 )
 
                 RetryButton(onRetry: onRetry)
             }
             .padding(.horizontal)
             .frame(maxWidth: .infinity)
-            .padding(.top, 200)
+            .padding(.top, 250)
         }
         .background(.tankoBackground)
         .refreshable { await onRetry() }

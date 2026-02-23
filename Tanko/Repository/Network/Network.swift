@@ -53,13 +53,11 @@ struct Network: NetworkRepository {
         var request = URLRequest(url: .jwtLogin)
         request.httpMethod = "POST"
 
-        // 🔑 JWT login usa Basic Auth
         request.setValue(
             "Basic \(encoded)",
             forHTTPHeaderField: "Authorization"
         )
 
-        // 🔑 App token obligatorio
         request.setValue(appToken, forHTTPHeaderField: "App-Token")
 
         request.setValue("application/json", forHTTPHeaderField: "Accept")
@@ -258,7 +256,8 @@ struct Network: NetworkRepository {
         return try await getJSON(request, type: UserMangaCollectionDTO.self)
     }
 
-    // MARK: - Helper Privado
+    // MARK: - Private Helper
+    
     private func authRequest(url: URL, method: String, token: String)
         -> URLRequest
     {

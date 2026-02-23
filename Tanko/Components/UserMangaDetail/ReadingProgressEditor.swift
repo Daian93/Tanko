@@ -99,3 +99,15 @@ struct ReadingProgressEditor: View {
         readingVolume -= 1
     }
 }
+
+#Preview {
+    @Previewable @State var readingVolume: Int = 3
+    @Previewable @FocusState var isTextFieldFocused: Bool
+
+    ReadingProgressEditor(
+        readingVolume: $readingVolume,
+        maxVolume: 10,
+        isTextFieldFocused: $isTextFieldFocused
+    )
+    .padding()
+}

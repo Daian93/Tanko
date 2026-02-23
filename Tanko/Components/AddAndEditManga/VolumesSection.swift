@@ -7,24 +7,25 @@
 
 import SwiftUI
 
-struct VolumesSection: View {
+struct VolumesContent: View {
     @Binding var volumesOwned: Set<Int>
     let totalVolumes: Int
 
     var body: some View {
-        SectionContainer(
-            title: "volume.title",
-            footer: "\(volumesOwned.count) \(totalVolumes) volume.footer"
-        ) {
+        VStack(spacing: 12) {
             VolumeSelectionGrid(
                 volumesOwned: $volumesOwned,
                 totalVolumes: totalVolumes
             )
+
+            Text("volume.footer \(volumesOwned.count) \(totalVolumes)")
+                .font(.caption)
+                .foregroundStyle(.tankoSecondary)
         }
     }
 }
 
 #Preview {
     @Previewable @State var volumesOwned: Set<Int> = [1, 3, 5]
-    VolumesSection(volumesOwned: $volumesOwned, totalVolumes: 10)
+    VolumesContent(volumesOwned: $volumesOwned, totalVolumes: 10)
 }

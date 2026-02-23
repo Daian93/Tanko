@@ -107,3 +107,6 @@ struct VolumeSelectionGrid: View {
     }
 }
 
+#Preview {
+    VolumeSelectionGrid(volumesOwned: .constant([1, 3, 5]), totalVolumes: 10)
+}

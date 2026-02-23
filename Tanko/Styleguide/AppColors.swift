@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// Define custom colors for the app using an extension on ShapeStyle, which allows us to use these colors in various SwiftUI views.
 extension ShapeStyle where Self == Color {
     static var tankoPrimary: Color { Color("TankoMainPrimary") }
     static var tankoSecondary: Color { Color("TankoMainSecondary") }

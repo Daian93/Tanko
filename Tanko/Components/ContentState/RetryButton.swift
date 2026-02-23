@@ -24,3 +24,7 @@ struct RetryButton: View {
         }
     }
 }
+
+#Preview {
+    RetryButton(onRetry: {})
+}

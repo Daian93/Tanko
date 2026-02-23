@@ -9,7 +9,6 @@ import SwiftUI
 import SwiftData
 
 struct PreviewContainer: PreviewModifier {
-
     static func makeSharedContext() async throws -> ModelContainer {
         let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(

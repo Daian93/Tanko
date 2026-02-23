@@ -8,11 +8,9 @@
 import Foundation
 import SwiftData
 
-/// Representa una operación pendiente de sincronizar con el servidor
+// Represents an operation (add, update, delete) that is pending synchronization with the server.
 @Model
 final class PendingOperation {
-    
-    /// Tipo de acción a realizar
     enum Action: String, Codable {
         case add = "add"
         case update = "update"
@@ -21,28 +19,13 @@ final class PendingOperation {
     
     // MARK: - Properties
     
-    /// ID único de la operación
     @Attribute(.unique) var id: UUID
-    
-    /// Tipo de acción (add, update, delete)
     var actionRaw: String
-    
-    /// ID del manga afectado
     var mangaID: Int
-    
-    /// Título del manga (para mostrar en UI)
     var mangaTitle: String
-    
-    /// Datos serializados del manga (JSON)
     var mangaDataJSON: Data?
-    
-    /// Timestamp de cuando se creó la operación
     var timestamp: Date
-    
-    /// Número de intentos de sincronización
     var retryCount: Int
-    
-    /// Si la operación falló
     var hasFailed: Bool
     
     // MARK: - Computed Properties
@@ -69,7 +52,7 @@ final class PendingOperation {
         self.retryCount = 0
         self.hasFailed = false
         
-        // Serializar mangaData a JSON si existe
+        // Serialize mangaData to JSON for storage
         if let mangaData = mangaData {
             self.mangaDataJSON = try? JSONEncoder().encode(mangaData)
         }
@@ -77,19 +60,16 @@ final class PendingOperation {
     
     // MARK: - Methods
     
-    /// Recupera los datos del manga desde JSON
     func getMangaData() -> MangaSyncData? {
         guard let json = mangaDataJSON else { return nil }
         return try? JSONDecoder().decode(MangaSyncData.self, from: json)
     }
     
-    /// Marca la operación como fallida
     func markAsFailed() {
         hasFailed = true
         retryCount += 1
     }
     
-    /// Resetea el estado de fallo
     func resetFailureState() {
         hasFailed = false
         retryCount = 0
@@ -98,6 +78,7 @@ final class PendingOperation {
 
 // MARK: - MangaSyncData Codable
 
+// Struct used to represent manga data for synchronization purposes. It can be encoded/decoded to/from JSON for storage in PendingOperation.
 extension MangaSyncData: Codable {
     enum CodingKeys: String, CodingKey {
         case mangaID, title, coverURL, totalVolumes

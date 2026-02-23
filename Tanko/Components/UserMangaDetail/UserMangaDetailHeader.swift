@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-// MARK: - Manga Header (for detail view)
-
 struct UserMangaDetailHeader: View {
     let coverURL: URL?
     let title: String
@@ -35,7 +33,9 @@ struct UserMangaDetailHeader: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .padding()
         .frame(height: 180)
+        .background(.tankoBackground)
     }
 }
 

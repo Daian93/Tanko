@@ -8,6 +8,7 @@
 import SwiftData
 import SwiftUI
 
+// Repository responsible for managing the user's manga collection stored locally in SwiftData.
 @MainActor
 final class LocalMangaCollectionRepository: MangaCollectionRepository {
     private let context: ModelContext

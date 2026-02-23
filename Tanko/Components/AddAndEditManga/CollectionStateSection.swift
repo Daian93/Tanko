@@ -7,28 +7,32 @@
 
 import SwiftUI
 
-struct CollectionStateSection: View {
+struct CollectionStateContent: View {
     let volumesOwned: Int
     let totalVolumes: Int
     let isComplete: Bool
 
-    var body: some View {
-        let state = CollectionStateDisplay(
+    private var stateDisplay: CollectionStateDisplay {
+        CollectionStateDisplay(
             volumesOwned: volumesOwned,
             totalVolumes: totalVolumes,
             isCompleteCollection: isComplete
         )
-        return SectionContainer(
-            title: "collection.state",
-            footer: state.footerText
-        ) {
-            state
+    }
+
+    var body: some View {
+        VStack(spacing: 8) {
+            stateDisplay
+
+            Text(stateDisplay.footerText)
+                .font(.caption)
+                .foregroundStyle(.tankoSecondary)
         }
     }
 }
 
 #Preview {
-    CollectionStateSection(
+    CollectionStateContent(
         volumesOwned: 5,
         totalVolumes: 10,
         isComplete: false

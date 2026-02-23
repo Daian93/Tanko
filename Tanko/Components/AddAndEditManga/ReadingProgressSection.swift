@@ -7,25 +7,27 @@
 
 import SwiftUI
 
-struct ReadingProgressSection: View {
+struct ReadingProgressContent: View {
     @Binding var readingVolume: Int
     let maxVolume: Int
     @FocusState.Binding var isTextFieldFocused: Bool
-
     let totalVolumes: Int
 
     var body: some View {
-        SectionContainer(
-            title: "reading.title",
-            footer: totalVolumes > 0
-                ? "reading.footer.one \(totalVolumes)"
-                : "reading.footer.two"
-        ) {
+        VStack(spacing: 12) {
             ReadingProgressEditor(
                 readingVolume: $readingVolume,
                 maxVolume: maxVolume,
                 isTextFieldFocused: $isTextFieldFocused
             )
+
+            Text(
+                totalVolumes > 0
+                ? "reading.footer.one \(totalVolumes)"
+                : "reading.footer.two"
+            )
+            .font(.caption)
+            .foregroundStyle(.tankoSecondary)
         }
     }
 }
@@ -33,7 +35,7 @@ struct ReadingProgressSection: View {
 #Preview {
     @Previewable @FocusState var isFocused: Bool
 
-    ReadingProgressSection(
+    ReadingProgressContent(
         readingVolume: .constant(5),
         maxVolume: 10,
         isTextFieldFocused: $isFocused,

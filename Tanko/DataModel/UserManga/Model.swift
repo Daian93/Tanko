@@ -44,6 +44,7 @@ final class UserManga {
     }
 }
 
+// Mapping between UserManga and MangaSyncData for synchronization purposes
 extension UserManga {
     var asSyncData: MangaSyncData {
         MangaSyncData(

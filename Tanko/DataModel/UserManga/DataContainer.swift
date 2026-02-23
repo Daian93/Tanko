@@ -19,4 +19,3 @@ enum DataContainer {
         return try! ModelContainer(for: schema)
     }()
 }
-

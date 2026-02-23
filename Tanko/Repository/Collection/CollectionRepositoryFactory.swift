@@ -7,9 +7,9 @@
 
 import Foundation
 
+// Factory that provides the appropriate MangaCollectionRepository based on the user's authentication status.
 @MainActor
 final class CollectionRepositoryFactory {
-
     private let session: SessionManager
     private let local: LocalMangaCollectionRepository
     private let remote: RemoteMangaCollectionRepository

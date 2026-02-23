@@ -8,6 +8,7 @@
 import Foundation
 import SwiftData
 
+// This repository is responsible for syncing the user's manga collection with the remote API.
 @MainActor
 final class RemoteMangaCollectionRepository: MangaCollectionRepository {
 
@@ -25,7 +26,7 @@ final class RemoteMangaCollectionRepository: MangaCollectionRepository {
         self.localRepo = localRepo
     }
 
-    // MARK: - Obtener colección remota y mapear a local
+    // Get manga collection from remote API and convert to MangaSyncData for local use
     func getCollection() async throws -> [MangaSyncData] {
         guard let token = session.token else { return [] }
         let request = URLRequest.get(url: .collectionManga, bearerToken: token)
@@ -52,6 +53,7 @@ final class RemoteMangaCollectionRepository: MangaCollectionRepository {
         try await add(mangaData: remote)
     }
 
+    // Get manga collection item details from remote API for a specific manga ID
     func getMangaFromCollection(mangaID: Int) async throws
         -> UserMangaCollectionDTO
     {
@@ -68,7 +70,7 @@ final class RemoteMangaCollectionRepository: MangaCollectionRepository {
         )
     }
 
-    // MARK: - Añadir manga a colección remota y local
+    // Add or update manga in remote collection using MangaSyncData
     func add(mangaData: MangaSyncData) async throws {
         guard let token = session.token else { return }
 
@@ -88,7 +90,7 @@ final class RemoteMangaCollectionRepository: MangaCollectionRepository {
         try await network.postJSON(request, status: 200)
     }
 
-    // MARK: - Eliminar manga de colección remota y local
+    // Remove manga from remote collection by manga ID
     func remove(_ manga: UserManga) async throws {
         guard let token = session.token else { return }
 

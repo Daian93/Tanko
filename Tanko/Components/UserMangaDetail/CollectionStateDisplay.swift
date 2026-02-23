@@ -38,4 +38,8 @@ struct CollectionStateDisplay: View {
     }
 }
 
+#Preview {
+    CollectionStateDisplay(volumesOwned: 8, totalVolumes: 10, isCompleteCollection: false)
+        .padding()
+}
 

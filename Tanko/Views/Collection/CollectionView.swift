@@ -244,7 +244,7 @@ struct CollectionView: View {
                                     Text("Progreso")
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
-                                    Spacer()
+                     S               Spacer()
                                     Text(hasDynamicTotal ? "\(reading)+" : "\(reading)/\(displayTotal)")
                                         .font(.caption.weight(.medium))
                                         .foregroundStyle(progressColor)

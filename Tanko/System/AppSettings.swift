@@ -9,6 +9,7 @@ import SwiftUI
 import Observation
 
 @Observable
+@MainActor
 final class AppSettings {
     var profileEmoji: String
     var userName: String

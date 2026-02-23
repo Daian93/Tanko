@@ -1,5 +1,5 @@
 //
-//  MangaError.swift
+//  MangaErrorView.swift
 //  Tanko
 //
 //  Created by Diana Rammal Sansón on 22/2/26.
@@ -28,7 +28,7 @@ struct MangaErrorView: View {
                 RetryButton(onRetry: onRetry)
             }
             .frame(maxWidth: .infinity)
-            .padding(.top, 200)
+            .padding(.top, 250)
             .padding(.horizontal)
         }
         .background(.tankoBackground)
