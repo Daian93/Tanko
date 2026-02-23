@@ -9,20 +9,36 @@ import SwiftData
 import SwiftUI
 
 struct SearchViewiPad: View {
+    @Environment(UserMangaCollectionViewModel.self) private var collectionVM
+    
     @State private var searchText = ""
     @State private var viewModel = SearchViewModel()
-    @Environment(UserMangaCollectionViewModel.self) private var collectionVM
     @State private var filtersViewModel = FiltersViewModel()
     @State private var searchTask: Task<Void, Never>?
+    @State private var navigationPath = NavigationPath()
+    @State private var router = NavigationRouter.shared
+    
     @Namespace private var namespace
     @FocusState private var isSearchFocused: Bool
-    @State private var navigationPath = NavigationPath()
 
     var body: some View {
         NavigationSplitView {
             filtersSidebar
         } detail: {
             searchResultsDetail
+        }
+        .onChange(of: router.pendingSearchFilter) { _, filter in
+            guard let filter else { return }
+            router.pendingSearchFilter = nil
+            navigationPath = NavigationPath()
+            applyPendingFilter(filter)
+        }
+        .onAppear {
+            if let filter = router.pendingSearchFilter {
+                router.pendingSearchFilter = nil
+                navigationPath = NavigationPath()
+                applyPendingFilter(filter)
+            }
         }
     }
 
@@ -31,7 +47,7 @@ struct SearchViewiPad: View {
     private var filtersSidebar: some View {
         List {
             Section {
-                // Búsqueda por texto
+                // Search by text
                 Section(header: Text("Búsqueda por texto").font(.headline)) {
                     TextField(
                         "Título del manga",
@@ -57,7 +73,7 @@ struct SearchViewiPad: View {
                     )
                 }
 
-                // Géneros
+                // Genre
                 DisclosureGroup {
                     ForEach(filtersViewModel.availableGenres) { genre in
                         MultiSelectionRow(
@@ -85,7 +101,7 @@ struct SearchViewiPad: View {
                     }
                 }
 
-                // Temáticas
+                // Theme
                 DisclosureGroup {
                     ForEach(filtersViewModel.availableThemes) { theme in
                         MultiSelectionRow(
@@ -113,7 +129,7 @@ struct SearchViewiPad: View {
                     }
                 }
 
-                // Demografía
+                // Demographic
                 DisclosureGroup {
                     ForEach(filtersViewModel.availableDemographics) { demo in
                         MultiSelectionRow(
@@ -144,7 +160,7 @@ struct SearchViewiPad: View {
                 }
             }
 
-            // Botones de acción
+            // Action buttons
             Section {
                 Button {
                     applyFilters()
@@ -276,8 +292,18 @@ struct SearchViewiPad: View {
             searchText = ""
             return
         }
-
         let dto = filtersViewModel.createSearchDTO()
+        Task {
+            await viewModel.search(mode: .advanced(dto: dto))
+        }
+    }
+
+    private func applyPendingFilter(_ dto: CustomSearchDTO) {
+        searchText = ""
+        searchTask?.cancel()
+        isSearchFocused = false
+        navigationPath = NavigationPath()
+        filtersViewModel.applyFromDTO(dto)
         Task {
             await viewModel.search(mode: .advanced(dto: dto))
         }

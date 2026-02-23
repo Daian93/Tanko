@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CustomSearchDTO: Codable {
+struct CustomSearchDTO: Codable, Equatable {
     var title: String? = nil
     var authorFirstName: String? = nil
     var authorLastName: String? = nil

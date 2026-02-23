@@ -10,6 +10,8 @@ import SwiftUI
 struct MangaDetailMetadata: View {
     let manga: Manga
 
+    @State private var router = NavigationRouter.shared
+
     private let pillSpacing: CGFloat = 8
 
     var body: some View {
@@ -37,50 +39,25 @@ struct MangaDetailMetadata: View {
                     .font(.subheadline)
                     .foregroundStyle(.textSecondary)
             }
-            .accessibilityLabel(Text("section.published: \(manga.publicationYear)"))
+            .accessibilityLabel(
+                Text("section.published: \(manga.publicationYear)")
+            )
 
             SectionDivider()
 
             // Genres
             MetadataSection(title: genreSectionTitle) {
-                if !manga.genreNames.isEmpty {
+                if !manga.genres.isEmpty {
                     FlowLayout(spacing: pillSpacing) {
                         ForEach(manga.genres) { genre in
-                            TagPill(text: genre.rawValue, color: .blue)
-                        }
-                    }
-                } else {
-                    Text("-")
-                }
-            }
-            .accessibilityLabel("\(manga.genres.count) section.genres: \(manga.genreNames)")
-
-            if !manga.themeNames.isEmpty || !manga.demographicsNames.isEmpty {
-                SectionDivider()
-            }
-
-            // Themes
-            MetadataSection(title: themeSectionTitle) {
-                if !manga.themeNames.isEmpty {
-                    FlowLayout(spacing: pillSpacing) {
-                        ForEach(manga.themes) { theme in
-                            TagPill(text: theme.rawValue, color: .purple)
-                        }
-                    }
-                } else {
-                    Text("-")
-                }
-            }
-            .accessibilityLabel("\(manga.themes.count) section.themes: \(manga.themeNames)")
-
-            SectionDivider()
-
-            // Demographics
-            MetadataSection(title: demographicSectionTitle) {
-                if !manga.demographicsNames.isEmpty {
-                    FlowLayout(spacing: pillSpacing) {
-                        ForEach(manga.demographics) { demographic in
-                            TagPill(text: demographic.rawValue, color: .green)
+                            FilterablePill(text: genre.rawValue, color: .blue) {
+                                router.navigateToSearch(
+                                    filter: CustomSearchDTO(
+                                        genres: [genre.rawValue],
+                                        contains: true
+                                    )
+                                )
+                            }
                         }
                     }
                 } else {
@@ -88,17 +65,67 @@ struct MangaDetailMetadata: View {
                 }
             }
             .accessibilityLabel(
-                "\(manga.demographics.count) section.demographics: \(manga.demographicsNames)"
+                "\(manga.genres.count) section.genres: \(manga.genreNames)"
             )
+
+            if !manga.themes.isEmpty {
+                SectionDivider()
+
+                // Themes
+                MetadataSection(title: themeSectionTitle) {
+                    FlowLayout(spacing: pillSpacing) {
+                        ForEach(manga.themes) { theme in
+                            FilterablePill(text: theme.rawValue, color: .purple)
+                            {
+                                router.navigateToSearch(
+                                    filter: CustomSearchDTO(
+                                        themes: [theme.rawValue],
+                                        contains: true
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+                .accessibilityLabel(
+                    "\(manga.themes.count) section.themes: \(manga.themeNames)"
+                )
+            }
+
+            if !manga.demographics.isEmpty {
+                SectionDivider()
+
+                // Demographics
+                MetadataSection(title: demographicSectionTitle) {
+                    FlowLayout(spacing: pillSpacing) {
+                        ForEach(manga.demographics) { demographic in
+                            FilterablePill(
+                                text: demographic.rawValue,
+                                color: .green
+                            ) {
+                                router.navigateToSearch(
+                                    filter: CustomSearchDTO(
+                                        demographics: [demographic.rawValue],
+                                        contains: true
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+                .accessibilityLabel(
+                    "\(manga.demographics.count) section.demographics: \(manga.demographicsNames)"
+                )
+            }
         }
         .padding(.horizontal)
-        .background(.tankoBackground)
     }
 
     // MARK: - Computed titles
 
     private var authorSectionTitle: LocalizedStringResource {
-        manga.authors.count == 1 ? "section.authors.one" : "section.authors.other"
+        manga.authors.count == 1
+            ? "section.authors.one" : "section.authors.other"
     }
 
     private var genreSectionTitle: LocalizedStringResource {
@@ -122,7 +149,10 @@ private struct MetadataSection<Content: View>: View {
     let title: LocalizedStringKey
     @ViewBuilder let content: () -> Content
 
-    init(title: LocalizedStringKey, @ViewBuilder content: @escaping () -> Content) {
+    init(
+        title: LocalizedStringKey,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
         self.title = title
         self.content = content
     }
@@ -138,8 +168,8 @@ private struct MetadataSection<Content: View>: View {
 }
 
 // Overload for LocalizedStringResource
-private extension MangaDetailMetadata {
-    struct MetadataSectionResource<Content: View>: View {
+extension MangaDetailMetadata {
+    fileprivate struct MetadataSectionResource<Content: View>: View {
         let title: LocalizedStringResource
         @ViewBuilder let content: () -> Content
 
@@ -153,7 +183,7 @@ private extension MangaDetailMetadata {
         }
     }
 
-    func MetadataSection(
+    fileprivate func MetadataSection(
         title: LocalizedStringResource,
         @ViewBuilder content: @escaping () -> some View
     ) -> some View {
@@ -180,11 +210,14 @@ private struct AuthorPill: View {
                 .background(.tankoPrimary.gradient)
                 .clipShape(Circle())
         }
-        .padding(.leading, 4)
-        .padding(.trailing, 2)
+        .padding(.leading, 8)
+        .padding(.trailing, 4)
         .padding(.vertical, 4)
-        .background(.tankoPrimary.opacity(0.1))
-        .clipShape(Capsule())
+        .background(.tankoPrimary.opacity(0.1), in: Capsule())
+        .overlay(
+            Capsule()
+                .stroke(.tankoPrimary.opacity(0.3), lineWidth: 1)
+        )
     }
 }
 
@@ -193,4 +226,3 @@ private struct AuthorPill: View {
         MangaDetailMetadata(manga: .test)
     }
 }
-

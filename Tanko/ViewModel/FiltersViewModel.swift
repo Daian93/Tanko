@@ -55,6 +55,25 @@ final class FiltersViewModel {
         containsSearch = true
     }
 
+    // Apply the filters from a given SearchDTO (from the pills in SearchView)
+    func applyFromDTO(_ dto: CustomSearchDTO) {
+        resetAllFilters()
+        searchTitle             = dto.title ?? ""
+        searchAuthorFirstName   = dto.authorFirstName ?? ""
+        searchAuthorLastName    = dto.authorLastName ?? ""
+        containsSearch          = dto.contains
+
+        if let genres = dto.genres {
+            selectedGenres = Set(genres.compactMap { Genre(rawValue: $0) })
+        }
+        if let themes = dto.themes {
+            selectedThemes = Set(themes.compactMap { Theme(rawValue: $0) })
+        }
+        if let demographics = dto.demographics {
+            selectedDemographics = Set(demographics.compactMap { Demographic(rawValue: $0) })
+        }
+    }
+
     var activeFiltersCount: Int {
         var count = 0
         if !searchTitle.isEmpty { count += 1 }

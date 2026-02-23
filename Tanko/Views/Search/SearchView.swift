@@ -9,15 +9,17 @@ import SwiftData
 import SwiftUI
 
 struct SearchView: View {
+    @Environment(UserMangaCollectionViewModel.self) private var collectionVM
+    
     @State private var searchText = ""
     @State private var viewModel = SearchViewModel()
-    @Environment(UserMangaCollectionViewModel.self) private var collectionVM
     @State private var filtersViewModel = FiltersViewModel()
     @State private var showFilters = false
     @State private var searchTask: Task<Void, Never>?
-    @Namespace private var namespace
-
     @State private var selectedManga: Manga?
+    @State private var router = NavigationRouter.shared
+    
+    @Namespace private var namespace
 
     var body: some View {
         NavigationStack {
@@ -57,6 +59,17 @@ struct SearchView: View {
             }
             .navigationDestination(for: Author.self) { author in
                 AuthorMangaView(author: author)
+            }
+            .onChange(of: router.pendingSearchFilter) { _, filter in
+                guard let filter else { return }
+                router.pendingSearchFilter = nil
+                applyPendingFilter(filter)
+            }
+            .onAppear {
+                if let filter = router.pendingSearchFilter {
+                    router.pendingSearchFilter = nil
+                    applyPendingFilter(filter)
+                }
             }
             .searchable(text: $searchText, prompt: "Buscar manga…")
             .onChange(of: searchText) { _, newValue in
@@ -113,7 +126,15 @@ struct SearchView: View {
     private func applyFilters(_ dto: CustomSearchDTO) {
         searchText = ""
         searchTask?.cancel()
+        Task {
+            await viewModel.search(mode: .advanced(dto: dto))
+        }
+    }
 
+    private func applyPendingFilter(_ dto: CustomSearchDTO) {
+        searchText = ""
+        searchTask?.cancel()
+        filtersViewModel.applyFromDTO(dto)
         Task {
             await viewModel.search(mode: .advanced(dto: dto))
         }
@@ -225,9 +246,6 @@ struct SearchView: View {
             }
         }
         .listStyle(.plain)
-        .navigationDestination(for: Manga.self) { manga in
-            MangaDetailView(manga: manga, namespace: namespace)
-        }
     }
 
     private var activeFiltersChips: some View {

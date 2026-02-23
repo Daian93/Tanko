@@ -15,13 +15,44 @@ struct TagPill: View {
 
     var body: some View {
         Text(text)
-            .font(.caption)
+            .font(.subheadline)
             .bold()
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
             .background(color.opacity(0.1))
             .foregroundStyle(color)
             .clipShape(Capsule())
+    }
+}
+
+// MARK: - FilterablePill (tappable → navega a Search)
+
+struct FilterablePill: View {
+    let text: String
+    let color: Color
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: 4) {
+                Text(text)
+                    .font(.caption)
+                    .bold()
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 9, weight: .bold))
+                    .opacity(0.7)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(color.opacity(0.1))
+            .foregroundStyle(color)
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(color.opacity(0.3), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
     }
 }
 
