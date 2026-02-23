@@ -545,13 +545,6 @@
 			path = Collection;
 			sourceTree = "<group>";
 		};
-		8489A1962F4BFFDD00640A60 /* Collection */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Collection;
-			sourceTree = "<group>";
-		};
 		849759A92F204D520049E62F /* Repository */ = {
 			isa = PBXGroup;
 			children = (
