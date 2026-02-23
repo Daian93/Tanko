@@ -11,10 +11,11 @@ struct EmojiPickerView: View {
     @Binding var selectedEmoji: String
 
     private let emojis = [
-        "🙂", "😎", "🤓", "😇", "🥳", "😺", "👾", "🐉", "🍀", "🔥", "🌸", "🌞", "🌙", "⭐️",
+        "🙂", "😎", "🤓", "😇", "🥳", "🔖", "📚", "📖", "👺", "🇯🇵", "🧚🏼‍♀️", "🐨", "🐼", "🌊", "🩵",
+        "💕", "👾", "🐉", "🍀", "🔥", "🌸", "🌞", "🌙", "⭐️",
     ]
 
-    private let columns = [GridItem(.adaptive(minimum: 50))]
+    private let columns = [GridItem(.adaptive(minimum: 110))]
 
     @Environment(\.dismiss) private var dismiss
 
@@ -41,10 +42,10 @@ struct EmojiPickerView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Selecciona un emoji")
+            .navigationTitle("emoji.select")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cerrar") { dismiss() }
+                    Button("button.close") { dismiss() }
                 }
             }
         }
@@ -52,5 +53,5 @@ struct EmojiPickerView: View {
 }
 
 #Preview {
-    EmojiPickerView(selectedEmoji: .constant("🙂"))
+    EmojiPickerView(selectedEmoji: .constant("🌸"))
 }

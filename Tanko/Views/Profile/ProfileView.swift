@@ -5,23 +5,21 @@
 //  Created by Diana Rammal Sansón on 11/2/26.
 //
 
-import SwiftData
 import SwiftUI
+import SwiftData
 
 struct ProfileView: View {
     @Environment(SessionManager.self) private var session
     @Environment(AppSettings.self) private var settings
-    @Environment(\.modelContext) private var context
 
     @State private var showEmojiPicker = false
-    @State private var showOnboarding = false
 
     var body: some View {
         @Bindable var settings = settings
 
         NavigationStack {
             #if os(macOS)
-                macContent(settings: _settings)
+            macContent(settings: _settings)
             #else
             iosContent(settings: _settings)
             #endif
@@ -29,119 +27,92 @@ struct ProfileView: View {
         .sheet(isPresented: $showEmojiPicker) {
             EmojiPickerView(selectedEmoji: $settings.profileEmoji)
         }
+        .background(.tankoBackground)
     }
+}
 
-    // MARK: - iOS Layout
+extension ProfileView {
+
     @ViewBuilder
-    private func iosContent(settings: Bindable<AppSettings>) -> some View {
+    func iosContent(settings: Bindable<AppSettings>) -> some View {
         Form {
-            Section("Personalización") {
-                VStack(spacing: 15) {
-                    profileImageSection
 
-                    TextField("Tu nombre", text: settings.userName)
-                        .multilineTextAlignment(.center)
-                        .font(.headline)
-                }
-                .padding(.vertical)
+            Section("profile.personalization") {
+                ProfileHeaderSection(
+                    userName: settings.userName,
+                    emoji: settings.profileEmoji.wrappedValue,
+                    onTapEmoji: { showEmojiPicker = true }
+                )
             }
 
-            Section("App") {
-                Toggle(isOn: settings.isDarkMode) {
-                    Label(
-                        "Modo oscuro",
-                        systemImage: settings.isDarkMode.wrappedValue
-                            ? "moon.fill" : "moon"
-                    )
-                }
+            Section("profile.appearance") {
+                AppearanceSection(isDarkMode: settings.isDarkMode)
             }
 
             Section {
-                logoutButton
+                LogoutSection(
+                    isGuest: session.isGuest,
+                    action: handleLogout
+                )
             } footer: {
                 if session.isGuest {
-                    Text(
-                        "Estás como invitado. Crea una cuenta para no perder tus datos."
-                    )
+                    Text("profile.guest.text")
                 }
             }
         }
-        .navigationTitle("Ajustes")
+        .navigationTitle("profile.title")
     }
+}
 
-    // MARK: - macOS Layout
+extension ProfileView {
     @ViewBuilder
-    private func macContent(settings: Bindable<AppSettings>) -> some View {
+    func macContent(settings: Bindable<AppSettings>) -> some View {
         ScrollView {
-            VStack(spacing: 30) {
-                Text("Ajustes")
+            VStack(spacing: 40) {
+
+                Text("profile.title")
                     .font(.system(size: 30, weight: .bold))
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                VStack(spacing: 20) {
-                    profileImageSection
-
-                    TextField("Tu nombre", text: settings.userName)
-                        .textFieldStyle(.roundedBorder)
-                        .multilineTextAlignment(.center)
-                        .font(.title3)
-                        .frame(maxWidth: 250)
-                }
+                ProfileHeaderSection(
+                    userName: settings.userName,
+                    emoji: settings.profileEmoji.wrappedValue,
+                    onTapEmoji: { showEmojiPicker = true }
+                )
                 .padding(30)
-                .background(Color.secondary.opacity(0.05))
+                .background(.tankoSecondary.opacity(0.05))
                 .clipShape(RoundedRectangle(cornerRadius: 20))
 
                 VStack(alignment: .leading, spacing: 20) {
-                    Toggle("Modo oscuro", isOn: settings.isDarkMode)
-                        .toggleStyle(.switch)
-
+                    AppearanceSection(isDarkMode: settings.isDarkMode)
                     Divider()
-
-                    logoutButton
-                        .buttonStyle(.borderedProminent)
+                    LogoutSection(
+                        isGuest: session.isGuest,
+                        action: handleLogout
+                    )
                 }
                 .padding(20)
 
                 if session.isGuest {
-                    Text("Modo invitado: los datos son locales.")
+                    Text("profile.guest.text")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.tankoSecondary)
                 }
             }
             .padding(40)
         }
     }
+}
 
-    // MARK: - Shared Components
-
-    private var profileImageSection: some View {
-        Text(settings.profileEmoji)
-            .font(.system(size: 80))
-            .padding()
-            .background(Circle().fill(Color.blue.opacity(0.1)))
-            .onTapGesture { showEmojiPicker = true }
-    }
-
-    private var logoutButton: some View {
-        Button(role: .destructive) {
-            handleLogout()
-        } label: {
-            Label(
-                session.isGuest ? "Volver al Inicio" : "Cerrar Sesión",
-                systemImage: session.isGuest
-                    ? "arrow.left.circle" : "rectangle.portrait.and.arrow.right"
-            )
-            .foregroundStyle(.red)
-        }
-    }
+extension ProfileView {
 
     private func handleLogout() {
-        withAnimation {
-            if session.isGuest {
-                session.exitGuest()
-            } else {
-                session.logout()
-            }
+        let wasGuest = session.isGuest
+
+        if wasGuest {
+            session.exitGuest()
+        } else {
+            session.logout()
         }
     }
 }
