@@ -32,7 +32,7 @@ struct MangaGridCard: View {
                         .overlay(
                             Image(systemName: "book")
                                 .font(.largeTitle)
-                                .foregroundStyle(.white.opacity(0.6))
+                                .foregroundStyle(.tankoPrimary)
                         )
                 }
                 .matchedGeometryEffect(id: "cover-\(manga.id)", in: namespace)
