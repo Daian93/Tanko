@@ -37,7 +37,7 @@ final class UserMangaCollectionViewModel {
         case leyendo     = "collection.filter.reading"
         case leidos      = "collection.filter.read"
         case completados = "collection.filter.complete"
-        
+
         var localized: LocalizedStringKey {
             LocalizedStringKey(self.rawValue)
         }
@@ -47,24 +47,27 @@ final class UserMangaCollectionViewModel {
         switch selectedFilter {
         case .todo:
             return mangas
+
         case .porEmpezar:
             return mangas.filter { ($0.readingVolume ?? 0) == 0 }
+
         case .leyendo:
             return mangas.filter {
-                guard let total = $0.totalVolumes else { return ($0.readingVolume ?? 0) > 0 }
                 let reading = $0.readingVolume ?? 0
-                return reading > 0 && reading < total
+                guard reading > 0 else { return false }
+                if let total = $0.totalVolumes, total > 0 { return reading < total }
+                return true
             }
+
         case .leidos:
-            return mangas.filter {
-                guard let total = $0.totalVolumes else { return false }
-                return ($0.readingVolume ?? 0) >= total
-            }
-        case .completados:
             return mangas.filter {
                 guard let total = $0.totalVolumes, total > 0 else { return false }
                 return ($0.readingVolume ?? 0) >= total
             }
+
+        case .completados:
+            // Tiene todos los tomos en estantería (completeCollection)
+            return mangas.filter { $0.completeCollection }
         }
     }
 
@@ -79,9 +82,10 @@ final class UserMangaCollectionViewModel {
 
     var collectionStats: CollectionStats {
         let reading = mangas.filter {
-            guard let total = $0.totalVolumes else { return false }
             let r = $0.readingVolume ?? 0
-            return r > 0 && r < total
+            guard r > 0 else { return false }
+            if let total = $0.totalVolumes, total > 0 { return r < total }
+            return true
         }.count
         let complete = mangas.filter { $0.completeCollection }.count
         let volumes = mangas.reduce(0) { $0 + $1.volumesOwned.count }

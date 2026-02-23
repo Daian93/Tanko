@@ -98,7 +98,11 @@ struct AdaptiveSectionContainer<Content: View>: View {
                     Text("This content is wrapped in a form section, which is more compact and integrates with the list style, making it suitable for forms or settings.")
                 }
             }
+            #if os(iOS)
             .listStyle(.insetGrouped)
+            #else
+            .listStyle(.inset)
+            #endif
             .frame(height: 200)
         }
         .padding(.vertical)

@@ -57,6 +57,11 @@ final class UserMangaDetailViewModel {
         return volumesOwned.count == definedTotal
     }
 
+    var isFullyRead: Bool {
+        guard let definedTotal = userManga.totalVolumes, definedTotal > 0 else { return false }
+        return readingVolume >= definedTotal
+    }
+
     var hasDynamicTotal: Bool {
         userManga.totalVolumes == nil
     }

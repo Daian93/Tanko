@@ -26,11 +26,18 @@ struct MangaProgressRow: View {
     private var safeReading: Int { min(reading, displayTotal) }
     private var safeTotal: Int { max(displayTotal, reading, 1) }
     private var progress: Double { Double(safeReading) / Double(safeTotal) }
-    private var isCompleted: Bool { safeReading >= safeTotal }
+
+    private var isFullyRead: Bool {
+        guard let total = totalVolumes, total > 0 else { return false }
+        return reading >= total
+    }
+
+    private var isCompleteCollection: Bool { userManga.completeCollection }
+
     private var progressColor: Color {
-        if isCompleted { return .green }
+        if isFullyRead { return .green }
         if progress == 0 { return .tankoSecondary }
-        if progress < 0.5 { return .tankoPrimary}
+        if progress < 0.5 { return .tankoPrimary }
         return .orange
     }
 
@@ -110,10 +117,14 @@ struct MangaProgressRow: View {
                 .foregroundStyle(.green)
                 .clipShape(Capsule())
 
-            if isCompleted {
+            if isCompleteCollection {
                 Label("badge.complete", systemImage: "checkmark.seal.fill")
                     .font(.caption2)
                     .foregroundStyle(.green)
+            } else if isFullyRead {
+                Label("badge.read", systemImage: "book.closed.fill")
+                    .font(.caption2)
+                    .foregroundStyle(.blue)
             }
         }
     }
