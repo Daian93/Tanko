@@ -37,6 +37,10 @@ final class UserMangaCollectionViewModel {
         case leyendo     = "collection.filter.reading"
         case leidos      = "collection.filter.read"
         case completados = "collection.filter.complete"
+        
+        var localized: LocalizedStringKey {
+            LocalizedStringKey(self.rawValue)
+        }
     }
 
     var filteredMangas: [UserManga] {
