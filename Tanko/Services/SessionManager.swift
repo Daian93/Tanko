@@ -15,6 +15,7 @@ final class SessionManager {
     private(set) var user: User?
     private(set) var token: String?
     var isGuest: Bool = false
+    var didLogout: Bool = false
 
     var isAuthenticated: Bool { token != nil }
     var canAccessApp: Bool { isAuthenticated || isGuest }
@@ -73,11 +74,7 @@ final class SessionManager {
         user = nil
         isGuest = false
         KeychainService.delete(key: SessionKeys.jwtToken)
-
-        NotificationCenter.default.post(
-            name: .didLogout,
-            object: nil
-        )
+        didLogout = true
     }
     
     func exitGuest() {
@@ -86,9 +83,4 @@ final class SessionManager {
         isGuest = false
     }
 
-}
-
-extension Notification.Name {
-    static let didLogout = Notification.Name("didLogout")
-    static let didLogin  = Notification.Name("didLogin")
 }

@@ -32,7 +32,6 @@ struct SearchResultsList: View {
                 .listRowSeparator(isLast ? .hidden : .visible, edges: .bottom)
                 .listRowSeparatorTint(.surface)
                 .listRowInsets(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 15))
-                .background(.tankoBackground)
                 .onAppear {
                     onLoadMore(manga)
                 }

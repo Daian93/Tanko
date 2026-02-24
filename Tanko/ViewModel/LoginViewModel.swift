@@ -53,10 +53,6 @@ final class LoginViewModel {
                 await LocalDatabaseCleaner.clear(context: context)
             }
             
-            await MainActor.run {
-                NotificationCenter.default.post(name: .didLogin, object: nil)
-            }
-            
         } catch {
             self.error = error.localizedDescription
         }

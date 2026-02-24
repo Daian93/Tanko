@@ -69,16 +69,16 @@ struct RootView: View {
                 buildViewModel()
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: .didLogout)) { _ in
+        .onChange(of: session.didLogout) { _, didLogout in
+            guard didLogout else { return }
             Task { @MainActor in
                 userCollectionVM?.invalidate()
                 userCollectionVM = nil
-      
                 await LocalDatabaseCleaner.clear(context: context)
                 await Task.yield()
-        
                 buildViewModel()
                 showLoadingOverlay = true
+                session.didLogout = false
             }
         }
     }

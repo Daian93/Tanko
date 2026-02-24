@@ -18,18 +18,22 @@ struct AppearanceSection: View {
                 Label {
                     Text("appearance.darkMode")
                 } icon: {
-                    Image(systemName: isDarkMode ? "moon.stars.fill" : "moon.stars")
-                        .foregroundStyle(.yellow)
-                        .symbolEffect(.bounce, value: isDarkMode)
+                    Image(
+                        systemName: isDarkMode
+                            ? "moon.stars.fill" : "moon.stars"
+                    )
+                    .foregroundStyle(.yellow)
+                    .symbolEffect(.bounce, value: isDarkMode)
                 }
             }
 
             // Language picker
             Picker(selection: $appLanguage) {
                 ForEach(AppSettings.AppLanguage.allCases) { lang in
-                    HStack(spacing: 6) {
-                        Text(lang.flag)
+                    Label {
                         Text(lang.label)
+                    } icon: {
+                        Text(lang.flag)
                     }
                     .tag(lang)
                 }
@@ -41,6 +45,7 @@ struct AppearanceSection: View {
                         .foregroundStyle(.blue)
                 }
             }
+            .pickerStyle(.menu)
         }
     }
 }

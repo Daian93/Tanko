@@ -3226,6 +3226,12 @@
             "state" : "translated",
             "value" : "Tanko v %1$@ (%2$@)"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tanko v %1$@ (%2$@)"
+          }
         }
       }
     },

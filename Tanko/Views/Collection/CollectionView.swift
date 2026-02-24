@@ -101,7 +101,7 @@ struct CollectionView: View {
                 .padding(.vertical)
             }
             .navigationTitle("collection.title")
-            .backgroundStyle(.tankoBackground)
+            .background(.tankoBackground)
             .onChange(of: router.searchPathResetToken) { _, _ in
                 router.collectionPath = NavigationPath()
             }
@@ -113,6 +113,25 @@ struct CollectionView: View {
                     namespace: namespace,
                     navigationPath: $router.collectionPath
                 )
+            }
+            .navigationDestination(for: Author.self) { author in
+                #if os(macOS)
+                AuthorMangaViewiPad(author: author)
+                #else
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    AuthorMangaViewiPad(author: author)
+                } else {
+                    AuthorMangaView(author: author)
+                }
+                #endif
+            }
+            .navigationDestination(for: MangaNavigation.self) { nav in
+                switch nav {
+                case .withTransition(let manga):
+                    MangaDetailView(manga: manga, namespace: namespace)
+                case .withoutTransition(let manga):
+                    MangaDetailView(manga: manga, namespace: nil)
+                }
             }
             .task {
                 if session.isAuthenticated {

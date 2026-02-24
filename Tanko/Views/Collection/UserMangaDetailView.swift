@@ -67,17 +67,6 @@ struct UserMangaDetailView: View {
                 )
             }
         }
-        .navigationDestination(for: Author.self) { author in
-            #if os(macOS)
-            AuthorMangaViewiPad(author: author)
-            #else
-            if UIDevice.current.userInterfaceIdiom == .pad {
-                AuthorMangaViewiPad(author: author)
-            } else {
-                AuthorMangaView(author: author)
-            }
-            #endif
-        }
     }
 }
 
