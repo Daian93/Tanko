@@ -39,6 +39,7 @@ struct ContactSection: View {
                 }
             }
         }
+        .background(.surface)
     }
 
     // MARK: - Actions

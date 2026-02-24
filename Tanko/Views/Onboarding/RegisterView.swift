@@ -10,6 +10,7 @@ import SwiftUI
 struct RegisterView: View {
     @Environment(SessionManager.self) private var session
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppSettings.self) private var settings
 
     @Bindable private var vm: RegisterViewModel
 
@@ -131,6 +132,7 @@ struct RegisterView: View {
                 }
             }
         }
+        .id(settings.appLanguage)
     }
 }
 

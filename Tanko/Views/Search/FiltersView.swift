@@ -9,6 +9,7 @@ import SwiftUI
 
 struct FiltersView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppSettings.self) private var settings
     @Bindable var filtersViewModel: FiltersViewModel
     let onApply: (CustomSearchDTO) -> Void
 
@@ -23,10 +24,14 @@ struct FiltersView: View {
                             filtersViewModel.resetAllFilters()
                         } label: {
                             Text("search.clean.all")
+                                .bold()
                         }
                     }
+                    .listRowBackground(Color.surface)
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(.tankoBackground)
             .navigationTitle("search.filters")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -41,6 +46,7 @@ struct FiltersView: View {
                 }
             }
         }
+        .id(settings.appLanguage)
     }
 }
 

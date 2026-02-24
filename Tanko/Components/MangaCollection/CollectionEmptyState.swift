@@ -14,7 +14,7 @@ struct CollectionEmptyState: View {
         switch filter {
         case .all:
             "collection.empty.todo"
-        case .toStart:
+        case .toRead:
             "collection.empty.to_start"
         case .reading:
             "collection.empty.reading"
@@ -28,7 +28,7 @@ struct CollectionEmptyState: View {
     private var icon: String {
         switch filter {
         case .all:        return "books.vertical"
-        case .toStart:  return "bookmark"
+        case .toRead:  return "bookmark"
         case .reading:     return "book"
         case .read:      return "book.closed"
         case .complete: return "checkmark.seal"

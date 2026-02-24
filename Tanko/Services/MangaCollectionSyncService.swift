@@ -94,14 +94,3 @@ final class MangaCollectionSyncService {
         )
     }
 }
-
-struct MangaSyncData {
-    let mangaID: Int
-    let title: String
-    let coverURL: URL?
-    let totalVolumes: Int?
-    let volumesOwned: [Int]
-    let readingVolume: Int?
-    let completeCollection: Bool
-    let updatedAt: Date
-}

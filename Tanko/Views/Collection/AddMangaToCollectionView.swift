@@ -13,6 +13,7 @@ struct AddMangaToCollectionView: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(UserMangaCollectionViewModel.self) private var collectionVM
+    @Environment(AppSettings.self) private var settings
 
     @State private var viewModel: AddMangaViewModel?
     @FocusState private var isTextFieldFocused: Bool
@@ -53,6 +54,7 @@ struct AddMangaToCollectionView: View {
                 .background(.tankoBackground)
             }
         }
+        .id(settings.appLanguage)
         .onAppear {
             viewModel = AddMangaViewModel(manga: manga, collectionVM: collectionVM)
         }

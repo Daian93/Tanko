@@ -17,7 +17,7 @@ struct ProfileHeaderSection: View {
             Text(emoji)
                 .font(.system(size: 80))
                 .padding()
-                .background(Circle().fill(Color.blue.opacity(0.1)))
+                .background(Circle().fill(.blue.opacity(0.1)))
                 .onTapGesture(perform: onTapEmoji)
 
             TextField("profile.name", text: $userName)
@@ -25,6 +25,7 @@ struct ProfileHeaderSection: View {
                 .font(.headline)
         }
         .padding(.vertical)
+        .background(.surface)
     }
 }
 

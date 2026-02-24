@@ -36,6 +36,7 @@ struct ProfileStatsSection: View {
                 )
             }
             .padding(.vertical, 8)
+            .background(.surface)
         } else {
             Text("stats.empty")
                 .font(.caption)

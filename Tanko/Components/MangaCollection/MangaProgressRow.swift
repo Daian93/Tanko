@@ -62,7 +62,6 @@ struct MangaProgressRow: View {
             .padding()
             .background(.surface)
             .clipShape(RoundedRectangle(cornerRadius: 18))
-            .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
             .overlay(alignment: .topTrailing) { deleteButton }
         }
         .buttonStyle(.plain)
@@ -108,8 +107,10 @@ struct MangaProgressRow: View {
     }
 
     private var badgesRow: some View {
-        HStack {
-            Label("\(userManga.volumesOwned.count) badge.volumes", systemImage: "books.vertical.fill")
+        HStack(spacing: 6) {
+
+            Label("\(userManga.volumesOwned.count) badge.volumes",
+                  systemImage: "books.vertical.fill")
                 .font(.caption2)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
@@ -117,14 +118,16 @@ struct MangaProgressRow: View {
                 .foregroundStyle(.green)
                 .clipShape(Capsule())
 
+            if isFullyRead {
+                Label("badge.read", systemImage: "book.closed.fill")
+                    .font(.caption2)
+                    .foregroundStyle(.blue)
+            }
+
             if isCompleteCollection {
                 Label("badge.complete", systemImage: "checkmark.seal.fill")
                     .font(.caption2)
                     .foregroundStyle(.green)
-            } else if isFullyRead {
-                Label("badge.read", systemImage: "book.closed.fill")
-                    .font(.caption2)
-                    .foregroundStyle(.blue)
             }
         }
     }

@@ -13,6 +13,7 @@ struct CollectionView: View {
     @Environment(UserMangaCollectionViewModel.self) private var collectionVM
     @Environment(SessionManager.self) private var session
     @Environment(\.modelContext) private var modelContext
+    @Environment(AppSettings.self) private var settings
 
     @State private var router = NavigationRouter.shared
     @State private var selectedFilter: UserMangaCollectionViewModel.CollectionFilter = .all
@@ -23,7 +24,7 @@ struct CollectionView: View {
         switch selectedFilter {
         case .all:
             return userMangas
-        case .toStart:
+        case .toRead:
             return userMangas.filter { ($0.readingVolume ?? 0) == 0 }
         case .reading:
             return userMangas.filter {
@@ -148,6 +149,7 @@ struct CollectionView: View {
                 }
             }
         }
+        .id(settings.appLanguage)
     }
 }
 

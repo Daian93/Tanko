@@ -24,6 +24,7 @@ struct ContentView: View {
     @Environment(UserMangaCollectionViewModel.self) private var userCollectionVM
     @Environment(MangaViewModel.self) private var viewModel
     @Environment(\.modelContext) private var modelContext
+    @Environment(AppSettings.self) private var settings
     
     @State private var bestMangaViewModel = BestMangaViewModel()
     @State private var router = NavigationRouter.shared
@@ -132,6 +133,7 @@ struct ContentView: View {
                 AddMangaToCollectionView(manga: manga)
             }
         }
+        .id(settings.appLanguage)
         .task {
             await viewModel.getMangas()
             await bestMangaViewModel.getBestMangas()

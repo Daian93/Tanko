@@ -25,10 +25,10 @@ struct ProfileView: View {
                 iosContent(settings: _settings)
             #endif
         }
+        .id(settings.appLanguage)
         .sheet(isPresented: $showEmojiPicker) {
             EmojiPickerView(selectedEmoji: $settings.profileEmoji)
         }
-        .background(.tankoBackground)
     }
 }
 
@@ -48,12 +48,15 @@ extension ProfileView {
                     onTapEmoji: { showEmojiPicker = true }
                 )
             }
+            .listRowBackground(Color.tankoCardSurface)
+            
 
             // Stats of the collection (only if there are mangas)
             if !collectionVM.mangas.isEmpty {
                 Section("profile.stats") {
                     ProfileStatsSection(stats: collectionVM.collectionStats)
                 }
+                .listRowBackground(Color.tankoCardSurface)
             }
 
             // Appearance settings (theme + language)
@@ -66,16 +69,19 @@ extension ProfileView {
                     settings.wrappedValue.updateLanguage(new)
                 }
             }
+            .listRowBackground(Color.tankoCardSurface)
 
             // Contact and support options
             Section("profile.support") {
                 ContactSection()
             }
+            .listRowBackground(Color.tankoCardSurface)
 
             // App version and logout
             Section {
                 AppVersionSection()
             }
+            .listRowBackground(Color.tankoCardSurface)
 
             // Cerrar sesión
             Section {
@@ -88,8 +94,11 @@ extension ProfileView {
                     Text("profile.guest.text")
                 }
             }
+            .listRowBackground(Color.tankoCardSurface)
         }
         .navigationTitle("profile.title")
+        .scrollContentBackground(.hidden)
+        .background(.tankoBackground)
     }
 }
 
@@ -121,7 +130,7 @@ extension ProfileView {
                     }
                 }
 
-                // Apariencia
+                // Appearance
                 macSection(title: "profile.appearance") {
                     AppearanceSection(
                         isDarkMode: settings.isDarkMode,
@@ -132,16 +141,16 @@ extension ProfileView {
                     }
                 }
 
-                // Soporte
+                // Contact and support
                 macSection(title: "profile.support") {
                     ContactSection()
                 }
 
-                // Versión + Logout
+                // Version + Logout
                 VStack(alignment: .leading, spacing: 12) {
                     AppVersionSection()
                     Divider()
-                    // Logout destacado en color tankoPrimary
+                    // Logout
                     Button(action: handleLogout) {
                         HStack(spacing: 10) {
                             Image(systemName: session.isGuest
@@ -156,17 +165,19 @@ extension ProfileView {
                         .padding(.vertical, 4)
                     }
                     .buttonStyle(.plain)
+                    .background(.surface)
 
                     if session.isGuest {
                         Text("profile.guest.text")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.tankoSecondary)
                     }
                 }
                 .macCard()
             }
             .padding(32)
-            .frame(maxWidth: .infinity) // ✅ Ocupa todo el ancho
+            .background(.tankoBackground)
+            .frame(maxWidth: .infinity)
         }
     }
 
@@ -183,6 +194,8 @@ extension ProfileView {
                 .foregroundStyle(.secondary)
             content()
         }
+        
+        .background(.surface)
         .macCard()
     }
 }
@@ -193,8 +206,8 @@ private extension View {
     func macCard() -> some View {
         self
             .padding(20)
-            .frame(maxWidth: .infinity, alignment: .leading) // ✅ Alarga hasta los bordes
-            .background(.tankoSecondary.opacity(0.05))
+            .background(.surface)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }

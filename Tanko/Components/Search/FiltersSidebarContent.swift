@@ -19,6 +19,7 @@ struct FiltersSidebarContent: View {
             TextField("author.surname", text: $filtersVM.searchAuthorLastName)
             Toggle("partial.search", isOn: $filtersVM.containsSearch)
         }
+        .listRowBackground(Color.surface)
 
         Section(header: Text("filter.categories")) {
             // Genres
@@ -75,6 +76,7 @@ struct FiltersSidebarContent: View {
                 )
             }
         }
+        .listRowBackground(Color.surface)
     }
 }
 

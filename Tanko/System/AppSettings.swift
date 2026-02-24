@@ -59,14 +59,6 @@ final class AppSettings {
             case .english:  return "🇬🇧"
             }
         }
-
-        var locale: Locale {
-            switch self {
-            case .system: return .current
-            case .spanish: return Locale(identifier: "es")
-            case .english: return Locale(identifier: "en")
-            }
-        }
     }
 
     // MARK: - Initialization

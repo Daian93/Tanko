@@ -12,6 +12,7 @@ struct LoginView: View {
     @Environment(SessionManager.self) private var session
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppSettings.self) private var settings
 
     @State private var vm: LoginViewModel
 
@@ -137,6 +138,7 @@ struct LoginView: View {
                 }
             }
         }
+        .id(settings.appLanguage)
     }
 }
 

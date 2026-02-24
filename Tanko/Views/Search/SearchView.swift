@@ -8,6 +8,7 @@ import SwiftUI
 
 struct SearchView: View {
     @Environment(UserMangaCollectionViewModel.self) private var collectionVM
+    @Environment(AppSettings.self) private var settings
 
     @State private var viewModel = SearchViewModel()
     @State private var filtersVM = FiltersViewModel()
@@ -108,6 +109,7 @@ struct SearchView: View {
                 }
             }
         }
+        .id(settings.appLanguage)
     }
 }
 

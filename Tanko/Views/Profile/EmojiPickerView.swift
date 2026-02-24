@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct EmojiPickerView: View {
+    @Environment(AppSettings.self) private var settings
     @Binding var selectedEmoji: String
 
     private let emojis = [
@@ -49,6 +50,7 @@ struct EmojiPickerView: View {
                 }
             }
         }
+        .id(settings.appLanguage)
     }
 }
 

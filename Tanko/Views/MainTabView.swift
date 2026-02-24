@@ -83,14 +83,12 @@ struct MainTabView: View {
         .onOpenURL { url in
             router.handleDeepLink(url, userMangas: allUserMangas)
         }
-        // Sync: router → selectedTab (deep links, pills, etc.)
         .onChange(of: router.selectedTabTag) { _, newTab in
             Task { @MainActor in
                 await Task.yield()
                 selectedTab = newTab
             }
         }
-        // Sync: selectedTab → router (usuario pulsa tab manualmente)
         .onChange(of: selectedTab) { _, newTab in
             if router.selectedTabTag != newTab {
                 router.selectedTabTag = newTab

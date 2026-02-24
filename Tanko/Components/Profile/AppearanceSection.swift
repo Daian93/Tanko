@@ -26,6 +26,7 @@ struct AppearanceSection: View {
                     .symbolEffect(.bounce, value: isDarkMode)
                 }
             }
+            .background(.surface)
 
             // Language picker
             Picker(selection: $appLanguage) {
@@ -46,6 +47,7 @@ struct AppearanceSection: View {
                 }
             }
             .pickerStyle(.menu)
+            .background(.surface)
         }
     }
 }

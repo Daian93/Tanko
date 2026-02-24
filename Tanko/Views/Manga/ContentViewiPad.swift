@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentViewiPad: View {
     @Environment(UserMangaCollectionViewModel.self) private var userCollectionVM
     @Environment(MangaViewModel.self) private var viewModel
+    @Environment(AppSettings.self) private var settings
     
     @State private var bestMangaViewModel = BestMangaViewModel()
     
@@ -128,6 +129,7 @@ struct ContentViewiPad: View {
                 AddMangaToCollectionView(manga: manga)
             }
         }
+        .id(settings.appLanguage)
         .task {
             await viewModel.getMangas()
             await bestMangaViewModel.getBestMangas()

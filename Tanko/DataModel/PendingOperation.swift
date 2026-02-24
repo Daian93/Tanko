@@ -75,37 +75,3 @@ final class PendingOperation {
         retryCount = 0
     }
 }
-
-// MARK: - MangaSyncData Codable
-
-// Struct used to represent manga data for synchronization purposes. It can be encoded/decoded to/from JSON for storage in PendingOperation.
-extension MangaSyncData: Codable {
-    enum CodingKeys: String, CodingKey {
-        case mangaID, title, coverURL, totalVolumes
-        case volumesOwned, readingVolume, completeCollection, updatedAt
-    }
-    
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        mangaID = try container.decode(Int.self, forKey: .mangaID)
-        title = try container.decode(String.self, forKey: .title)
-        coverURL = try container.decodeIfPresent(URL.self, forKey: .coverURL)
-        totalVolumes = try container.decodeIfPresent(Int.self, forKey: .totalVolumes)
-        volumesOwned = try container.decode([Int].self, forKey: .volumesOwned)
-        readingVolume = try container.decodeIfPresent(Int.self, forKey: .readingVolume)
-        completeCollection = try container.decode(Bool.self, forKey: .completeCollection)
-        updatedAt = try container.decode(Date.self, forKey: .updatedAt)
-    }
-    
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(mangaID, forKey: .mangaID)
-        try container.encode(title, forKey: .title)
-        try container.encodeIfPresent(coverURL, forKey: .coverURL)
-        try container.encodeIfPresent(totalVolumes, forKey: .totalVolumes)
-        try container.encode(volumesOwned, forKey: .volumesOwned)
-        try container.encodeIfPresent(readingVolume, forKey: .readingVolume)
-        try container.encode(completeCollection, forKey: .completeCollection)
-        try container.encode(updatedAt, forKey: .updatedAt)
-    }
-}

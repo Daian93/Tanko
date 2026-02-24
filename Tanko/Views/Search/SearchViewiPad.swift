@@ -8,6 +8,7 @@ import SwiftUI
 
 struct SearchViewiPad: View {
     @Environment(UserMangaCollectionViewModel.self) private var collectionVM
+    @Environment(AppSettings.self) private var settings
 
     @State private var viewModel = SearchViewModel()
     @State private var filtersVM = FiltersViewModel()
@@ -130,6 +131,7 @@ struct SearchViewiPad: View {
                 AuthorMangaViewiPad(author: author)
             }
         }
+        .id(settings.appLanguage)
     }
 }
 
