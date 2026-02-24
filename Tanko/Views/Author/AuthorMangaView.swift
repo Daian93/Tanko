@@ -10,7 +10,6 @@ import SwiftUI
 struct AuthorMangaView: View {
     let author: Author
     @State private var viewModel: AuthorViewModel
-    @Namespace private var namespace
 
     private let columns = [
         GridItem(.flexible(), spacing: 20),
@@ -37,10 +36,10 @@ struct AuthorMangaView: View {
                     LazyVGrid(columns: columns, spacing: 25) {
                         ForEach(viewModel.mangas) { manga in
                             NavigationLink(value: MangaNavigation.withoutTransition(manga)) {
-                                MangaGridCard(manga: manga, namespace: namespace)
-                                    .task {
-                                        await viewModel.loadNextPageIfNeeded(currentItem: manga)
-                                    }
+                                MangaGridCard(manga: manga)
+                            }
+                            .onAppear {
+                                Task { await viewModel.loadNextPageIfNeeded(currentItem: manga) }
                             }
                         }
                     }

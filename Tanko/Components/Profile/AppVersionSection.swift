@@ -26,7 +26,7 @@ struct AppVersionSection: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Text("Tanko v\(appVersion) (\(buildNumber))")
+            Text("tanko.version \(appVersion) (\(buildNumber))")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }

@@ -14,9 +14,10 @@ struct CollectionView: View {
     @Environment(SessionManager.self) private var session
     @Environment(\.modelContext) private var modelContext
 
-    @Namespace private var namespace
     @State private var router = NavigationRouter.shared
     @State private var selectedFilter: UserMangaCollectionViewModel.CollectionFilter = .all
+    
+    @Namespace private var namespace
 
     private var filteredMangas: [UserManga] {
         switch selectedFilter {
@@ -101,6 +102,9 @@ struct CollectionView: View {
             }
             .navigationTitle("collection.title")
             .backgroundStyle(.tankoBackground)
+            .onChange(of: router.searchPathResetToken) { _, _ in
+                router.collectionPath = NavigationPath()
+            }
             .navigationDestination(for: UserManga.self) { userManga in
                 UserMangaDetailView(
                     userManga: userManga,

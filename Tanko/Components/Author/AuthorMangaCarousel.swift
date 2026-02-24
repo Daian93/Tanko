@@ -10,7 +10,7 @@ struct AuthorMangaCarousel: View {
     let cardHeight: CGFloat
     let horizontalInset: CGFloat
     let canLoadMore: Bool
-    let onLoadMore: (Manga) async -> Void
+    let onLoadMore: (Manga) -> Void
 
     private let spacing: CGFloat = 40
 
@@ -18,11 +18,11 @@ struct AuthorMangaCarousel: View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: spacing) {
                 ForEach(mangas) { manga in
-                    NavigationLink(value: manga) {
+                    NavigationLink(value: MangaNavigation.withoutTransition(manga)) {
                         MangaCardLandscape(manga: manga, height: cardHeight)
-                            .task { await onLoadMore(manga) }
                     }
                     .buttonStyle(.plain)
+                    .onAppear { onLoadMore(manga) }
                 }
 
                 if canLoadMore {

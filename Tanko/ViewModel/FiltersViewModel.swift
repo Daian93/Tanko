@@ -85,4 +85,29 @@ final class FiltersViewModel {
         return count
     }
 
+    // MARK: - Toggle Actions
+
+    func toggleGenre(_ genre: Genre) {
+        if selectedGenres.contains(genre) {
+            selectedGenres.remove(genre)
+        } else {
+            selectedGenres.insert(genre)
+        }
+    }
+
+    func toggleTheme(_ theme: Theme) {
+        if selectedThemes.contains(theme) {
+            selectedThemes.remove(theme)
+        } else {
+            selectedThemes.insert(theme)
+        }
+    }
+
+    func toggleDemographic(_ demo: Demographic) {
+        if selectedDemographics.contains(demo) {
+            selectedDemographics.remove(demo)
+        } else {
+            selectedDemographics.insert(demo)
+        }
+    }
 }

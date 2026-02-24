@@ -64,7 +64,9 @@ struct AuthorMangaViewiPad: View {
                 horizontalInset: horizontalInset,
                 canLoadMore: viewModel.canLoadMore,
                 onLoadMore: { manga in
-                    await viewModel.loadNextPageIfNeeded(currentItem: manga)
+                    Task { await
+                        viewModel.loadNextPageIfNeeded(currentItem: manga)
+                    }
                 }
             )
 
@@ -103,7 +105,9 @@ struct AuthorMangaViewiPad: View {
                     cardWidth: cardWidth,
                     canLoadMore: viewModel.canLoadMore,
                     onLoadMore: { manga in
-                        await viewModel.loadNextPageIfNeeded(currentItem: manga)
+                        Task { await
+                            viewModel.loadNextPageIfNeeded(currentItem: manga)
+                        }
                     }
                 )
                 .padding(.horizontal, horizontalPadding)

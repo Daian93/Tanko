@@ -26,13 +26,15 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     
     @State private var bestMangaViewModel = BestMangaViewModel()
-    
+    @State private var router = NavigationRouter.shared
+    @State private var localPath = NavigationPath()
+
     @Namespace private var namespace
 
     var body: some View {
         @Bindable var mangasVM = viewModel
 
-        NavigationStack {
+        NavigationStack(path: $localPath) {
             Group {
                 switch viewModel.state {
 
@@ -122,6 +124,9 @@ struct ContentView: View {
             }
             .navigationDestination(for: Author.self) { author in
                 AuthorMangaView(author: author)
+            }
+            .onChange(of: router.searchPathResetToken) { _, _ in
+                localPath = NavigationPath()
             }
             .sheet(item: $mangasVM.selectedMangaForCollection) { manga in
                 AddMangaToCollectionView(manga: manga)

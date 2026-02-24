@@ -2,16 +2,12 @@
 //  MangaGridCard.swift
 //  Tanko
 //
-//  Created by Diana Rammal Sansón on 8/2/26.
-//
 
 import SwiftUI
 
 struct MangaGridCard: View {
 
     let manga: Manga
-    let namespace: Namespace.ID
-
     private let cardSize: CGFloat = 170
 
     var body: some View {
@@ -35,14 +31,11 @@ struct MangaGridCard: View {
                                 .foregroundStyle(.tankoPrimary)
                         )
                 }
-                .matchedGeometryEffect(id: "cover-\(manga.id)", in: namespace)
 
-                // Manga status
                 MangaStatusBadge(status: manga.status)
                     .padding(6)
             }
 
-            // Title and score under the cover
             VStack(alignment: .leading, spacing: 4) {
                 Text(manga.title)
                     .font(.subheadline)
@@ -60,7 +53,6 @@ struct MangaGridCard: View {
 }
 
 #Preview {
-    @Previewable @Namespace var namespace
-    MangaGridCard(manga: .test, namespace: namespace)
+    MangaGridCard(manga: .test)
         .padding()
 }

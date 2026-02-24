@@ -69,10 +69,6 @@ struct RegisterView: View {
                                 .padding()
                                 .background(.surface)
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
-                            
-                            Text("Usa al menos 8 caracteres con mayúsculas, minúsculas y números")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
                         }
                         
                         // Error message

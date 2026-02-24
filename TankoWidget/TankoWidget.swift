@@ -18,8 +18,8 @@ struct TankoWidget: Widget {
                     WidgetTheme.backgroundGradient
                 }
         }
-        .configurationDisplayName("Tanko - Leyendo")
-        .description("Ve tu progreso de lectura de manga")
+        .configurationDisplayName("widget.display.name")
+        .description("widget.description")
         .contentMarginsDisabled()
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }

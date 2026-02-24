@@ -28,7 +28,7 @@ struct TagPill: View {
 // MARK: - FilterablePill
 
 struct FilterablePill: View {
-    let text: String
+    let text: LocalizedStringKey
     let color: Color
     let onTap: () -> Void
 

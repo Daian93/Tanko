@@ -12,18 +12,16 @@ struct AuthorMangaGrid: View {
     let columns: [GridItem]
     let cardWidth: CGFloat
     let canLoadMore: Bool
-    let onLoadMore: (Manga) async -> Void
+    let onLoadMore: (Manga) -> Void
 
     var body: some View {
         LazyVGrid(columns: columns, spacing: 30) {
             ForEach(mangas) { manga in
-                NavigationLink(value: manga) {
+                NavigationLink(value: MangaNavigation.withoutTransition(manga)) {
                     MangaCardPortrait(manga: manga, width: cardWidth)
-                        .task {
-                            await onLoadMore(manga)
-                        }
                 }
                 .buttonStyle(.plain)
+                .onAppear { onLoadMore(manga) }
             }
 
             if canLoadMore {

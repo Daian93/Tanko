@@ -15,6 +15,7 @@ final class NavigationRouter {
     var selectedTabTag: Int = 0
     var collectionPath = NavigationPath()
     var pendingSearchFilter: CustomSearchDTO? = nil
+    var searchPathResetToken: UUID? = nil
 
     private init() {}
 
@@ -33,7 +34,7 @@ final class NavigationRouter {
         selectedTabTag = 1
         collectionPath = NavigationPath()
         Task {
-            try? await Task.sleep(for: .milliseconds(150))
+            try? await Task.sleep(for: .milliseconds(300))
             collectionPath.append(manga)
         }
     }
@@ -42,6 +43,7 @@ final class NavigationRouter {
 
     func navigateToSearch(filter: CustomSearchDTO) {
         pendingSearchFilter = nil
+        searchPathResetToken = UUID()
 
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(32))

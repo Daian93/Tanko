@@ -50,7 +50,7 @@ struct MangaDetailMetadata: View {
                 if !manga.genres.isEmpty {
                     FlowLayout(spacing: pillSpacing) {
                         ForEach(manga.genres) { genre in
-                            FilterablePill(text: genre.rawValue, color: .blue) {
+                            FilterablePill(text: genre.localized, color: .blue) {
                                 router.navigateToSearch(
                                     filter: CustomSearchDTO(
                                         genres: [genre.rawValue],
@@ -75,7 +75,7 @@ struct MangaDetailMetadata: View {
                 MetadataSection(title: themeSectionTitle) {
                     FlowLayout(spacing: pillSpacing) {
                         ForEach(manga.themes) { theme in
-                            FilterablePill(text: theme.rawValue, color: .purple)
+                            FilterablePill(text: theme.localized, color: .purple)
                             {
                                 router.navigateToSearch(
                                     filter: CustomSearchDTO(
@@ -100,7 +100,7 @@ struct MangaDetailMetadata: View {
                     FlowLayout(spacing: pillSpacing) {
                         ForEach(manga.demographics) { demographic in
                             FilterablePill(
-                                text: demographic.rawValue,
+                                text: demographic.localized,
                                 color: .green
                             ) {
                                 router.navigateToSearch(
