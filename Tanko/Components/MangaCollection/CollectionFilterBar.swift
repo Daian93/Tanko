@@ -51,6 +51,6 @@ private struct FilterPill: View {
 }
 
 #Preview {
-    @Previewable @State var filter = UserMangaCollectionViewModel.CollectionFilter.todo
+    @Previewable @State var filter = UserMangaCollectionViewModel.CollectionFilter.all
     CollectionFilterBar(selectedFilter: $filter)
 }

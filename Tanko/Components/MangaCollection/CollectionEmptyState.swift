@@ -12,26 +12,26 @@ struct CollectionEmptyState: View {
 
     private var message: LocalizedStringKey {
         switch filter {
-        case .todo:
+        case .all:
             "collection.empty.todo"
-        case .porEmpezar:
+        case .toStart:
             "collection.empty.to_start"
-        case .leyendo:
+        case .reading:
             "collection.empty.reading"
-        case .leidos:
+        case .read:
             "collection.empty.read"
-        case .completados:
+        case .complete:
             "collection.empty.completed"
         }
     }
 
     private var icon: String {
         switch filter {
-        case .todo:        return "books.vertical"
-        case .porEmpezar:  return "bookmark"
-        case .leyendo:     return "book"
-        case .leidos:      return "book.closed"
-        case .completados: return "checkmark.seal"
+        case .all:        return "books.vertical"
+        case .toStart:  return "bookmark"
+        case .reading:     return "book"
+        case .read:      return "book.closed"
+        case .complete: return "checkmark.seal"
         }
     }
 
@@ -52,5 +52,5 @@ struct CollectionEmptyState: View {
 }
 
 #Preview {
-    CollectionEmptyState(filter: .todo)
+    CollectionEmptyState(filter: .all)
 }

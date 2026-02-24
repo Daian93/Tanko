@@ -16,27 +16,27 @@ struct CollectionView: View {
 
     @Namespace private var namespace
     @State private var navigationPath = NavigationPath()
-    @State private var selectedFilter: UserMangaCollectionViewModel.CollectionFilter = .todo
+    @State private var selectedFilter: UserMangaCollectionViewModel.CollectionFilter = .all
 
     private var filteredMangas: [UserManga] {
         switch selectedFilter {
-        case .todo:
+        case .all:
             return userMangas
-        case .porEmpezar:
+        case .toStart:
             return userMangas.filter { ($0.readingVolume ?? 0) == 0 }
-        case .leyendo:
+        case .reading:
             return userMangas.filter {
                 let reading = $0.readingVolume ?? 0
                 guard reading > 0 else { return false }
                 if let total = $0.totalVolumes, total > 0 { return reading < total }
                 return true
             }
-        case .leidos:
+        case .read:
             return userMangas.filter {
                 guard let total = $0.totalVolumes, total > 0 else { return false }
                 return ($0.readingVolume ?? 0) >= total
             }
-        case .completados:
+        case .complete:
             return userMangas.filter { $0.completeCollection }
         }
     }
