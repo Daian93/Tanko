@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import SwiftData
 import Network
+import SwiftData
 
 @Observable
 @MainActor
@@ -25,10 +25,10 @@ final class OfflineOperationsManager {
     private(set) var isConnected: Bool = true
     private(set) var pendingOperationsCount: Int = 0
 
-    // Evita procesar la queue múltiples veces simultáneamente
+    // Avoid concurrent processing of the queue
     private var isProcessingQueue = false
 
-    // Callback para procesar la queue cuando vuelve la conexión
+    // Callback for notifying when connection is restored
     var onConnectionRestored: (() async -> Void)?
 
     // MARK: - Initialization
@@ -42,7 +42,6 @@ final class OfflineOperationsManager {
     // MARK: - Network Monitoring
 
     private func setupNetworkMonitoring() {
-        // Obtenemos el estado inicial ANTES de arrancar el monitor
         let initialPath = monitor.currentPath
         isConnected = initialPath.status == .satisfied
 
@@ -52,15 +51,17 @@ final class OfflineOperationsManager {
                 guard let self else { return }
                 let wasConnected = self.isConnected
 
-                // Solo actualizamos si realmente cambió el estado
+                // Only update state and trigger actions if the connection status actually changed
                 guard wasConnected != connected else { return }
 
                 self.isConnected = connected
                 print("📡 Red: \(connected ? "✅ Online" : "❌ Offline")")
 
-                // Si acabamos de recuperar conexión, procesamos la queue
+                // If we just regained connection, trigger processing of pending operations
                 if connected && !wasConnected {
-                    print("🔁 Conexión restaurada - procesando operaciones pendientes...")
+                    print(
+                        "🔁 Conexión restaurada - procesando operaciones pendientes..."
+                    )
                     await self.onConnectionRestored?()
                 }
             }
@@ -76,7 +77,7 @@ final class OfflineOperationsManager {
         mangaTitle: String,
         mangaData: MangaSyncData
     ) {
-        // Evitar duplicados: si ya existe una operación del mismo tipo para el mismo manga, la reemplazamos
+        // If an operation of the same type for the same manga already exists, remove it to avoid duplicates
         let existing = getPendingOperations().filter {
             $0.mangaID == mangaID && $0.action == action
         }
@@ -93,7 +94,9 @@ final class OfflineOperationsManager {
         try? modelContext.save()
         updatePendingCount()
 
-        print("📝 Encolado: \(action.rawValue.uppercased()) - \(mangaTitle) (\(pendingOperationsCount) pendientes)")
+        print(
+            "📝 Encolado: \(action.rawValue.uppercased()) - \(mangaTitle) (\(pendingOperationsCount) pendientes)"
+        )
     }
 
     func getPendingOperations() -> [PendingOperation] {
@@ -125,12 +128,20 @@ final class OfflineOperationsManager {
         using repository: RemoteMangaCollectionRepository
     ) async -> ProcessingResult {
         guard isConnected else {
-            return ProcessingResult(processed: 0, failed: 0, total: pendingOperationsCount)
+            return ProcessingResult(
+                processed: 0,
+                failed: 0,
+                total: pendingOperationsCount
+            )
         }
 
         guard !isProcessingQueue else {
             print("⚠️ Queue ya siendo procesada")
-            return ProcessingResult(processed: 0, failed: 0, total: pendingOperationsCount)
+            return ProcessingResult(
+                processed: 0,
+                failed: 0,
+                total: pendingOperationsCount
+            )
         }
 
         let operations = getPendingOperations()
@@ -151,14 +162,20 @@ final class OfflineOperationsManager {
                 try await processOperation(operation, using: repository)
                 dequeue(operation)
                 processed += 1
-                print("✅ \(operation.action.rawValue.uppercased()): \(operation.mangaTitle)")
+                print(
+                    "✅ \(operation.action.rawValue.uppercased()): \(operation.mangaTitle)"
+                )
             } catch {
                 operation.markAsFailed()
                 failed += 1
-                print("❌ Error: \(operation.mangaTitle) - \(error.localizedDescription)")
+                print(
+                    "❌ Error: \(operation.mangaTitle) - \(error.localizedDescription)"
+                )
 
                 if operation.retryCount > 3 {
-                    print("⚠️ Descartada tras \(operation.retryCount) intentos: \(operation.mangaTitle)")
+                    print(
+                        "⚠️ Descartada tras \(operation.retryCount) intentos: \(operation.mangaTitle)"
+                    )
                     dequeue(operation)
                 }
             }
@@ -168,10 +185,16 @@ final class OfflineOperationsManager {
         updatePendingCount()
 
         if processed > 0 || failed > 0 {
-            print("📊 Procesadas: \(processed) | Fallidas: \(failed) | Pendientes: \(pendingOperationsCount)")
+            print(
+                "📊 Procesadas: \(processed) | Fallidas: \(failed) | Pendientes: \(pendingOperationsCount)"
+            )
         }
 
-        return ProcessingResult(processed: processed, failed: failed, total: operations.count)
+        return ProcessingResult(
+            processed: processed,
+            failed: failed,
+            total: operations.count
+        )
     }
 
     private func processOperation(
@@ -199,6 +222,14 @@ final class OfflineOperationsManager {
             )
             try await repository.remove(userManga)
         }
+    }
+
+    // MARK: - Lifecycle
+
+    func stopMonitoring() {
+        monitor.cancel()
+        onConnectionRestored = nil
+        print("🛑 El monitor de red se ha detenido")
     }
 
     deinit {

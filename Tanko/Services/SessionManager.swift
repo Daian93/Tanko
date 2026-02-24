@@ -21,13 +21,17 @@ final class SessionManager {
 
     init(network: NetworkRepository = Network()) {
         self.network = network
-        restoreSession()
+        // Restore token synchronously (no Task, no state mutation during render)
+        if let savedToken = KeychainService.load(key: SessionKeys.jwtToken) {
+            self.token = savedToken
+        }
     }
 
-    func restoreSession() {
-        guard let savedToken = KeychainService.load(key: SessionKeys.jwtToken) else { return }
-        self.token = savedToken
-        Task { await loadCurrentUser() }
+    func restoreSession() async {
+        // Token is already restored in init synchronously.
+        // Here we just load the user profile if authenticated.
+        guard token != nil else { return }
+        await loadCurrentUser()
     }
 
     func login(email: String, password: String, onCompletion: (() async -> Void)? = nil) async throws {

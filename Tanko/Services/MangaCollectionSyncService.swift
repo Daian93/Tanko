@@ -5,17 +5,22 @@ import SwiftData
 final class MangaCollectionSyncService {
 
     private let localRepo: LocalMangaCollectionRepository
-    private let remoteRepo: RemoteMangaCollectionRepository
+    private let remoteRepo: RemoteMangaCollectionRepository?
 
     init(
         local: LocalMangaCollectionRepository,
-        remote: RemoteMangaCollectionRepository
+        remote: RemoteMangaCollectionRepository?
     ) {
         self.localRepo = local
         self.remoteRepo = remote
     }
 
     func sync() async throws {
+        guard let remoteRepo else {
+            print("⚠️ SyncService: sin repositorio remoto, omitiendo la sincronización")
+            return
+        }
+
         let localItems = try await localRepo.getCollection()
         let remoteItems = try await remoteRepo.getCollection()
 
@@ -66,10 +71,10 @@ final class MangaCollectionSyncService {
                 } else if let nsError = error as NSError?,
                     nsError.domain == NSCocoaErrorDomain && nsError.code == 3840
                 {
-                    print("⚠️ Server returned OK but no JSON for manga ID: \(id)")
+                    print("⚠️ El servidor respondió correctamente, pero no hay JSON para el ID del manga: \(id)")
                     continue
                 } else {
-                    print("⚠️ Error syncing manga ID \(id): \(error)")
+                    print("⚠️ Error al sincronizar el ID del manga \(id): \(error)")
                     throw NetworkError.general(error)
                 }
             }

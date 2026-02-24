@@ -12,11 +12,16 @@ enum LocalDatabaseCleaner {
 
     static func clear(context: ModelContext) async {
         do {
-            let fetch = FetchDescriptor<UserManga>()
-            let all = try context.fetch(fetch)
-            for item in all {
-                context.delete(item)
-            }
+            // Clear UserManga objects
+            let mangaFetch = FetchDescriptor<UserManga>()
+            let allMangas = try context.fetch(mangaFetch)
+            allMangas.forEach { context.delete($0) }
+
+            // Clear PendingOperation objects too
+            let pendingFetch = FetchDescriptor<PendingOperation>()
+            let allPending = try context.fetch(pendingFetch)
+            allPending.forEach { context.delete($0) }
+
             try context.save()
             print("🧹 Base de datos local limpiada")
         } catch {
