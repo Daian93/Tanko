@@ -32,17 +32,12 @@ enum PreviewHelper {
     static func makeCollectionVM() -> UserMangaCollectionViewModel {
         let context = container.mainContext
         let local = LocalMangaCollectionRepository(context: context)
-        let remote = RemoteMangaCollectionRepository(
-            network: Network(),
-            session: SessionManager(),
-            localRepo: local
-        )
-        let sync = MangaCollectionSyncService(local: local, remote: remote)
-        
+        let sync = MangaCollectionSyncService(local: local, remote: nil)
         return UserMangaCollectionViewModel(
             context: context,
             repository: local,
-            syncService: sync
+            syncService: sync,
+            isAuthenticated: false
         )
     }
 }

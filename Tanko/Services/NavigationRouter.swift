@@ -7,16 +7,13 @@
 
 import SwiftUI
 
-extension NSNotification.Name {
-    static let navigateToManga = NSNotification.Name("navigateToManga")
-}
-
 @Observable
 @MainActor
 final class NavigationRouter {
     static let shared = NavigationRouter()
 
     var selectedTabTag: Int = 0
+    var collectionPath = NavigationPath()
     var pendingSearchFilter: CustomSearchDTO? = nil
 
     private init() {}
@@ -34,12 +31,10 @@ final class NavigationRouter {
 
     func navigateToMangaDetail(_ manga: UserManga) {
         selectedTabTag = 1
+        collectionPath = NavigationPath()
         Task {
             try? await Task.sleep(for: .milliseconds(150))
-            NotificationCenter.default.post(
-                name: .navigateToManga,
-                object: manga
-            )
+            collectionPath.append(manga)
         }
     }
 

@@ -94,7 +94,7 @@ struct RootView: View {
               )
             : nil
 
-        let repo: MangaCollectionRepository = remote ?? local
+        let repo: any MangaCollectionRepository = remote ?? local
         let syncService = MangaCollectionSyncService(local: local, remote: remote)
 
         userCollectionVM = UserMangaCollectionViewModel(

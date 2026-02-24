@@ -15,7 +15,7 @@ struct CollectionView: View {
     @Environment(\.modelContext) private var modelContext
 
     @Namespace private var namespace
-    @State private var navigationPath = NavigationPath()
+    @State private var router = NavigationRouter.shared
     @State private var selectedFilter: UserMangaCollectionViewModel.CollectionFilter = .all
 
     private var filteredMangas: [UserManga] {
@@ -59,7 +59,7 @@ struct CollectionView: View {
     }
 
     var body: some View {
-        NavigationStack(path: $navigationPath) {
+        NavigationStack(path: $router.collectionPath) {
             ScrollView {
                 VStack(spacing: 24) {
 
@@ -107,7 +107,7 @@ struct CollectionView: View {
                     collectionVM: collectionVM,
                     modelContext: modelContext,
                     namespace: namespace,
-                    navigationPath: $navigationPath
+                    navigationPath: $router.collectionPath
                 )
             }
             .task {
@@ -122,14 +122,6 @@ struct CollectionView: View {
                     await collectionVM.synchronize()
                 } else {
                     await collectionVM.loadCollection()
-                }
-            }
-            .onReceive(
-                NotificationCenter.default.publisher(for: .navigateToManga)
-            ) { notification in
-                if let manga = notification.object as? UserManga {
-                    navigationPath = NavigationPath()
-                    navigationPath.append(manga)
                 }
             }
         }
