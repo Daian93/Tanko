@@ -17,18 +17,22 @@ struct UserMangaDetailView: View {
     init(
         userManga: UserManga,
         collectionVM: UserMangaCollectionViewModel,
+        modelContext: ModelContext,
         namespace: Namespace.ID,
         navigationPath: Binding<NavigationPath>
     ) {
-        self.viewModel = UserMangaDetailViewModel(userManga: userManga, collectionVM: collectionVM)
         self.namespace = namespace
         self._navigationPath = navigationPath
+        _viewModel = State(initialValue: UserMangaDetailViewModel(
+            userManga: userManga,
+            collectionVM: collectionVM,
+            modelContext: modelContext
+        ))
     }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 5) {
-                // Header with cover and title
                 UserMangaDetailHeader(
                     coverURL: viewModel.userManga.coverURL,
                     title: viewModel.userManga.title,
@@ -37,7 +41,6 @@ struct UserMangaDetailView: View {
                 .padding(.horizontal)
                 .padding(.top, 8)
 
-                // Editable content
                 EditMangaContentView(
                     volumesOwned: $viewModel.volumesOwned,
                     readingVolume: $viewModel.readingVolume,
@@ -82,11 +85,13 @@ struct UserMangaDetailView: View {
     @Previewable @Namespace var namespace
     @Previewable @State var path = NavigationPath()
     let collectionVM = PreviewHelper.makeCollectionVM()
+    let modelContext = PreviewHelper.makeModelContext()
 
-    NavigationStack(path: $path) {
+    NavigationStack {
         UserMangaDetailView(
             userManga: .monster,
             collectionVM: collectionVM,
+            modelContext: modelContext,
             namespace: namespace,
             navigationPath: $path
         )

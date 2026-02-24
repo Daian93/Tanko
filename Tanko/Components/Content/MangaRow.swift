@@ -34,9 +34,8 @@ struct MangaRow: View {
 
                     Spacer()
 
-                    // Bookmark icon if manga is in user's collection, tappable to trigger bookmark action
                     if isInCollection {
-                        Image(systemName: "bookmark.plus")
+                        Image(systemName: "bookmark.fill")
                             .foregroundStyle(.tankoPrimary)
                             .padding(.trailing, 2)
                     }
@@ -51,7 +50,7 @@ struct MangaRow: View {
                 Spacer(minLength: 20)
 
                 HStack {
-                    // Manga score/
+                    // Manga score
                     MangaRatingView(score: manga.formattedScore)
                         .font(.subheadline)
                         .foregroundStyle(.textSecondary)

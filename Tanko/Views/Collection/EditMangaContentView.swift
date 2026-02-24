@@ -85,7 +85,8 @@ struct EditMangaContentView: View {
     
     let testVM = UserMangaDetailViewModel(
             userManga: .monster,
-            collectionVM: PreviewHelper.makeCollectionVM()
+            collectionVM: PreviewHelper.makeCollectionVM(),
+            modelContext: PreviewHelper.makeModelContext()
         )
 
     EditMangaContentView(

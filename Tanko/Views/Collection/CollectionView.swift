@@ -12,14 +12,54 @@ struct CollectionView: View {
     @Query(sort: \UserManga.title) private var userMangas: [UserManga]
     @Environment(UserMangaCollectionViewModel.self) private var collectionVM
     @Environment(SessionManager.self) private var session
-    
+    @Environment(\.modelContext) private var modelContext
+
     @Namespace private var namespace
-    @State private var router = NavigationRouter.shared
+    @State private var navigationPath = NavigationPath()
+    @State private var selectedFilter: UserMangaCollectionViewModel.CollectionFilter = .todo
+
+    private var filteredMangas: [UserManga] {
+        switch selectedFilter {
+        case .todo:
+            return userMangas
+        case .porEmpezar:
+            return userMangas.filter { ($0.readingVolume ?? 0) == 0 }
+        case .leyendo:
+            return userMangas.filter {
+                let reading = $0.readingVolume ?? 0
+                guard reading > 0 else { return false }
+                if let total = $0.totalVolumes, total > 0 { return reading < total }
+                return true
+            }
+        case .leidos:
+            return userMangas.filter {
+                guard let total = $0.totalVolumes, total > 0 else { return false }
+                return ($0.readingVolume ?? 0) >= total
+            }
+        case .completados:
+            return userMangas.filter { $0.completeCollection }
+        }
+    }
+
+    private var stats: UserMangaCollectionViewModel.CollectionStats {
+        let reading = userMangas.filter {
+            let r = $0.readingVolume ?? 0
+            guard r > 0 else { return false }
+            if let total = $0.totalVolumes, total > 0 { return r < total }
+            return true
+        }.count
+        let complete = userMangas.filter { $0.completeCollection }.count
+        let volumes = userMangas.reduce(0) { $0 + $1.volumesOwned.count }
+        return UserMangaCollectionViewModel.CollectionStats(
+            total: userMangas.count,
+            reading: reading,
+            volumesOwned: volumes,
+            complete: complete
+        )
+    }
 
     var body: some View {
-        @Bindable var vm = collectionVM
-
-        NavigationStack(path: $router.collectionPath) {
+        NavigationStack(path: $navigationPath) {
             ScrollView {
                 VStack(spacing: 24) {
 
@@ -38,19 +78,19 @@ struct CollectionView: View {
                             .font(.title2.bold())
                             .padding(.horizontal)
 
-                        CollectionStatsGrid(stats: collectionVM.collectionStats)
+                        CollectionStatsGrid(stats: stats)
                     }
 
                     // MARK: - Filters
-                    CollectionFilterBar(selectedFilter: $vm.selectedFilter)
+                    CollectionFilterBar(selectedFilter: $selectedFilter)
 
                     // MARK: - List
                     VStack(spacing: 12) {
-                        if collectionVM.filteredMangas.isEmpty {
-                            CollectionEmptyState(filter: collectionVM.selectedFilter)
+                        if filteredMangas.isEmpty {
+                            CollectionEmptyState(filter: selectedFilter)
                                 .padding(.top, 40)
                         } else {
-                            ForEach(collectionVM.filteredMangas) { manga in
+                            ForEach(filteredMangas) { manga in
                                 MangaProgressRow(userManga: manga, namespace: namespace)
                             }
                         }
@@ -65,8 +105,9 @@ struct CollectionView: View {
                 UserMangaDetailView(
                     userManga: userManga,
                     collectionVM: collectionVM,
+                    modelContext: modelContext,
                     namespace: namespace,
-                    navigationPath: $router.collectionPath
+                    navigationPath: $navigationPath
                 )
             }
             .task {
@@ -81,6 +122,14 @@ struct CollectionView: View {
                     await collectionVM.synchronize()
                 } else {
                     await collectionVM.loadCollection()
+                }
+            }
+            .onReceive(
+                NotificationCenter.default.publisher(for: .navigateToManga)
+            ) { notification in
+                if let manga = notification.object as? UserManga {
+                    navigationPath = NavigationPath()
+                    navigationPath.append(manga)
                 }
             }
         }

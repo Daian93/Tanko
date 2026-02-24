@@ -24,6 +24,10 @@ enum PreviewHelper {
             return container
         }()
 
+    static func makeModelContext() -> ModelContext {
+        container.mainContext
+    }
+
     // Factory method to create a fully configured UserMangaCollectionViewModel for previews
     static func makeCollectionVM() -> UserMangaCollectionViewModel {
         let context = container.mainContext

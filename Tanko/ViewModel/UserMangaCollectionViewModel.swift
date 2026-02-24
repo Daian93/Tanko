@@ -29,14 +29,14 @@ final class UserMangaCollectionViewModel {
 
     // MARK: - Collection Filter
 
-    var selectedFilter: CollectionFilter = .todo
+    var selectedFilter: CollectionFilter = .all
 
     enum CollectionFilter: String, CaseIterable {
-        case todo        = "collection.filter.all"
-        case porEmpezar  = "collection.filter.notStarted"
-        case leyendo     = "collection.filter.reading"
-        case leidos      = "collection.filter.read"
-        case completados = "collection.filter.complete"
+        case all        = "collection.filter.all"
+        case toStart  = "collection.filter.notStarted"
+        case reading     = "collection.filter.reading"
+        case read      = "collection.filter.read"
+        case complete = "collection.filter.complete"
 
         var localized: LocalizedStringKey {
             LocalizedStringKey(self.rawValue)
@@ -45,13 +45,13 @@ final class UserMangaCollectionViewModel {
 
     var filteredMangas: [UserManga] {
         switch selectedFilter {
-        case .todo:
+        case .all:
             return mangas
 
-        case .porEmpezar:
+        case .toStart:
             return mangas.filter { ($0.readingVolume ?? 0) == 0 }
 
-        case .leyendo:
+        case .reading:
             return mangas.filter {
                 let reading = $0.readingVolume ?? 0
                 guard reading > 0 else { return false }
@@ -59,14 +59,13 @@ final class UserMangaCollectionViewModel {
                 return true
             }
 
-        case .leidos:
+        case .read:
             return mangas.filter {
                 guard let total = $0.totalVolumes, total > 0 else { return false }
                 return ($0.readingVolume ?? 0) >= total
             }
 
-        case .completados:
-            // Tiene todos los tomos en estantería (completeCollection)
+        case .complete:
             return mangas.filter { $0.completeCollection }
         }
     }
@@ -117,6 +116,12 @@ final class UserMangaCollectionViewModel {
         }
     }
     
+    // Call before destroying the VM to stop network monitoring safely
+    func invalidate() {
+        offlineManager.stopMonitoring()
+        mangas.removeAll()
+    }
+
     func synchronize() async {
         guard !isSyncing else {
             print("⚠️ Sincronización ya en progreso")
@@ -140,11 +145,11 @@ final class UserMangaCollectionViewModel {
             print("✅ Sincronización completada. Recargando datos...")
             await reloadFromLocalDatabase()
         } catch NetworkError.cancelled {
-            print("⚠️ Synchronization cancelled")
+            print("⚠️ Sincronización cancelada")
         } catch NetworkError.invalidJSON {
-            print("⚠️ Server returned OK but no valid JSON")
+            print("⚠️ El servidor respondió correctamente, pero no hay ningún JSON válido.")
         } catch {
-            print("❌ Error during synchronization: \(error)")
+            print("❌ Error durante la sincronización: \(error)")
         }
     }
     
@@ -162,9 +167,9 @@ final class UserMangaCollectionViewModel {
             await reloadFromLocalDatabase()
             
         } catch NetworkError.cancelled {
-            print("⚠️ Load cancelled")
+            print("⚠️ Carga cancelada")
         } catch {
-            print("❌ Error loading collection: \(error)")
+            print("❌ Error al cargar la colección: \(error)")
         }
     }
     
@@ -177,12 +182,12 @@ final class UserMangaCollectionViewModel {
             )
             
             self.mangas = try modelContext.fetch(descriptor)
-            print("✅ Local collection updated: \(mangas.count) mangas")
+            print("✅ Colección local actualizada: \(mangas.count) mangas")
             
             // Update widget after reloading
             updateWidget()
         } catch {
-            print("❌ Error reloading from local database: \(error)")
+            print("❌ Error al recargar desde la base de datos local: \(error)")
         }
     }
     
@@ -228,9 +233,9 @@ final class UserMangaCollectionViewModel {
             if offlineManager.isConnected {
                 do {
                     try await repository.add(mangaData: syncData)
-                    print("✅ Manga added to server")
+                    print("✅ Manga añadido al servidor")
                 } catch {
-                    print("⚠️ Failed to add to server, enqueueing: \(error)")
+                    print("⚠️ No se ha podido añadir al servidor, poniendo en cola: \(error)")
                     offlineManager.enqueue(
                         action: .add,
                         mangaID: newUserManga.mangaID,
@@ -239,7 +244,7 @@ final class UserMangaCollectionViewModel {
                     )
                 }
             } else {
-                print("📴 Offline - Enqueueing add operation for: \(newUserManga.title)")
+                print("📴 Sin conexión: operación de adición en cola para: \(newUserManga.title)")
                 offlineManager.enqueue(
                     action: .add,
                     mangaID: newUserManga.mangaID,
@@ -263,9 +268,9 @@ final class UserMangaCollectionViewModel {
         if offlineManager.isConnected {
             do {
                 try await repository.remove(manga)
-                print("✅ Manga deleted from server: \(manga.title)")
+                print("✅ Manga eliminado del servidor: \(manga.title)")
             } catch {
-                print("⚠️ Failed to delete from server, enqueueing: \(error)")
+                print("⚠️ No se ha podido eliminar del servidor, poniendo en cola: \(error)")
                 offlineManager.enqueue(
                     action: .delete,
                     mangaID: idToRemove,
@@ -274,7 +279,7 @@ final class UserMangaCollectionViewModel {
                 )
             }
         } else {
-            print("📴 Offline - Enqueueing delete operation for: \(manga.title)")
+            print("📴 Sin conexión: operación de eliminación en cola para: \(manga.title)")
             offlineManager.enqueue(
                 action: .delete,
                 mangaID: idToRemove,
@@ -306,10 +311,10 @@ final class UserMangaCollectionViewModel {
         if offlineManager.isConnected {
             do {
                 try await repository.add(mangaData: syncData)
-                print("✅ Synced with server")
+                print("✅ Sincronizado con el servidor")
                 updateWidget()
             } catch {
-                print("⚠️ Failed to sync, enqueueing update: \(error)")
+                print("⚠️ Error al sincronizar, poniendo en cola la actualización: \(error)")
                 offlineManager.enqueue(
                     action: .update,
                     mangaID: userManga.mangaID,
@@ -318,7 +323,7 @@ final class UserMangaCollectionViewModel {
                 )
             }
         } else {
-            print("📴 Offline - Enqueueing update operation for: \(userManga.title)")
+            print("📴 Sin conexión: operación de actualización en cola para: \(userManga.title)")
             offlineManager.enqueue(
                 action: .update,
                 mangaID: userManga.mangaID,

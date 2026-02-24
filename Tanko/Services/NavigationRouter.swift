@@ -7,13 +7,16 @@
 
 import SwiftUI
 
+extension NSNotification.Name {
+    static let navigateToManga = NSNotification.Name("navigateToManga")
+}
+
 @Observable
 @MainActor
 final class NavigationRouter {
     static let shared = NavigationRouter()
 
     var selectedTabTag: Int = 0
-    var collectionPath = NavigationPath()
     var pendingSearchFilter: CustomSearchDTO? = nil
 
     private init() {}
@@ -31,29 +34,32 @@ final class NavigationRouter {
 
     func navigateToMangaDetail(_ manga: UserManga) {
         selectedTabTag = 1
-        collectionPath = NavigationPath()
         Task {
             try? await Task.sleep(for: .milliseconds(150))
-            collectionPath.append(manga)
+            NotificationCenter.default.post(
+                name: .navigateToManga,
+                object: manga
+            )
         }
     }
 
     // MARK: - Search Navigation
 
-    // Navigate to the search tab with a specific filter.
     func navigateToSearch(filter: CustomSearchDTO) {
         pendingSearchFilter = nil
-        // Primero cambiamos de tab, luego seteamos el filtro
-        // En macOS necesitamos más tiempo para que SearchViewiPad se monte
-        selectedTabTag = 3
+
         Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(32))
+
+            selectedTabTag = 3
+
             #if os(macOS)
-            try? await Task.sleep(for: .milliseconds(200))
+            try? await Task.sleep(for: .milliseconds(300))
             #else
-            try? await Task.sleep(for: .milliseconds(50))
+            try? await Task.sleep(for: .milliseconds(200))
             #endif
+
             pendingSearchFilter = filter
         }
     }
 }
-

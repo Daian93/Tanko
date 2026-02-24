@@ -39,7 +39,7 @@ struct RootView: View {
             if session.canAccessApp {
                 buildViewModel()
     
-                try? await Task.sleep(nanoseconds: 100_000_000) 
+                try? await Task.sleep(nanoseconds: 100_000_000)
                 if let vm = userCollectionVM {
                     if session.isAuthenticated {
                         await vm.synchronize()
@@ -56,14 +56,27 @@ struct RootView: View {
                 }
             }
         }
-    
+        .task {
+            await session.restoreSession()
+        }
+
         .onChange(of: session.isAuthenticated) { _, newValue in
-            showLoadingOverlay = true
-            buildViewModel()
+            guard newValue else { return }
+            Task { @MainActor in
+                await Task.yield()
+                userCollectionVM?.invalidate()
+                showLoadingOverlay = true
+                buildViewModel()
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .didLogout)) { _ in
             Task { @MainActor in
+                userCollectionVM?.invalidate()
+                userCollectionVM = nil
+      
                 await LocalDatabaseCleaner.clear(context: context)
+                await Task.yield()
+        
                 buildViewModel()
                 showLoadingOverlay = true
             }
@@ -72,18 +85,18 @@ struct RootView: View {
 
     private func buildViewModel() {
         let local = LocalMangaCollectionRepository(context: context)
-        let remote: RemoteMangaCollectionRepository? = session.isAuthenticated
-            ? RemoteMangaCollectionRepository(network: Network(), session: session, localRepo: local)
-            : nil
-        
-        let repo: MangaCollectionRepository = remote ?? local
-        
 
-        let syncService = MangaCollectionSyncService(
-            local: local,
-            remote: remote ?? RemoteMangaCollectionRepository(network: Network(), session: session, localRepo: local)
-        )
-        
+        let remote: RemoteMangaCollectionRepository? = session.isAuthenticated
+            ? RemoteMangaCollectionRepository(
+                network: Network(),
+                session: session,
+                localRepo: local
+              )
+            : nil
+
+        let repo: MangaCollectionRepository = remote ?? local
+        let syncService = MangaCollectionSyncService(local: local, remote: remote)
+
         userCollectionVM = UserMangaCollectionViewModel(
             context: context,
             repository: repo,

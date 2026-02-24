@@ -23,6 +23,7 @@ struct MainTabView: View {
     @Environment(UserMangaCollectionViewModel.self) private var userCollectionVM
 
     @State private var router = NavigationRouter.shared
+    @State private var selectedTab: Int = 0
 
     @Query private var allUserMangas: [UserManga]
 
@@ -35,7 +36,7 @@ struct MainTabView: View {
     #endif
 
     var body: some View {
-        TabView(selection: $router.selectedTabTag) {
+        TabView(selection: $selectedTab) {
             Tab("tab.mangas", systemImage: "book.closed.fill", value: 0) {
                 #if os(macOS)
                     ContentViewiPad()
@@ -81,6 +82,19 @@ struct MainTabView: View {
         #endif
         .onOpenURL { url in
             router.handleDeepLink(url, userMangas: allUserMangas)
+        }
+        // Sync: router → selectedTab (deep links, pills, etc.)
+        .onChange(of: router.selectedTabTag) { _, newTab in
+            Task { @MainActor in
+                await Task.yield()
+                selectedTab = newTab
+            }
+        }
+        // Sync: selectedTab → router (usuario pulsa tab manualmente)
+        .onChange(of: selectedTab) { _, newTab in
+            if router.selectedTabTag != newTab {
+                router.selectedTabTag = newTab
+            }
         }
     }
 }

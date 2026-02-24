@@ -58,7 +58,8 @@ struct MangaInfoLink: View {
     let collectionVM = PreviewHelper.makeCollectionVM()
     let viewModel = UserMangaDetailViewModel(
         userManga: .monster,
-        collectionVM: collectionVM
+        collectionVM: collectionVM,
+        modelContext: PreviewHelper.makeModelContext()
     )
     
     NavigationStack {
