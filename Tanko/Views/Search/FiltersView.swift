@@ -10,7 +10,9 @@ import SwiftUI
 struct FiltersView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(AppSettings.self) private var settings
-    @Bindable var filtersViewModel: FiltersViewModel
+    
+    @State var filtersViewModel: FiltersViewModel
+    
     let onApply: (CustomSearchDTO) -> Void
 
     var body: some View {

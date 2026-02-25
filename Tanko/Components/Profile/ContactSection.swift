@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct ContactSection: View {
-
     private let supportEmail = "support@tankoapp.com"
     // Will be replaced with the actual App Store ID when available
     private let appStoreID   = "123456789"

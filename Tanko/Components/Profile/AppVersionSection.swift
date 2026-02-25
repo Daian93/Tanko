@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct AppVersionSection: View {
-
     private var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
     }

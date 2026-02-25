@@ -10,7 +10,7 @@ import SwiftUI
 // Contenido de filtros reutilizable entre FiltersView (iPhone sheet)
 // y SearchViewiPad (sidebar del NavigationSplitView)
 struct FiltersSidebarContent: View {
-    @Bindable var filtersVM: FiltersViewModel
+    @State var filtersVM: FiltersViewModel
 
     var body: some View {
         Section(header: Text("filter.header").font(.headline)) {

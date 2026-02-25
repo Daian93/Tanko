@@ -65,9 +65,6 @@ extension ProfileView {
                     isDarkMode: settings.isDarkMode,
                     appLanguage: settings.appLanguage
                 )
-                .onChange(of: settings.appLanguage.wrappedValue) { _, new in
-                    settings.wrappedValue.updateLanguage(new)
-                }
             }
             .listRowBackground(Color.tankoCardSurface)
 
@@ -136,9 +133,6 @@ extension ProfileView {
                         isDarkMode: settings.isDarkMode,
                         appLanguage: settings.appLanguage
                     )
-                    .onChange(of: settings.appLanguage.wrappedValue) { _, new in
-                        settings.wrappedValue.updateLanguage(new)
-                    }
                 }
 
                 // Contact and support

@@ -10,7 +10,8 @@ import SwiftUI
 // MARK: - Active Filters Chips Bar
 
 struct ActiveFiltersChips: View {
-    @Bindable var filtersVM: FiltersViewModel
+    @State var filtersVM: FiltersViewModel
+    
     let onFiltersChanged: () -> Void
 
     var body: some View {

@@ -12,7 +12,7 @@ struct RegisterView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(AppSettings.self) private var settings
 
-    @Bindable private var vm: RegisterViewModel
+    @State private var vm: RegisterViewModel
 
     init(session: SessionManager) {
         self.vm = RegisterViewModel(session: session)

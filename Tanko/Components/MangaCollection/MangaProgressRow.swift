@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct MangaProgressRow: View {
-    @Bindable var userManga: UserManga
-    let namespace: Namespace.ID
-
     @Environment(UserMangaCollectionViewModel.self) private var collectionVM
     @State private var showDeleteAlert = false
+    
+    let userManga: UserManga
+    let namespace: Namespace.ID
 
     // MARK: - Computed
 
