@@ -5,8 +5,8 @@
 //  Created by Diana Rammal Sansón on 13/2/26.
 //
 
-import WidgetKit
 import SwiftUI
+import WidgetKit
 
 @main
 struct TankoWidgetBundle: WidgetBundle {

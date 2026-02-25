@@ -5,8 +5,8 @@
 //  Created by Diana Rammal Sansón on 13/2/26.
 //
 
-import WidgetKit
 import SwiftUI
+import WidgetKit
 
 struct TankoWidget: Widget {
     let kind: String = "TankoWidget"
@@ -15,7 +15,7 @@ struct TankoWidget: Widget {
         StaticConfiguration(kind: kind, provider: TankoTimeline()) { entry in
             TankoWidgetView(entry: entry)
                 .containerBackground(for: .widget) {
-                    WidgetTheme.backgroundGradient
+                    WidgetTheme.widgetBackgroundColor
                 }
         }
         .configurationDisplayName("widget.display.name")

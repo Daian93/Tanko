@@ -13,12 +13,12 @@ struct EmptyStateView: View {
             Image(systemName: "books.vertical.fill")
                 .font(.system(size: 40))
                 .foregroundStyle(.white.opacity(0.4))
-            
+
             VStack(spacing: 4) {
                 Text("widget.no.manga")
                     .font(.subheadline.bold())
                     .foregroundStyle(.white.opacity(0.9))
-                
+
                 Text("widget.add.manga")
                     .font(.caption2)
                     .foregroundStyle(.white.opacity(0.6))

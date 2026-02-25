@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+
 struct MediumWidgetView: View {
     let mangas: [ReadingManga]
 

@@ -24,11 +24,24 @@ struct LargeWidgetView: View {
                 Spacer()
             }
             .padding(WidgetTheme.Spacing.cardPadding)
+        } else if mangas.count == 2 {
+            VStack(spacing: WidgetTheme.Spacing.cardPadding) {
+                ForEach(mangas) { manga in
+                    MangaCardWidget(manga: manga)
+                }
+            }
+            .padding(WidgetTheme.Spacing.cardPadding)
         } else {
             LazyVGrid(
                 columns: [
-                    GridItem(.flexible(), spacing: WidgetTheme.Spacing.cardPadding),
-                    GridItem(.flexible(), spacing: WidgetTheme.Spacing.cardPadding)
+                    GridItem(
+                        .flexible(),
+                        spacing: WidgetTheme.Spacing.cardPadding
+                    ),
+                    GridItem(
+                        .flexible(),
+                        spacing: WidgetTheme.Spacing.cardPadding
+                    ),
                 ],
                 spacing: WidgetTheme.Spacing.cardPadding
             ) {
