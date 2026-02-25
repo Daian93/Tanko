@@ -5,38 +5,33 @@
 //  Created by Diana Rammal Sansón on 17/2/26.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 @Observable
 @MainActor
 final class UserMangaDetailViewModel {
 
     // MARK: - Dependencies
+
     private let collectionVM: UserMangaCollectionViewModel
-    private let modelContext: ModelContext
-
-    // Store the ID to re-fetch if needed
-    private let mangaPersistentID: PersistentIdentifier
-
     private(set) var userManga: UserManga
 
     // MARK: - State
+
     var volumesOwned: Set<Int>
     var readingVolume: Int
     var manga: Manga? = nil
     var isLoadingManga = false
 
     // MARK: - Initialization
+
     init(
         userManga: UserManga,
-        collectionVM: UserMangaCollectionViewModel,
-        modelContext: ModelContext
+        collectionVM: UserMangaCollectionViewModel
     ) {
         self.userManga = userManga
-        self.mangaPersistentID = userManga.persistentModelID
         self.collectionVM = collectionVM
-        self.modelContext = modelContext
         self.volumesOwned = Set(userManga.volumesOwned)
         self.readingVolume = userManga.readingVolume ?? 0
     }
@@ -58,13 +53,10 @@ final class UserMangaDetailViewModel {
     }
 
     var isCompleteCollection: Bool {
-        guard let definedTotal = userManga.totalVolumes, definedTotal > 0 else { return false }
+        guard let definedTotal = userManga.totalVolumes, definedTotal > 0 else {
+            return false
+        }
         return volumesOwned.count == definedTotal
-    }
-
-    var isFullyRead: Bool {
-        guard let definedTotal = userManga.totalVolumes, definedTotal > 0 else { return false }
-        return readingVolume >= definedTotal
     }
 
     var hasDynamicTotal: Bool {
@@ -89,25 +81,17 @@ final class UserMangaDetailViewModel {
     // MARK: - Actions
 
     func saveChanges() {
-        // Re-fetch the object from the context to ensure it's not detached
-        guard let liveObject = modelContext.model(for: mangaPersistentID) as? UserManga else {
-            print("⚠️ UserManga separado del contexto, omitiendo guardar")
-            return
-        }
-
-        if let definedTotal = liveObject.totalVolumes {
+        if let definedTotal = userManga.totalVolumes {
             readingVolume = min(readingVolume, definedTotal)
         }
-        liveObject.readingVolume = readingVolume == 0 ? nil : readingVolume
-        liveObject.volumesOwned = Array(volumesOwned).sorted()
-        liveObject.completeCollection = isCompleteCollection
-        liveObject.updatedAt = .now
-        userManga = liveObject
 
-        try? modelContext.save()
+        userManga.readingVolume = readingVolume == 0 ? nil : readingVolume
+        userManga.volumesOwned = Array(volumesOwned).sorted()
+        userManga.completeCollection = isCompleteCollection
+        userManga.updatedAt = .now
 
         Task {
-            await collectionVM.updateRemote(liveObject)
+            await collectionVM.updateRemote(userManga)
         }
     }
 

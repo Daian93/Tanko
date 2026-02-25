@@ -25,8 +25,7 @@ struct UserMangaDetailView: View {
         self._navigationPath = navigationPath
         _viewModel = State(initialValue: UserMangaDetailViewModel(
             userManga: userManga,
-            collectionVM: collectionVM,
-            modelContext: modelContext
+            collectionVM: collectionVM
         ))
     }
 
