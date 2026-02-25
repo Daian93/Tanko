@@ -5,8 +5,8 @@
 //  Created by Diana Rammal Sansón on 10/2/26.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 @Observable
 @MainActor
@@ -15,7 +15,7 @@ final class RegisterViewModel {
 
     var email = ""
     var password = ""
-    var error: String?
+    var error: AuthError?
     var isLoading = false
 
     init(session: SessionManager) {
@@ -23,7 +23,8 @@ final class RegisterViewModel {
     }
 
     var isFormValid: Bool {
-        AuthValidator.isValidEmail(email) && AuthValidator.isValidPassword(password)
+        AuthValidator.isValidEmail(email)
+            && AuthValidator.isValidPassword(password)
     }
 
     func register() async {
@@ -35,18 +36,17 @@ final class RegisterViewModel {
         do {
             try await session.register(email: email, password: password)
             try await session.login(email: email, password: password)
-        } catch let authError as LocalizedError {
-            await MainActor.run {
-                self.error = authError.errorDescription
+        } catch let networkError as NetworkError {
+            switch networkError {
+            case .status(409): self.error = .emailAlreadyInUse
+            case .noInternet: self.error = .noInternet
+            case .timedOut: self.error = .timedOut
+            default: self.error = .unknown
             }
         } catch {
-            await MainActor.run {
-                self.error = String(localized: "auth.error.unknown")
-            }
+            self.error = .unknown
         }
 
-        await MainActor.run {
-            self.isLoading = false
-        }
+        self.isLoading = false
     }
 }

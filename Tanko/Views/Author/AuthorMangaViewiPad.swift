@@ -39,9 +39,10 @@ struct AuthorMangaViewiPad: View {
     @ViewBuilder
     private func landscapeLayout(geo: GeometryProxy) -> some View {
         let cardHeight = geo.size.height * 0.45
-        let cardWidth  = cardHeight * 0.7
+        let cardWidth = cardHeight * 0.7
         let spacing: CGFloat = 40
-        let totalContentWidth = CGFloat(viewModel.mangas.count) * cardWidth
+        let totalContentWidth =
+            CGFloat(viewModel.mangas.count) * cardWidth
             + CGFloat(max(viewModel.mangas.count - 1, 0)) * spacing
         let horizontalInset = max((geo.size.width - totalContentWidth) / 2, 60)
 
@@ -64,8 +65,8 @@ struct AuthorMangaViewiPad: View {
                 horizontalInset: horizontalInset,
                 canLoadMore: viewModel.canLoadMore,
                 onLoadMore: { manga in
-                    Task { await
-                        viewModel.loadNextPageIfNeeded(currentItem: manga)
+                    Task {
+                        await viewModel.loadNextPageIfNeeded(currentItem: manga)
                     }
                 }
             )
@@ -81,7 +82,8 @@ struct AuthorMangaViewiPad: View {
     private func portraitLayout(geo: GeometryProxy) -> some View {
         let horizontalPadding: CGFloat = 40
         let spacing: CGFloat = 30
-        let cardWidth = (geo.size.width - (horizontalPadding * 2) - (spacing * 2)) / 3
+        let cardWidth =
+            (geo.size.width - (horizontalPadding * 2) - (spacing * 2)) / 3
         let columns = [
             GridItem(.fixed(cardWidth), spacing: spacing),
             GridItem(.fixed(cardWidth), spacing: spacing),
@@ -105,8 +107,10 @@ struct AuthorMangaViewiPad: View {
                     cardWidth: cardWidth,
                     canLoadMore: viewModel.canLoadMore,
                     onLoadMore: { manga in
-                        Task { await
-                            viewModel.loadNextPageIfNeeded(currentItem: manga)
+                        Task {
+                            await viewModel.loadNextPageIfNeeded(
+                                currentItem: manga
+                            )
                         }
                     }
                 )

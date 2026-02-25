@@ -24,7 +24,8 @@ final class NavigationRouter {
     func handleDeepLink(_ url: URL, userMangas: [UserManga]) {
         guard url.scheme == "tanko", url.host == "manga" else { return }
         guard let idString = url.pathComponents.last,
-              let mangaID = Int(idString) else { return }
+            let mangaID = Int(idString)
+        else { return }
         if let manga = userMangas.first(where: { $0.mangaID == mangaID }) {
             navigateToMangaDetail(manga)
         }
@@ -51,9 +52,9 @@ final class NavigationRouter {
             selectedTabTag = 3
 
             #if os(macOS)
-            try? await Task.sleep(for: .milliseconds(300))
+                try? await Task.sleep(for: .milliseconds(300))
             #else
-            try? await Task.sleep(for: .milliseconds(200))
+                try? await Task.sleep(for: .milliseconds(200))
             #endif
 
             pendingSearchFilter = filter

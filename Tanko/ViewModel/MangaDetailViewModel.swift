@@ -37,7 +37,9 @@ final class MangaDetailViewModel {
 
     func toggleBookmark(manga: Manga) {
         if collectionVM.isInCollection(mangaID: manga.id) {
-            if let existing = collectionVM.mangas.first(where: { $0.mangaID == manga.id }) {
+            if let existing = collectionVM.mangas.first(where: {
+                $0.mangaID == manga.id
+            }) {
                 mangaToDelete = existing
                 showDeleteAlert = true
             }

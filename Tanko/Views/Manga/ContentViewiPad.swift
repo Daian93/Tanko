@@ -44,10 +44,13 @@ struct ContentViewiPad: View {
 
                                 #if os(macOS)
                                     Text("tab.mangas")
-                                    .font(.system(size: 30, weight: .bold))
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.horizontal)
-                                    .padding(.top)
+                                        .font(.system(size: 30, weight: .bold))
+                                        .frame(
+                                            maxWidth: .infinity,
+                                            alignment: .leading
+                                        )
+                                        .padding(.horizontal)
+                                        .padding(.top)
                                 #endif
                                 if !bestMangaViewModel.mangas.isEmpty {
                                     VStack(alignment: .leading, spacing: 12) {

@@ -12,7 +12,9 @@ extension UserManga {
     @MainActor static let onePiece = UserManga(
         mangaID: 13,
         title: "One Piece",
-        coverURL: URL(string: "https://cdn.myanimelist.net/images/manga/2/253146.jpg"),
+        coverURL: URL(
+            string: "https://cdn.myanimelist.net/images/manga/2/253146.jpg"
+        ),
         totalVolumes: nil,
         volumesOwned: Array(1...5),
         readingVolume: 5,
@@ -22,7 +24,9 @@ extension UserManga {
     @MainActor static let monster = UserManga(
         mangaID: 1,
         title: "Monster",
-        coverURL: URL(string: "https://cdn.myanimelist.net/images/manga/3/258224l.jpg"),
+        coverURL: URL(
+            string: "https://cdn.myanimelist.net/images/manga/3/258224l.jpg"
+        ),
         totalVolumes: 18,
         volumesOwned: Array(1...18),
         readingVolume: nil,
@@ -31,7 +35,6 @@ extension UserManga {
 
     @MainActor static let sampleCollection: [UserManga] = [
         onePiece,
-        monster
+        monster,
     ]
 }
-

@@ -16,9 +16,9 @@ final class PendingOperation {
         case update = "update"
         case delete = "delete"
     }
-    
+
     // MARK: - Properties
-    
+
     @Attribute(.unique) var id: UUID
     var actionRaw: String
     var mangaID: Int
@@ -27,16 +27,16 @@ final class PendingOperation {
     var timestamp: Date
     var retryCount: Int
     var hasFailed: Bool
-    
+
     // MARK: - Computed Properties
-    
+
     var action: Action {
         get { Action(rawValue: actionRaw) ?? .update }
         set { actionRaw = newValue.rawValue }
     }
-    
+
     // MARK: - Initialization
-    
+
     init(
         action: Action,
         mangaID: Int,
@@ -51,25 +51,25 @@ final class PendingOperation {
         self.timestamp = timestamp
         self.retryCount = 0
         self.hasFailed = false
-        
+
         // Serialize mangaData to JSON for storage
         if let mangaData = mangaData {
             self.mangaDataJSON = try? JSONEncoder().encode(mangaData)
         }
     }
-    
+
     // MARK: - Methods
-    
+
     func getMangaData() -> MangaSyncData? {
         guard let json = mangaDataJSON else { return nil }
         return try? JSONDecoder().decode(MangaSyncData.self, from: json)
     }
-    
+
     func markAsFailed() {
         hasFailed = true
         retryCount += 1
     }
-    
+
     func resetFailureState() {
         hasFailed = false
         retryCount = 0

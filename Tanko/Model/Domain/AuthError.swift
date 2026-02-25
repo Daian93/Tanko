@@ -9,24 +9,24 @@ import Foundation
 
 enum AuthError: LocalizedError {
     case invalidCredentials
-    case emailAlreadyExists
+    case emailAlreadyInUse
     case sessionExpired
-    case invalidEmail
-    case weakPassword
+    case noInternet
+    case timedOut
     case unknown
 
     var errorDescription: String? {
         switch self {
         case .invalidCredentials:
             String(localized: "auth.error.invalid_credentials")
-        case .emailAlreadyExists:
+        case .emailAlreadyInUse:
             String(localized: "auth.error.email_exists")
         case .sessionExpired:
             String(localized: "auth.error.session_expired")
-        case .invalidEmail:
-            String(localized: "auth.error.invalid_email")
-        case .weakPassword:
-            String(localized: "auth.error.weak_password")
+        case .noInternet:
+            String(localized: "auth.error.no_internet")
+        case .timedOut:
+            String(localized: "auth.error.timed_out")
         case .unknown:
             String(localized: "auth.error.unknown")
         }

@@ -14,7 +14,8 @@ enum MangaViewState: Equatable {
     case error(String)
 }
 
-@Observable @MainActor
+@Observable
+@MainActor
 final class MangaViewModel {
     let repository: NetworkRepository
 
@@ -84,7 +85,7 @@ final class MangaViewModel {
             errorMsg = error.localizedDescription
             showError = true
         }
-        
+
         isLoadingPage = false
     }
 

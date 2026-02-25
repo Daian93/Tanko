@@ -11,7 +11,7 @@ struct EditMangaContentView: View {
     @Binding var volumesOwned: Set<Int>
     @Binding var readingVolume: Int
     @FocusState.Binding var isTextFieldFocused: Bool
-    
+
     let totalVolumes: Int
     let maxVolume: Int
     let isCompleteCollection: Bool
@@ -82,11 +82,11 @@ struct EditMangaContentView: View {
     @Previewable @State var volumesOwned: Set<Int> = [1, 2, 3]
     @Previewable @State var readingVolume: Int = 2
     @Previewable @FocusState var isFocused: Bool
-    
+
     let testVM = UserMangaDetailViewModel(
-            userManga: .monster,
-            collectionVM: PreviewHelper.makeCollectionVM()
-        )
+        userManga: .monster,
+        collectionVM: PreviewHelper.makeCollectionVM()
+    )
 
     EditMangaContentView(
         volumesOwned: $volumesOwned,
@@ -101,4 +101,3 @@ struct EditMangaContentView: View {
         }
     )
 }
-

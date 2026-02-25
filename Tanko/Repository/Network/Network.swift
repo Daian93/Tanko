@@ -15,14 +15,6 @@ struct Network: NetworkRepository {
 
     // MARK: - Auth
     func createUser(email: String, password: String) async throws {
-        guard await AuthValidator.isValidEmail(email) else {
-            throw AuthError.invalidEmail
-        }
-
-        guard await AuthValidator.isValidPassword(password) else {
-            throw AuthError.weakPassword
-        }
-
         let body = UsersCreate(email: email, password: password)
         var request = URLRequest.post(url: .createUser, body: body)
 
@@ -32,17 +24,7 @@ struct Network: NetworkRepository {
         try await postJSON(request, status: 201)
     }
 
-    func login(email: String, password: String) async throws
-        -> String
-    {
-        guard await AuthValidator.isValidEmail(email) else {
-            throw AuthError.invalidEmail
-        }
-
-        guard await AuthValidator.isValidPassword(password) else {
-            throw AuthError.weakPassword
-        }
-
+    func login(email: String, password: String) async throws -> String {
         let credentials = "\(email):\(password)"
         guard let data = credentials.data(using: .utf8) else {
             throw NetworkError.invalidData

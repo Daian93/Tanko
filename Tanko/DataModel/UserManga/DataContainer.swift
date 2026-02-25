@@ -5,8 +5,8 @@
 //  Created by Diana Rammal Sansón on 20/1/26.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 enum DataContainer {
 

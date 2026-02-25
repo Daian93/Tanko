@@ -49,7 +49,6 @@ extension ProfileView {
                 )
             }
             .listRowBackground(Color.tankoCardSurface)
-            
 
             // Stats of the collection (only if there are mangas)
             if !collectionVM.mangas.isEmpty {
@@ -89,6 +88,7 @@ extension ProfileView {
             } footer: {
                 if session.isGuest {
                     Text("profile.guest.text")
+                        .padding(.bottom, 12)
                 }
             }
             .listRowBackground(Color.tankoCardSurface)
@@ -147,13 +147,16 @@ extension ProfileView {
                     // Logout
                     Button(action: handleLogout) {
                         HStack(spacing: 10) {
-                            Image(systemName: session.isGuest
-                                  ? "arrow.left.circle.fill"
-                                  : "rectangle.portrait.and.arrow.right.fill")
-                                .font(.system(size: 16, weight: .semibold))
-                            Text(session.isGuest ? "logout.guest" : "logout.user")
-                                .fontWeight(.semibold)
-                            Spacer()
+                            Image(
+                                systemName: session.isGuest
+                                    ? "arrow.left.circle.fill"
+                                    : "rectangle.portrait.and.arrow.right.fill"
+                            )
+                            .font(.system(size: 16, weight: .semibold))
+                            Text(
+                                session.isGuest ? "logout.guest" : "logout.user"
+                            )
+                            .fontWeight(.semibold)
                         }
                         .foregroundStyle(.tankoPrimary)
                         .padding(.vertical, 4)
@@ -188,7 +191,7 @@ extension ProfileView {
                 .foregroundStyle(.tankoSecondary)
             content()
         }
-        
+
         .background(.surface)
         .macCard()
     }
@@ -196,8 +199,8 @@ extension ProfileView {
 
 // MARK: - Mac Card ViewModifier
 
-private extension View {
-    func macCard() -> some View {
+extension View {
+    fileprivate func macCard() -> some View {
         self
             .padding(20)
             .background(.surface)

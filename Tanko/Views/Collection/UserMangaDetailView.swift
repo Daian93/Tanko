@@ -5,8 +5,8 @@
 //  Created by Diana Rammal Sansón on 17/2/26.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct UserMangaDetailView: View {
     @State private var viewModel: UserMangaDetailViewModel
@@ -23,10 +23,12 @@ struct UserMangaDetailView: View {
     ) {
         self.namespace = namespace
         self._navigationPath = navigationPath
-        _viewModel = State(initialValue: UserMangaDetailViewModel(
-            userManga: userManga,
-            collectionVM: collectionVM
-        ))
+        _viewModel = State(
+            initialValue: UserMangaDetailViewModel(
+                userManga: userManga,
+                collectionVM: collectionVM
+            )
+        )
     }
 
     var body: some View {

@@ -80,4 +80,3 @@ struct AddMangaContentView: View {
         isCompleteCollection: false
     )
 }
-

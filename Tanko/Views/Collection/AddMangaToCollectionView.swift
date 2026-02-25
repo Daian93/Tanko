@@ -44,7 +44,9 @@ struct AddMangaToCollectionView: View {
                             }
                         } label: {
                             HStack(spacing: 4) {
-                                if vm.isAdding { ProgressView().scaleEffect(0.8) }
+                                if vm.isAdding {
+                                    ProgressView().scaleEffect(0.8)
+                                }
                                 Text("button.add")
                             }
                         }
@@ -56,7 +58,10 @@ struct AddMangaToCollectionView: View {
         }
         .id(settings.appLanguage)
         .onAppear {
-            viewModel = AddMangaViewModel(manga: manga, collectionVM: collectionVM)
+            viewModel = AddMangaViewModel(
+                manga: manga,
+                collectionVM: collectionVM
+            )
         }
     }
 }

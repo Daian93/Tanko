@@ -35,7 +35,11 @@ final class SessionManager {
         await loadCurrentUser()
     }
 
-    func login(email: String, password: String, onCompletion: (() async -> Void)? = nil) async throws {
+    func login(
+        email: String,
+        password: String,
+        onCompletion: (() async -> Void)? = nil
+    ) async throws {
         let jwt = try await network.login(email: email, password: password)
 
         self.token = jwt
@@ -44,13 +48,16 @@ final class SessionManager {
 
         await loadCurrentUser()
     }
-    
+
     func loadCurrentUser() async {
         guard let token else { return }
 
         do {
             let request = URLRequest.get(url: .jwtMe, bearerToken: token)
-            let response: UserResponse = try await network.getJSON(request, type: UserResponse.self)
+            let response: UserResponse = try await network.getJSON(
+                request,
+                type: UserResponse.self
+            )
             self.user = response.toDomain
             print("✅ Usuario JWT cargado correctamente")
         } catch {
@@ -76,7 +83,7 @@ final class SessionManager {
         KeychainService.delete(key: SessionKeys.jwtToken)
         didLogout = true
     }
-    
+
     func exitGuest() {
         token = nil
         user = nil

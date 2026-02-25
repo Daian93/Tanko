@@ -16,8 +16,9 @@ struct CollectionView: View {
     @Environment(AppSettings.self) private var settings
 
     @State private var router = NavigationRouter.shared
-    @State private var selectedFilter: UserMangaCollectionViewModel.CollectionFilter = .all
-    
+    @State private var selectedFilter:
+        UserMangaCollectionViewModel.CollectionFilter = .all
+
     @Namespace private var namespace
 
     private var filteredMangas: [UserManga] {
@@ -30,12 +31,16 @@ struct CollectionView: View {
             return userMangas.filter {
                 let reading = $0.readingVolume ?? 0
                 guard reading > 0 else { return false }
-                if let total = $0.totalVolumes, total > 0 { return reading < total }
+                if let total = $0.totalVolumes, total > 0 {
+                    return reading < total
+                }
                 return true
             }
         case .read:
             return userMangas.filter {
-                guard let total = $0.totalVolumes, total > 0 else { return false }
+                guard let total = $0.totalVolumes, total > 0 else {
+                    return false
+                }
                 return ($0.readingVolume ?? 0) >= total
             }
         case .complete:
@@ -65,18 +70,20 @@ struct CollectionView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     #if os(macOS)
-                    Text("collection.title")
-                        .font(.system(size: 30, weight: .bold))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal)
-                        .padding(.top)
+                        Text("collection.title")
+                            .font(.system(size: 30, weight: .bold))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal)
+                            .padding(.top)
                     #endif
 
                     // MARK: - Offline Banner
                     if collectionVM.hasPendingOperations {
                         OfflineBanner(
-                            isConnected: collectionVM.offlineManager.isConnected,
-                            pendingCount: collectionVM.offlineManager.pendingOperationsCount
+                            isConnected: collectionVM.offlineManager
+                                .isConnected,
+                            pendingCount: collectionVM.offlineManager
+                                .pendingOperationsCount
                         )
                         .padding(.horizontal)
                     }
@@ -100,7 +107,10 @@ struct CollectionView: View {
                                 .padding(.top, 40)
                         } else {
                             ForEach(filteredMangas) { manga in
-                                MangaProgressRow(userManga: manga, namespace: namespace)
+                                MangaProgressRow(
+                                    userManga: manga,
+                                    namespace: namespace
+                                )
                             }
                         }
                     }
@@ -124,13 +134,13 @@ struct CollectionView: View {
             }
             .navigationDestination(for: Author.self) { author in
                 #if os(macOS)
-                AuthorMangaViewiPad(author: author)
-                #else
-                if UIDevice.current.userInterfaceIdiom == .pad {
                     AuthorMangaViewiPad(author: author)
-                } else {
-                    AuthorMangaView(author: author)
-                }
+                #else
+                    if UIDevice.current.userInterfaceIdiom == .pad {
+                        AuthorMangaViewiPad(author: author)
+                    } else {
+                        AuthorMangaView(author: author)
+                    }
                 #endif
             }
             .navigationDestination(for: MangaNavigation.self) { nav in

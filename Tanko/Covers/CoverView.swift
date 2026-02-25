@@ -30,11 +30,12 @@ struct CoverView: View {
                             .scaledToFill()
                             .frame(width: 70, height: 100)
                             .clipShape(RoundedRectangle(cornerRadius: 11))
-                        
+
                         if let namespace = namespace {
                             imageView
                                 .matchedTransitionSource(
-                                    id: cover?.lastPathComponent ?? UUID().uuidString,
+                                    id: cover?.lastPathComponent
+                                        ?? UUID().uuidString,
                                     in: namespace
                                 )
                         } else {
@@ -46,11 +47,12 @@ struct CoverView: View {
                             .scaledToFill()
                             .frame(width: 70, height: 100)
                             .clipShape(RoundedRectangle(cornerRadius: 11))
-                        
+
                         if let namespace = namespace {
                             imageView
                                 .matchedTransitionSource(
-                                    id: cover?.lastPathComponent ?? UUID().uuidString,
+                                    id: cover?.lastPathComponent
+                                        ?? UUID().uuidString,
                                     in: namespace
                                 )
                         } else {
@@ -61,7 +63,8 @@ struct CoverView: View {
                     if let namespace = namespace {
                         placeholder
                             .matchedTransitionSource(
-                                id: cover?.lastPathComponent ?? UUID().uuidString,
+                                id: cover?.lastPathComponent
+                                    ?? UUID().uuidString,
                                 in: namespace
                             )
                     } else {
@@ -76,12 +79,13 @@ struct CoverView: View {
                             .scaledToFill()
                             .frame(width: 120, height: 160)
                             .clipShape(RoundedRectangle(cornerRadius: 11))
-                        
+
                         if let namespace = namespace {
                             imageView
                                 .navigationTransition(
                                     .zoom(
-                                        sourceID: cover?.lastPathComponent ?? UUID().uuidString,
+                                        sourceID: cover?.lastPathComponent
+                                            ?? UUID().uuidString,
                                         in: namespace
                                     )
                                 )
@@ -101,7 +105,8 @@ struct CoverView: View {
                             placeholder
                                 .navigationTransition(
                                     .zoom(
-                                        sourceID: cover?.lastPathComponent ?? UUID().uuidString,
+                                        sourceID: cover?.lastPathComponent
+                                            ?? UUID().uuidString,
                                         in: namespace
                                     )
                                 )

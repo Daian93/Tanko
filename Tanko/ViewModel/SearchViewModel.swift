@@ -84,7 +84,8 @@ final class SearchViewModel {
     }
 
     // Apply a pending filter coming from the chips in SearchView
-    func applyPendingFilter(_ dto: CustomSearchDTO, filtersVM: FiltersViewModel) {
+    func applyPendingFilter(_ dto: CustomSearchDTO, filtersVM: FiltersViewModel)
+    {
         searchText = ""
         searchTask?.cancel()
         filtersVM.applyFromDTO(dto)
@@ -110,7 +111,8 @@ final class SearchViewModel {
     func retry(filtersVM: FiltersViewModel) {
         Task { [weak self] in
             guard let self else { return }
-            let mode: SearchMode = filtersVM.hasActiveFilters
+            let mode: SearchMode =
+                filtersVM.hasActiveFilters
                 ? .advanced(dto: filtersVM.createSearchDTO())
                 : .simple(title: searchText)
             await search(mode: mode)
@@ -125,9 +127,9 @@ final class SearchViewModel {
 
         do {
             let page = try await fetchPage(for: mode, page: currentPage)
-            
+
             guard !Task.isCancelled else { return }
-            
+
             results = page.items
             hasMorePages = page.metadata.hasNextPage
             state = results.isEmpty ? .empty : .loaded
@@ -163,7 +165,7 @@ final class SearchViewModel {
     private func loadNextPage(using mode: SearchMode) async {
         currentPage += 1
         isLoadingNextPage = true
-        
+
         do {
             let page = try await fetchPage(for: mode, page: currentPage)
             guard !Task.isCancelled else { return }
@@ -171,12 +173,12 @@ final class SearchViewModel {
             let newItems = page.items.filter { item in
                 !results.contains(where: { $0.id == item.id })
             }
-            
+
             results.append(contentsOf: newItems)
             hasMorePages = page.metadata.hasNextPage
         } catch {
             currentPage -= 1
-            
+
             if results.isEmpty {
                 state = .error(error.localizedDescription)
             } else {
@@ -187,20 +189,34 @@ final class SearchViewModel {
         isLoadingNextPage = false
     }
 
-    private func fetchPage(for mode: SearchMode, page: Int) async throws -> Page<Manga> {
+    private func fetchPage(for mode: SearchMode, page: Int) async throws
+        -> Page<Manga>
+    {
         switch mode {
         case .simple(let title):
             if title.count < 3 {
                 let items = try await repository.searchMangasBeginsWith(title)
                 return Page(
-                    metadata: PageMetadata(total: items.count, page: 1, per: items.count),
+                    metadata: PageMetadata(
+                        total: items.count,
+                        page: 1,
+                        per: items.count
+                    ),
                     items: items
                 )
             } else {
-                return try await repository.searchMangasContains(title, page: page, per: perPage)
+                return try await repository.searchMangasContains(
+                    title,
+                    page: page,
+                    per: perPage
+                )
             }
         case .advanced(let dto):
-            return try await repository.advancedSearch(dto, page: page, per: perPage)
+            return try await repository.advancedSearch(
+                dto,
+                page: page,
+                per: perPage
+            )
         }
     }
 

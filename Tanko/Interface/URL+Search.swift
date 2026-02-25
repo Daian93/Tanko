@@ -14,7 +14,6 @@ extension URL {
         perPage: Int = NetworkConstants.defaultPerPage
     ) -> URL {
         api
-
             .appending(path: "search/mangasContains").appending(path: search)
             .appending(queryItems: [
                 URLQueryItem(name: "page", value: "\(page)"),

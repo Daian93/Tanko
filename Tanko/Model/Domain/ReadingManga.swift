@@ -7,9 +7,7 @@
 
 import Foundation
 
-/// Lightweight model used by the Tanko widget.
-/// Contains only the necessary information to display
-/// the user's current reading progress.
+/* Lightweight model used by the Tanko widget. Contains only the necessary information to display the user's current reading progress. */
 struct ReadingManga: Identifiable, Codable, Hashable {
 
     // MARK: - Core Data

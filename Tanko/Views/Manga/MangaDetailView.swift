@@ -79,22 +79,28 @@ struct MangaDetailView: View {
         .navigationBarTitleDisplayModeCompatible(.inline)
         .toolbar {
             ToolbarItem(
-                placement: CompatibleToolbarItemPlacement.topBarTrailing.placement
+                placement: CompatibleToolbarItemPlacement.topBarTrailing
+                    .placement
             ) {
                 Button {
                     viewModel?.toggleBookmark(manga: manga)
                 } label: {
-                    Image(systemName: isInCollection ? "bookmark.fill" : "bookmark")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(isInCollection ? .tankoPrimary : .primary)
+                    Image(
+                        systemName: isInCollection
+                            ? "bookmark.fill" : "bookmark"
+                    )
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(isInCollection ? .tankoPrimary : .primary)
                 }
                 .animation(.easeInOut(duration: 0.2), value: isInCollection)
             }
         }
-        .sheet(isPresented: Binding(
-            get: { viewModel?.showAddSheet ?? false },
-            set: { viewModel?.showAddSheet = $0 }
-        )) {
+        .sheet(
+            isPresented: Binding(
+                get: { viewModel?.showAddSheet ?? false },
+                set: { viewModel?.showAddSheet = $0 }
+            )
+        ) {
             AddMangaToCollectionView(manga: manga)
                 .environment(collectionVM)
         }

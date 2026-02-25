@@ -17,7 +17,9 @@ final class MangaCollectionSyncService {
 
     func sync() async throws {
         guard let remoteRepo else {
-            print("⚠️ SyncService: sin repositorio remoto, omitiendo la sincronización")
+            print(
+                "⚠️ SyncService: sin repositorio remoto, omitiendo la sincronización"
+            )
             return
         }
 
@@ -71,10 +73,14 @@ final class MangaCollectionSyncService {
                 } else if let nsError = error as NSError?,
                     nsError.domain == NSCocoaErrorDomain && nsError.code == 3840
                 {
-                    print("⚠️ El servidor respondió correctamente, pero no hay JSON para el ID del manga: \(id)")
+                    print(
+                        "⚠️ El servidor respondió correctamente, pero no hay JSON para el ID del manga: \(id)"
+                    )
                     continue
                 } else {
-                    print("⚠️ Error al sincronizar el ID del manga \(id): \(error)")
+                    print(
+                        "⚠️ Error al sincronizar el ID del manga \(id): \(error)"
+                    )
                     throw NetworkError.general(error)
                 }
             }

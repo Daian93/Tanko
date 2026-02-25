@@ -8,7 +8,8 @@
 import Foundation
 import Observation
 
-@Observable @MainActor
+@Observable
+@MainActor
 final class FiltersViewModel {
     let availableGenres: [Genre] = Genre.allCases
     let availableThemes: [Theme] = Theme.allCases
@@ -58,10 +59,10 @@ final class FiltersViewModel {
     // Apply the filters from a given SearchDTO (from the pills in SearchView)
     func applyFromDTO(_ dto: CustomSearchDTO) {
         resetAllFilters()
-        searchTitle             = dto.title ?? ""
-        searchAuthorFirstName   = dto.authorFirstName ?? ""
-        searchAuthorLastName    = dto.authorLastName ?? ""
-        containsSearch          = dto.contains
+        searchTitle = dto.title ?? ""
+        searchAuthorFirstName = dto.authorFirstName ?? ""
+        searchAuthorLastName = dto.authorLastName ?? ""
+        containsSearch = dto.contains
 
         if let genres = dto.genres {
             selectedGenres = Set(genres.compactMap { Genre(rawValue: $0) })
@@ -70,7 +71,9 @@ final class FiltersViewModel {
             selectedThemes = Set(themes.compactMap { Theme(rawValue: $0) })
         }
         if let demographics = dto.demographics {
-            selectedDemographics = Set(demographics.compactMap { Demographic(rawValue: $0) })
+            selectedDemographics = Set(
+                demographics.compactMap { Demographic(rawValue: $0) }
+            )
         }
     }
 

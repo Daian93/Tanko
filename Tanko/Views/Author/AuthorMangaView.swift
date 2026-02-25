@@ -35,11 +35,17 @@ struct AuthorMangaView: View {
 
                     LazyVGrid(columns: columns, spacing: 25) {
                         ForEach(viewModel.mangas) { manga in
-                            NavigationLink(value: MangaNavigation.withoutTransition(manga)) {
+                            NavigationLink(
+                                value: MangaNavigation.withoutTransition(manga)
+                            ) {
                                 MangaGridCard(manga: manga)
                             }
                             .onAppear {
-                                Task { await viewModel.loadNextPageIfNeeded(currentItem: manga) }
+                                Task {
+                                    await viewModel.loadNextPageIfNeeded(
+                                        currentItem: manga
+                                    )
+                                }
                             }
                         }
                     }
