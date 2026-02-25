@@ -52,7 +52,7 @@ struct AuthorMangaViewiPad: View {
 
             Text("section.mangas_by_author")
                 .font(.headline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.tankoSecondary)
                 .padding(.horizontal, 40)
                 .padding(.top, 20)
 
@@ -96,7 +96,7 @@ struct AuthorMangaViewiPad: View {
 
                 Text("section.mangas_by_author")
                     .font(.headline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.tankoSecondary)
                     .padding(.horizontal, 40)
 
                 AuthorMangaGrid(

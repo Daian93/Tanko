@@ -64,6 +64,13 @@ struct CollectionView: View {
         NavigationStack(path: $router.collectionPath) {
             ScrollView {
                 VStack(spacing: 24) {
+                    #if os(macOS)
+                    Text("collection.title")
+                        .font(.system(size: 30, weight: .bold))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+                        .padding(.top)
+                    #endif
 
                     // MARK: - Offline Banner
                     if collectionVM.hasPendingOperations {

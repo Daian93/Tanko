@@ -22,7 +22,7 @@ struct AppVersionSection: View {
                 Text("version.title")
             } icon: {
                 Image(systemName: "info.circle.fill")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.tankoSecondary)
             }
             Spacer()
             Text("tanko.version \(appVersion) (\(buildNumber))")

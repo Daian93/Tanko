@@ -23,7 +23,7 @@ struct OfflineBanner: View {
 
                 Text("\(pendingCount) offline.changes")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.tankoSecondary)
             }
 
             Spacer()

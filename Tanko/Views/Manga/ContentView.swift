@@ -12,7 +12,7 @@ import SwiftUI
 enum MangaNavigation: Hashable {
     case withTransition(Manga)
     case withoutTransition(Manga)
-    
+
     var manga: Manga {
         switch self {
         case .withTransition(let m), .withoutTransition(let m): return m
@@ -25,7 +25,7 @@ struct ContentView: View {
     @Environment(MangaViewModel.self) private var viewModel
     @Environment(\.modelContext) private var modelContext
     @Environment(AppSettings.self) private var settings
-    
+
     @State private var bestMangaViewModel = BestMangaViewModel()
     @State private var router = NavigationRouter.shared
     @State private var localPath = NavigationPath()

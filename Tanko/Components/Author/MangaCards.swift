@@ -47,7 +47,7 @@ struct MangaCardPortrait: View {
                         .foregroundStyle(.yellow)
                     Text(manga.formattedScore)
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.tankoSecondary)
                 }
             }
 
@@ -97,7 +97,7 @@ struct MangaCardLandscape: View {
                     Text(manga.formattedScore)
                         .font(.caption)
                         .fontWeight(.bold)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.tankoSecondary)
                 }
             }
 

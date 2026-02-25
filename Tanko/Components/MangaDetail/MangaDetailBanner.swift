@@ -58,14 +58,14 @@ struct MangaDetailBanner: View {
                     if let titleJapanese = manga.titleJapanese {
                         Text(titleJapanese)
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.tankoSecondary)
                             .lineLimit(1)
                     }
 
                     if let titleEng = manga.titleEnglish {
                         Text(titleEng)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.tankoSecondary)
                             .lineLimit(1)
                     }
                 }

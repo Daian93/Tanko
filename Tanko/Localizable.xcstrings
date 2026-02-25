@@ -867,13 +867,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You don't have any completed collections."
+            "value" : "You don't have any completed collections"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No tienes ninguna colección completa."
+            "value" : "No tienes ninguna colección completa"
           }
         }
       }
@@ -885,13 +885,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You haven't finished reading any manga yet."
+            "value" : "You haven't finished reading any manga yet"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aún no has terminado de leer ningún manga."
+            "value" : "Aún no has terminado de leer ningún manga"
           }
         }
       }
@@ -903,13 +903,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You're not currently reading any manga."
+            "value" : "You're not currently reading any manga"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No estás leyendo ningún manga ahora mismo."
+            "value" : "No estás leyendo ningún manga ahora mismo"
           }
         }
       }
@@ -921,13 +921,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You don't have any manga waiting to be started."
+            "value" : "You don't have any manga waiting to be started"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No tienes mangas pendientes de empezar a leer."
+            "value" : "No tienes mangas pendientes de empezar a leer"
           }
         }
       }
@@ -995,7 +995,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Leídos"
           }
         }
@@ -2973,13 +2973,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You have not added any manga to your collection yet."
+            "value" : "You have not added any manga to your collection yet"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aún no has añadido ningún manga a tu colección."
+            "value" : "Aún no has añadido ningún manga a tu colección"
           }
         }
       }

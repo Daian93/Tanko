@@ -23,7 +23,7 @@ struct EditMangaContentView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 5) {
+            VStack(spacing: 20) {
                 sections(usingCardStyle: true)
 
                 infoLink()

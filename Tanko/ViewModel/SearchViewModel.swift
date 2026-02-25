@@ -67,10 +67,6 @@ final class SearchViewModel {
             return
         }
 
-        if filtersVM.hasActiveFilters {
-            filtersVM.resetAllFilters()
-        }
-
         searchTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: 500_000_000)
             guard !Task.isCancelled, let self else { return }
@@ -124,16 +120,21 @@ final class SearchViewModel {
     // MARK: - Core Search
 
     func search(mode: SearchMode) async {
-        reset()
         state = .loading
         lastSearchMode = mode
 
         do {
             let page = try await fetchPage(for: mode, page: currentPage)
+            
+            guard !Task.isCancelled else { return }
+            
             results = page.items
             hasMorePages = page.metadata.hasNextPage
             state = results.isEmpty ? .empty : .loaded
+        } catch is CancellationError {
+            return
         } catch {
+            guard !Task.isCancelled else { return }
             state = .error(error.localizedDescription)
         }
     }
@@ -161,17 +162,29 @@ final class SearchViewModel {
 
     private func loadNextPage(using mode: SearchMode) async {
         currentPage += 1
+        isLoadingNextPage = true
+        
         do {
             let page = try await fetchPage(for: mode, page: currentPage)
+            guard !Task.isCancelled else { return }
+
             let newItems = page.items.filter { item in
                 !results.contains(where: { $0.id == item.id })
             }
+            
             results.append(contentsOf: newItems)
             hasMorePages = page.metadata.hasNextPage
         } catch {
             currentPage -= 1
-            state = .error(error.localizedDescription)
+            
+            if results.isEmpty {
+                state = .error(error.localizedDescription)
+            } else {
+                print("Error en paginación: \(error)")
+                hasMorePages = false
+            }
         }
+        isLoadingNextPage = false
     }
 
     private func fetchPage(for mode: SearchMode, page: Int) async throws -> Page<Manga> {

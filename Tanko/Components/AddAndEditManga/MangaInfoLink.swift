@@ -11,7 +11,7 @@ struct MangaInfoLink: View {
     @State var viewModel: UserMangaDetailViewModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 15) {
             Text("info.text")
                 .font(.headline)
                 .padding(.horizontal)
@@ -38,7 +38,6 @@ struct MangaInfoLink: View {
                 .foregroundStyle(
                     viewModel.manga != nil ? .tankoPrimary : .tankoSecondary
                 )
-                .backgroundStyle(.surface)
                 .clipShape(RoundedRectangle(cornerRadius: 16))
                 .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
             }
@@ -51,6 +50,7 @@ struct MangaInfoLink: View {
                 .foregroundStyle(.tankoSecondary)
                 .padding(.horizontal)
         }
+        .padding(.bottom, 10)
     }
 }
 

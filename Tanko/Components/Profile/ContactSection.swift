@@ -39,6 +39,7 @@ struct ContactSection: View {
             }
         }
         .background(.surface)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     // MARK: - Actions

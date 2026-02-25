@@ -16,11 +16,14 @@ struct SearchResultsList: View {
 
     var body: some View {
         List {
-            ForEach(Array(results.enumerated()), id: \.element.id) { index, manga in
+            ForEach(Array(results.enumerated()), id: \.element.id) {
+                index,
+                manga in
                 let isFirst = index == 0
                 let isLast = index == results.count - 1
 
-                NavigationLink(value: MangaNavigation.withoutTransition(manga)) {
+                NavigationLink(value: MangaNavigation.withoutTransition(manga))
+                {
                     MangaRow(
                         manga: manga,
                         namespace: namespace,
@@ -31,7 +34,9 @@ struct SearchResultsList: View {
                 .listRowSeparator(isFirst ? .hidden : .visible, edges: .top)
                 .listRowSeparator(isLast ? .hidden : .visible, edges: .bottom)
                 .listRowSeparatorTint(.surface)
-                .listRowInsets(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 15))
+                .listRowInsets(
+                    EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 15)
+                )
                 .onAppear {
                     onLoadMore(manga)
                 }
@@ -57,11 +62,14 @@ struct SearchResultsListiPad: View {
 
     var body: some View {
         List {
-            ForEach(Array(results.enumerated()), id: \.element.id) { index, manga in
+            ForEach(Array(results.enumerated()), id: \.element.id) {
+                index,
+                manga in
                 let isFirst = index == 0
                 let isLast = index == results.count - 1
 
-                NavigationLink(value: MangaNavigation.withoutTransition(manga)) {
+                NavigationLink(value: MangaNavigation.withoutTransition(manga))
+                {
                     MangaRow(
                         manga: manga,
                         namespace: namespace,
@@ -71,8 +79,9 @@ struct SearchResultsListiPad: View {
                 .listRowSeparator(isFirst ? .hidden : .visible, edges: .top)
                 .listRowSeparator(isLast ? .hidden : .visible, edges: .bottom)
                 .listRowSeparatorTint(.surface)
-                .listRowInsets(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 15))
-                .background(.tankoBackground)
+                .listRowInsets(
+                    EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 15)
+                )
                 .onAppear {
                     onLoadMore(manga)
                 }

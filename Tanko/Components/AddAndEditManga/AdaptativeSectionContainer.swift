@@ -60,9 +60,8 @@ struct AdaptiveSectionContainer<Content: View>: View {
 
             content
                 .padding()
-                .backgroundStyle(.surface)
+                .background(.surface)
                 .clipShape(RoundedRectangle(cornerRadius: 16))
-                .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
                 .padding(.horizontal)
 
             if let footer {

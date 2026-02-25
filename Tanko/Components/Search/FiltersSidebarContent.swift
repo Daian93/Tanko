@@ -7,21 +7,45 @@
 
 import SwiftUI
 
-// Contenido de filtros reutilizable entre FiltersView (iPhone sheet)
-// y SearchViewiPad (sidebar del NavigationSplitView)
+/* Filter content reusable between FiltersView (iPhone sheet) and SearchViewiPad (NavigationSplitView sidebar) */
 struct FiltersSidebarContent: View {
-    @State var filtersVM: FiltersViewModel
+    @Bindable var filtersVM: FiltersViewModel
 
     var body: some View {
-        Section(header: Text("filter.header").font(.headline)) {
-            TextField("manga.title", text: $filtersVM.searchTitle)
-            TextField("author.name", text: $filtersVM.searchAuthorFirstName)
-            TextField("author.surname", text: $filtersVM.searchAuthorLastName)
-            Toggle("partial.search", isOn: $filtersVM.containsSearch)
+        Section(
+            header: Text("filter.header")
+                .font(.headline)
+                .foregroundStyle(.textSecondary)
+                .padding(.top, 8)
+        ) {
+            VStack(alignment: .leading, spacing: 10) {
+                TextField("manga.title", text: $filtersVM.searchTitle)
+                    .textFieldStyle(.roundedBorder)
+
+                TextField("author.name", text: $filtersVM.searchAuthorFirstName)
+                    .textFieldStyle(.roundedBorder)
+
+                TextField(
+                    "author.surname",
+                    text: $filtersVM.searchAuthorLastName
+                )
+                .textFieldStyle(.roundedBorder)
+
+                Toggle("partial.search", isOn: $filtersVM.containsSearch)
+                    #if os(macOS)
+                        .toggleStyle(.checkbox)
+                    #endif
+            }
+            .padding(.vertical, 4)
         }
         .listRowBackground(Color.surface)
 
-        Section(header: Text("filter.categories")) {
+        Section(
+            header: Text("filter.categories")
+                .font(.headline)
+                .foregroundStyle(.tankoSecondary)
+        ) {
+
             // Genres
             DisclosureGroup {
                 ForEach(filtersVM.availableGenres) { genre in
@@ -63,7 +87,9 @@ struct FiltersSidebarContent: View {
                 ForEach(filtersVM.availableDemographics) { demo in
                     MultiSelectionRow(
                         title: demo.localized,
-                        isSelected: filtersVM.selectedDemographics.contains(demo)
+                        isSelected: filtersVM.selectedDemographics.contains(
+                            demo
+                        )
                     ) {
                         filtersVM.toggleDemographic(demo)
                     }

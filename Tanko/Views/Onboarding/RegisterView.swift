@@ -39,7 +39,7 @@ struct RegisterView: View {
                         
                         Text("Crea una cuenta para guardar tu colección en la nube")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.tankoSecondary)
                             .multilineTextAlignment(.center)
                     }
                     .padding(.top, 20)
@@ -50,7 +50,7 @@ struct RegisterView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Email")
                                 .font(.subheadline.bold())
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.tankoSecondary)
                             
                             TextField("email@ejemplo.com", text: $vm.email)
                                 .keyboardTypeCompatible(.emailAddress)
@@ -64,7 +64,7 @@ struct RegisterView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Contraseña")
                                 .font(.subheadline.bold())
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.tankoSecondary)
                             
                             SecureField("Mínimo 8 caracteres", text: $vm.password)
                                 .padding()
@@ -109,9 +109,9 @@ struct RegisterView: View {
                             .background(
                                 vm.isFormValid && !vm.isLoading
                                 ? .tankoPrimary
-                                    : Color.gray
+                                : Color.gray.opacity(0.5)
                             )
-                            .foregroundStyle(.white)
+                            .foregroundStyle(.tankoBackground)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         .disabled(!vm.isFormValid || vm.isLoading)
@@ -126,7 +126,7 @@ struct RegisterView: View {
             #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar") {
+                    Button("button.cancel") {
                         dismiss()
                     }
                 }

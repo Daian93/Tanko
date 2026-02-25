@@ -11,9 +11,9 @@ struct ContentViewiPad: View {
     @Environment(UserMangaCollectionViewModel.self) private var userCollectionVM
     @Environment(MangaViewModel.self) private var viewModel
     @Environment(AppSettings.self) private var settings
-    
+
     @State private var bestMangaViewModel = BestMangaViewModel()
-    
+
     @Namespace private var namespace
 
     var body: some View {
@@ -33,12 +33,22 @@ struct ContentViewiPad: View {
                         let isLandscape = geo.size.width > geo.size.height
                         let minWidth = isLandscape ? 320 : 420
                         let gridItems = [
-                            GridItem(.adaptive(minimum: CGFloat(minWidth)), spacing: 20)
+                            GridItem(
+                                .adaptive(minimum: CGFloat(minWidth)),
+                                spacing: 20
+                            )
                         ]
 
                         ScrollView {
                             VStack(spacing: 32) {
 
+                                #if os(macOS)
+                                    Text("tab.mangas")
+                                    .font(.system(size: 30, weight: .bold))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.horizontal)
+                                    .padding(.top)
+                                #endif
                                 if !bestMangaViewModel.mangas.isEmpty {
                                     VStack(alignment: .leading, spacing: 12) {
                                         Text("content.best")
@@ -66,13 +76,15 @@ struct ContentViewiPad: View {
                                             MangaCollectionRow(
                                                 manga: manga,
                                                 namespace: namespace,
-                                                userCollectionVM: userCollectionVM
+                                                userCollectionVM:
+                                                    userCollectionVM
                                             )
                                             .onAppear {
                                                 Task {
-                                                    await viewModel.loadNextPageIfNeeded(
-                                                        currentItem: manga
-                                                    )
+                                                    await viewModel
+                                                        .loadNextPageIfNeeded(
+                                                            currentItem: manga
+                                                        )
                                                 }
                                             }
                                         }

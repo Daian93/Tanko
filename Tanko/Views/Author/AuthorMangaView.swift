@@ -30,7 +30,7 @@ struct AuthorMangaView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("section.mangas_by_author")
                         .font(.headline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.tankoSecondary)
                         .padding(.horizontal, 4)
 
                     LazyVGrid(columns: columns, spacing: 25) {
@@ -56,7 +56,7 @@ struct AuthorMangaView: View {
             }
             .padding(.horizontal)
         }
-        .backgroundStyle(.tankoBackground)
+        .background(.tankoBackground)
         .navigationBarTitleDisplayModeCompatible(.inline)
         .task {
             await viewModel.loadInitial()

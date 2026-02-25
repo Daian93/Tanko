@@ -14,7 +14,7 @@ struct AppearanceSection: View {
     var body: some View {
         Group {
             // Dark mode toggle
-            Toggle(isOn: $isDarkMode) {
+            HStack {
                 Label {
                     Text("appearance.darkMode")
                 } icon: {
@@ -25,30 +25,46 @@ struct AppearanceSection: View {
                     .foregroundStyle(.yellow)
                     .symbolEffect(.bounce, value: isDarkMode)
                 }
+                Spacer()
+                Toggle(isOn: $isDarkMode) {}
+                    .toggleStyle(.switch)
             }
             .background(.surface)
 
             // Language picker
-            Picker(selection: $appLanguage) {
-                ForEach(AppSettings.AppLanguage.allCases) { lang in
-                    Label {
-                        Text(lang.label)
-                    } icon: {
-                        Text(lang.flag)
-                    }
-                    .tag(lang)
-                }
-            } label: {
+            HStack {
                 Label {
                     Text("appearance.language")
                 } icon: {
                     Image(systemName: "globe")
                         .foregroundStyle(.blue)
                 }
+                Spacer()
+                #if os(macOS)
+                Picker("", selection: $appLanguage) {
+                    ForEach(AppSettings.AppLanguage.allCases) { lang in
+                        Text(lang.label)
+                            .tag(lang)
+                    }
+                }
+                .pickerStyle(.menu)
+                #else
+                Picker("", selection: $appLanguage) {
+                    ForEach(AppSettings.AppLanguage.allCases) { lang in
+                        Label {
+                            Text(lang.label)
+                        } icon: {
+                            Text(lang.flag)
+                        }
+                        .tag(lang)
+                    }
+                }
+                .pickerStyle(.menu)
+                #endif
             }
-            .pickerStyle(.menu)
             .background(.surface)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

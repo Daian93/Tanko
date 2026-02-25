@@ -115,7 +115,7 @@ struct LoginView: View {
                             .background(
                                 vm.isFormValid && !vm.isLoading
                                 ? .tankoPrimary
-                                    : Color.gray
+                                : Color.gray.opacity(0.5)
                             )
                             .foregroundStyle(.tankoBackground)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -144,11 +144,13 @@ struct LoginView: View {
 
 #Preview {
     let session = SessionManager()
+    let settings = AppSettings()
 
     return LoginView(
         session: session,
         context: PreviewHelper.container.mainContext
     )
     .environment(session)
+    .environment(settings)
     .modelContainer(PreviewHelper.container)
 }

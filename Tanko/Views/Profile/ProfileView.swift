@@ -80,7 +80,7 @@ extension ProfileView {
             }
             .listRowBackground(Color.tankoCardSurface)
 
-            // Cerrar sesión
+            // Logout
             Section {
                 LogoutSection(
                     isGuest: session.isGuest,
@@ -185,7 +185,7 @@ extension ProfileView {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
                 .font(.headline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.tankoSecondary)
             content()
         }
         

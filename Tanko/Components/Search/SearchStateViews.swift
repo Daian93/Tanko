@@ -16,7 +16,7 @@ struct SearchEmptyState: View {
         VStack(spacing: 16) {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 60))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.tankoSecondary)
 
             Text("search.title")
                 .font(.title2)
@@ -27,7 +27,7 @@ struct SearchEmptyState: View {
                     ? "search.subtext.ipad"
                     : "search.subtext.ios"
             )
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.tankoSecondary)
             .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -42,14 +42,14 @@ struct SearchNoResultsState: View {
         VStack(spacing: 16) {
             Image(systemName: "book.closed")
                 .font(.system(size: 60))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.tankoSecondary)
 
             Text("search.noResults.title")
                 .font(.title3)
                 .fontWeight(.semibold)
 
             Text("search.noResults.subtitle")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.tankoSecondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
@@ -66,14 +66,14 @@ struct SearchErrorState: View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.largeTitle)
-                .foregroundStyle(.red)
+                .foregroundStyle(.tankoPrimary)
 
             Text("error.title")
                 .font(.headline)
 
             Text(message)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.tankoSecondary)
                 .multilineTextAlignment(.center)
 
             Button("button.retry", action: onRetry)

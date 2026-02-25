@@ -26,7 +26,6 @@ struct FiltersView: View {
                             filtersViewModel.resetAllFilters()
                         } label: {
                             Text("search.clean.all")
-                                .bold()
                         }
                     }
                     .listRowBackground(Color.surface)

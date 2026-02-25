@@ -13,16 +13,14 @@ struct SearchFilterToolbarButton: View {
 
     var body: some View {
         Button(action: action) {
-            ZStack(alignment: .topTrailing) {
+            if hasActiveFilters {
+                Image("line.3.horizontal.decrease.circle.badge")
+                    .font(.title3)
+                    .foregroundStyle(.tankoPrimary, .primary)
+            } else {
                 Image(systemName: "line.3.horizontal.decrease.circle")
                     .font(.title3)
-
-                if hasActiveFilters {
-                    Circle()
-                        .fill(.red)
-                        .frame(width: 7, height: 7)
-                        .offset(x: 4, y: -4)
-                }
+                    .foregroundStyle(.primary)
             }
         }
     }
