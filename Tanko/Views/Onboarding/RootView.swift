@@ -5,12 +5,13 @@
 //  Created by Diana Rammal Sansón on 9/2/26.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct RootView: View {
     @Environment(SessionManager.self) private var session
     @Environment(\.modelContext) private var context
+
     @State private var userCollectionVM: UserMangaCollectionViewModel?
     @State private var showLoadingOverlay = true
 
@@ -18,16 +19,11 @@ struct RootView: View {
         Group {
             if session.canAccessApp {
                 if let vm = userCollectionVM {
-                    if showLoadingOverlay {
-                        LoadingView(message: session.isAuthenticated
-                                    ? "Sincronizando tu colección..."
-                                    : "Cargando biblioteca...")
-                        .transition(.opacity)
-                    } else {
-                        MainTabView()
-                            .environment(vm)
-                            .transition(.opacity)
-                    }
+                    RootContent(
+                        vm: vm,
+                        showLoadingOverlay: showLoadingOverlay,
+                        isAuthenticated: session.isAuthenticated
+                    )
                 } else {
                     ProgressView()
                 }
@@ -38,7 +34,7 @@ struct RootView: View {
         .task(id: session.canAccessApp) {
             if session.canAccessApp {
                 buildViewModel()
-    
+
                 try? await Task.sleep(nanoseconds: 100_000_000)
                 if let vm = userCollectionVM {
                     if session.isAuthenticated {
@@ -47,7 +43,7 @@ struct RootView: View {
                         await vm.loadCollection()
                     }
                 }
-        
+
                 try? await Task.sleep(nanoseconds: 500_000_000)
                 await MainActor.run {
                     withAnimation {
@@ -86,16 +82,20 @@ struct RootView: View {
     private func buildViewModel() {
         let local = LocalMangaCollectionRepository(context: context)
 
-        let remote: RemoteMangaCollectionRepository? = session.isAuthenticated
+        let remote: RemoteMangaCollectionRepository? =
+            session.isAuthenticated
             ? RemoteMangaCollectionRepository(
                 network: Network(),
                 session: session,
                 localRepo: local
-              )
+            )
             : nil
 
         let repo: any MangaCollectionRepository = remote ?? local
-        let syncService = MangaCollectionSyncService(local: local, remote: remote)
+        let syncService = MangaCollectionSyncService(
+            local: local,
+            remote: remote
+        )
 
         userCollectionVM = UserMangaCollectionViewModel(
             context: context,
