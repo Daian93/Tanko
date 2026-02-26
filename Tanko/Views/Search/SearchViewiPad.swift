@@ -81,7 +81,13 @@ struct SearchViewiPad: View {
                 }
             }
         }
-        .listStyle(.sidebar)
+        #if os(iOS)
+            .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
+            .background(.tankoBackground)
+        #else
+            .listStyle(.sidebar)
+        #endif
         .navigationTitle("search.filters")
     }
 
@@ -102,7 +108,9 @@ struct SearchViewiPad: View {
                         results: viewModel.results,
                         canLoadMore: viewModel.canLoadMore,
                         namespace: namespace,
-                        onLoadMore: { viewModel.loadNextPageIfNeeded(currentItem: $0) }
+                        onLoadMore: {
+                            viewModel.loadNextPageIfNeeded(currentItem: $0)
+                        }
                     )
 
                 case .empty:
@@ -132,6 +140,7 @@ struct SearchViewiPad: View {
             }
         }
         .id(settings.appLanguage)
+        .background(.tankoBackground)
     }
 }
 

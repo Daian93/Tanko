@@ -1715,7 +1715,7 @@
         }
       }
     },
-    "genre.Ecchi" : {
+    "genre.ecchi" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {

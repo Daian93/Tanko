@@ -30,13 +30,17 @@ struct AuthorHeader: View {
                 .padding(.horizontal, large ? 14 : 10)
                 .padding(.vertical, large ? 8 : 4)
                 .foregroundStyle(.tankoPrimary)
-                .background(.tankoPrimary.opacity(0.1))
+                .background(.surface)
                 .clipShape(Capsule())
             }
             Spacer()
         }
         .padding(large ? 30 : 16)
-        .background(.surface)
+        #if os(macOS)
+            .background(.tankoSecondary.opacity(0.3))
+        #else
+            .background(.surface)
+        #endif
         .clipShape(RoundedRectangle(cornerRadius: large ? 24 : 20))
         .shadow(
             color: .black.opacity(large ? 0.25 : 0.3),

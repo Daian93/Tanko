@@ -73,14 +73,20 @@ struct MangaCardLandscape: View {
                     .frame(width: width, height: height)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
             } placeholder: {
-                Color.surface
-                    .frame(width: width, height: height)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                    .overlay(
-                        Image(systemName: "book")
-                            .font(.largeTitle)
-                            .foregroundStyle(.tankoPrimary)
-                    )
+                Group {
+                    #if os(macOS)
+                        Color.tankoSecondary.opacity(0.3)
+                    #else
+                        Color.surface
+                    #endif
+                }
+                .frame(width: width, height: height)
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .overlay(
+                    Image(systemName: "book")
+                        .font(.largeTitle)
+                        .foregroundStyle(.tankoPrimary)
+                )
             }
 
             VStack(alignment: .leading, spacing: 4) {

@@ -15,7 +15,7 @@ struct FiltersSidebarContent: View {
         Section(
             header: Text("filter.header")
                 .font(.headline)
-                .foregroundStyle(.textSecondary)
+                .foregroundStyle(.tankoSecondary)
                 .padding(.top, 8)
         ) {
             VStack(alignment: .leading, spacing: 10) {
@@ -45,7 +45,6 @@ struct FiltersSidebarContent: View {
                 .font(.headline)
                 .foregroundStyle(.tankoSecondary)
         ) {
-
             // Genres
             DisclosureGroup {
                 ForEach(filtersVM.availableGenres) { genre in

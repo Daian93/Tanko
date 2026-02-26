@@ -22,7 +22,7 @@ struct MangaGridCard: View {
                         .frame(width: cardSize, height: cardSize)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                 } placeholder: {
-                    Color.gray.opacity(0.2)
+                    Color.surface
                         .frame(width: cardSize, height: cardSize)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .overlay(

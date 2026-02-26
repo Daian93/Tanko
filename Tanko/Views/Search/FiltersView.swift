@@ -10,9 +10,9 @@ import SwiftUI
 struct FiltersView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(AppSettings.self) private var settings
-    
+
     @State var filtersViewModel: FiltersViewModel
-    
+
     let onApply: (CustomSearchDTO) -> Void
 
     var body: some View {
@@ -31,6 +31,7 @@ struct FiltersView: View {
                     .listRowBackground(Color.surface)
                 }
             }
+            .formStyle(.grouped)
             .scrollContentBackground(.hidden)
             .background(.tankoBackground)
             .navigationTitle("search.filters")

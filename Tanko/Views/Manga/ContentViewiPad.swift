@@ -41,17 +41,17 @@ struct ContentViewiPad: View {
 
                         ScrollView {
                             VStack(spacing: 32) {
-
-                                #if os(macOS)
-                                    Text("tab.mangas")
-                                        .font(.system(size: 30, weight: .bold))
-                                        .frame(
-                                            maxWidth: .infinity,
-                                            alignment: .leading
-                                        )
+                                Text("tab.mangas")
+                                    .font(.system(size: 30, weight: .bold))
+                                    .frame(
+                                        maxWidth: .infinity,
+                                        alignment: .leading
+                                    )
+                                    #if os(macOS)
                                         .padding(.horizontal)
                                         .padding(.top)
-                                #endif
+                                    #endif
+
                                 if !bestMangaViewModel.mangas.isEmpty {
                                     VStack(alignment: .leading, spacing: 12) {
                                         Text("content.best")

@@ -73,6 +73,7 @@ struct AuthorMangaViewiPad: View {
 
             Spacer()
         }
+        .background(.tankoBackground)
         .frame(minHeight: geo.size.height * 0.7)
     }
 
@@ -118,6 +119,7 @@ struct AuthorMangaViewiPad: View {
             }
             .padding(.bottom, 40)
         }
+        .background(.tankoBackground)
     }
 }
 
