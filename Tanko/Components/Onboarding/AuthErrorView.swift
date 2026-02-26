@@ -15,7 +15,7 @@ struct AuthErrorView: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundStyle(.tankoPrimary)
 
-            Text(error.localizedDescription)
+            Text(error.localizedKey)
                 .font(.footnote)
                 .foregroundStyle(.tankoPrimary)
         }
@@ -30,5 +30,3 @@ struct AuthErrorView: View {
     AuthErrorView(error: .invalidCredentials)
         .padding()
 }
-
-

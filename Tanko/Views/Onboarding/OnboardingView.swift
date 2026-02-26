@@ -15,6 +15,10 @@ struct OnboardingView: View {
     @State private var activeSheet: Sheet?
     @State private var isAnimating = false
 
+    #if os(iOS)
+        private var isIPad: Bool { UIDevice.current.userInterfaceIdiom == .pad }
+    #endif
+
     enum Sheet: Identifiable {
         case login, register
         var id: Int { hashValue }
@@ -47,7 +51,9 @@ struct OnboardingView: View {
             case .login:
                 LoginView(session: session, context: context)
                     #if os(iOS)
-                        .presentationDetents([.medium, .large])
+                        .presentationDetents(
+                            isIPad ? [.large] : [.medium, .large]
+                        )
                         .presentationDragIndicator(.visible)
                     #endif
                     #if os(macOS)
@@ -57,7 +63,9 @@ struct OnboardingView: View {
             case .register:
                 RegisterView(session: session)
                     #if os(iOS)
-                        .presentationDetents([.medium, .large])
+                        .presentationDetents(
+                            isIPad ? [.large] : [.medium, .large]
+                        )
                         .presentationDragIndicator(.visible)
                     #endif
                     #if os(macOS)

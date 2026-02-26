@@ -21,47 +21,58 @@ struct RegisterView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 20) {
-                    AuthHeader(
-                        icon: "person.badge.plus.fill",
-                        title: "register.title",
-                        subtitle: "register.subtitle",
-                    )
-
-                    // Form
-                    VStack(spacing: 16) {
-                        AuthTextField(
-                            label: "email.label",
-                            placeholder: "email.placeholder",
-                            text: $vm.email
+                VStack {
+                    #if os(macOS)
+                        Spacer()
+                    #endif
+                    VStack(spacing: 20) {
+                        AuthHeader(
+                            icon: "person.badge.plus.fill",
+                            title: "register.title",
+                            subtitle: "register.subtitle"
                         )
 
-                        AuthSecureField(
-                            label: "password.label",
-                            placeholder: "password.placeholder",
-                            text: $vm.password
-                        )
+                        // Form
+                        VStack(spacing: 16) {
+                            AuthTextField(
+                                label: "email.label",
+                                placeholder: "email.placeholder",
+                                text: $vm.email
+                            )
 
-                        if let error = vm.error {
-                            AuthErrorView(error: error)
-                        }
+                            AuthSecureField(
+                                label: "password.label",
+                                placeholder: "password.placeholder",
+                                text: $vm.password
+                            )
 
-                        // Button
-                        AuthSubmitButton(
-                            label: "register.title",
-                            isLoading: vm.isLoading,
-                            isFormValid: vm.isFormValid,
-                            maxWidth: 120
-                        ) {
-                            Task {
-                                await vm.register()
-                                if vm.error == nil { dismiss() }
+                            if let error = vm.error {
+                                AuthErrorView(error: error)
                             }
+
+                            AuthSubmitButton(
+                                label: "register.title",
+                                isLoading: vm.isLoading,
+                                isFormValid: vm.isFormValid,
+                                maxWidth: 120
+                            ) {
+                                Task {
+                                    await vm.register()
+                                    if vm.error == nil { dismiss() }
+                                }
+                            }
+                            .padding(.top, 8)
                         }
                     }
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 40)
+                    #if os(macOS)
+                        Spacer()
+                    #endif
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 40)
+                #if os(macOS)
+                    .frame(maxWidth: .infinity, minHeight: 520)
+                #endif
             }
             #if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)

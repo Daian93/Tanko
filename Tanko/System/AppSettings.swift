@@ -10,19 +10,51 @@ import SwiftUI
 @Observable
 @MainActor
 final class AppSettings {
-    // We use @ObservationIgnored so that the Macro does not attempt to transform @AppStorage
-    // We give it a private name for the ‘disk’
-    @ObservationIgnored @AppStorage("profileEmoji") private var _profileEmoji:
-        String = "🙂"
-    @ObservationIgnored @AppStorage("profileUserName") private var _userName:
-        String = ""
-    @ObservationIgnored @AppStorage("isDarkMode") private var _isDarkMode:
-        Bool = false
-    @ObservationIgnored @AppStorage("appLanguage") private var _appLanguage:
-        AppLanguage = .system
+    // Current user ID used to namespace all keys — nil = guest
+    private var currentUserID: String = "guest"
 
-    // We create computed properties that the UI can observe
-    // We use access and withMutation to manually ‘notify’ SwiftUI
+    // In-memory values (loaded from UserDefaults with per-user keys)
+    private var _profileEmoji: String = "🙂"
+    private var _userName: String = ""
+    private var _isDarkMode: Bool = false
+    private var _appLanguage: AppLanguage = .system
+
+    // MARK: - Per-user key helpers
+
+    private func key(_ base: String) -> String { "\(base).\(currentUserID)" }
+
+    private func load() {
+        let defaults = UserDefaults.standard
+        withMutation(keyPath: \.profileEmoji) {
+            _profileEmoji = defaults.string(forKey: key("profileEmoji")) ?? "🙂"
+        }
+        withMutation(keyPath: \.userName) {
+            _userName = defaults.string(forKey: key("profileUserName")) ?? ""
+        }
+        withMutation(keyPath: \.isDarkMode) {
+            _isDarkMode = defaults.bool(forKey: key("isDarkMode"))
+        }
+        withMutation(keyPath: \.appLanguage) {
+            let raw =
+                defaults.string(forKey: key("appLanguage"))
+                ?? AppLanguage.system.rawValue
+            _appLanguage = AppLanguage(rawValue: raw) ?? .system
+        }
+    }
+
+    private func save(_ value: Any?, forKey base: String) {
+        UserDefaults.standard.set(value, forKey: key(base))
+    }
+
+    // MARK: - Called on login / logout
+
+    func switchUser(to userID: String?) {
+        currentUserID = userID ?? "guest"
+        load()
+    }
+
+    // MARK: - Observed properties
+
     var profileEmoji: String {
         get {
             access(keyPath: \.profileEmoji)
@@ -30,6 +62,7 @@ final class AppSettings {
         }
         set {
             withMutation(keyPath: \.profileEmoji) { _profileEmoji = newValue }
+            save(newValue, forKey: "profileEmoji")
         }
     }
 
@@ -38,7 +71,10 @@ final class AppSettings {
             access(keyPath: \.userName)
             return _userName
         }
-        set { withMutation(keyPath: \.userName) { _userName = newValue } }
+        set {
+            withMutation(keyPath: \.userName) { _userName = newValue }
+            save(newValue, forKey: "profileUserName")
+        }
     }
 
     var isDarkMode: Bool {
@@ -46,7 +82,10 @@ final class AppSettings {
             access(keyPath: \.isDarkMode)
             return _isDarkMode
         }
-        set { withMutation(keyPath: \.isDarkMode) { _isDarkMode = newValue } }
+        set {
+            withMutation(keyPath: \.isDarkMode) { _isDarkMode = newValue }
+            save(newValue, forKey: "isDarkMode")
+        }
     }
 
     var appLanguage: AppLanguage {
@@ -54,10 +93,14 @@ final class AppSettings {
             access(keyPath: \.appLanguage)
             return _appLanguage
         }
-        set { withMutation(keyPath: \.appLanguage) { _appLanguage = newValue } }
+        set {
+            withMutation(keyPath: \.appLanguage) { _appLanguage = newValue }
+            save(newValue.rawValue, forKey: "appLanguage")
+        }
     }
 
-    // MARK: - Computed property for current locale
+    // MARK: - Computed
+
     var locale: Locale {
         switch appLanguage {
         case .system: return .current
@@ -67,6 +110,7 @@ final class AppSettings {
     }
 
     // MARK: - Language Enum
+
     enum AppLanguage: String, CaseIterable, Identifiable {
         case system = "system"
         case spanish = "es"

@@ -24,7 +24,14 @@ struct TankoApp: App {
                 .environment(\.locale, settings.locale)
                 #if os(macOS)
                     .buttonStyle(.plain)
+                    .dynamicTypeSize(.xLarge)
                 #endif
+                .onAppear {
+                    settings.switchUser(to: session.user?.id.uuidString)
+                }
+                .onChange(of: session.user?.id) { _, newID in
+                    settings.switchUser(to: newID?.uuidString)
+                }
         }
         .modelContainer(for: [UserManga.self, PendingOperation.self])
     }

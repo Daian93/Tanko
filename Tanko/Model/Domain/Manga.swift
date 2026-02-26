@@ -34,16 +34,27 @@ extension Manga {
         String(format: "%.2f", score)
     }
 
-    var publicationYear: String {
+    var publicationStartYear: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy"
+        return startDate.map { formatter.string(from: $0) } ?? "?"
+    }
 
-        let start = startDate.map { formatter.string(from: $0) } ?? "?"
+    var publicationEndYear: String? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy"
+        return endDate.map { formatter.string(from: $0) }
+    }
+
+    var isOngoing: Bool {
+        endDate == nil && status != .finished
+    }
+
+    var publicationYear: String {
         let end =
-            endDate.map { formatter.string(from: $0) }
-            ?? (status == .finished ? "?" : "Presente")
-
-        return "\(start) - \(end)"
+            publicationEndYear
+            ?? (isOngoing ? String(localized: "date.present") : "?")
+        return "\(publicationStartYear) - \(end)"
     }
 
     var authorNames: String {
@@ -63,7 +74,7 @@ extension Manga {
     }
 }
 
-enum MangaStatus: String, Codable, CaseIterable{
+enum MangaStatus: String, Codable, CaseIterable {
     case discontinued = "discontinued"
     case onHiatus = "on_hiatus"
     case currentlyPublishing = "currently_publishing"
@@ -81,7 +92,7 @@ extension MangaStatus {
         case .none: return "status.unknown"
         }
     }
-    
+
     var localized: LocalizedStringKey {
         LocalizedStringKey(localizedKey)
     }

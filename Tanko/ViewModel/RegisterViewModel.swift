@@ -32,21 +32,13 @@ final class RegisterViewModel {
 
         isLoading = true
         error = nil
+        defer { isLoading = false }
 
         do {
             try await session.register(email: email, password: password)
             try await session.login(email: email, password: password)
-        } catch let networkError as NetworkError {
-            switch networkError {
-            case .status(409): self.error = .emailAlreadyInUse
-            case .noInternet: self.error = .noInternet
-            case .timedOut: self.error = .timedOut
-            default: self.error = .unknown
-            }
         } catch {
-            self.error = .unknown
+            self.error = AuthError(from: error)
         }
-
-        self.isLoading = false
     }
 }
