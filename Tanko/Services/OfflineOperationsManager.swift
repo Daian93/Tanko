@@ -6,151 +6,197 @@
 //
 
 import Foundation
-import SwiftData
 import Network
-import Combine
+import SwiftData
 
-/// Gestor de operaciones pendientes offline
+@Observable
 @MainActor
-final class OfflineOperationsManager: Observable {
-    
+final class OfflineOperationsManager {
+
     // MARK: - Properties
-    
+
     private let modelContext: ModelContext
     private let monitor = NWPathMonitor()
-    private let monitorQueue = DispatchQueue(label: "NetworkMonitor")
-    
-    @Published var isConnected: Bool = true
-    @Published var pendingOperationsCount: Int = 0
-    
+    private let monitorQueue = DispatchQueue(
+        label: "com.tanko.NetworkMonitor",
+        qos: .utility
+    )
+
+    private(set) var isConnected: Bool = true
+    private(set) var pendingOperationsCount: Int = 0
+
+    // Avoid concurrent processing of the queue
+    private var isProcessingQueue = false
+
+    // Callback for notifying when connection is restored
+    var onConnectionRestored: (() async -> Void)?
+
     // MARK: - Initialization
-    
+
     init(context: ModelContext) {
         self.modelContext = context
-        setupNetworkMonitoring()
         updatePendingCount()
+        setupNetworkMonitoring()
     }
-    
+
     // MARK: - Network Monitoring
-    
+
     private func setupNetworkMonitoring() {
+        let initialPath = monitor.currentPath
+        isConnected = initialPath.status == .satisfied
+
         monitor.pathUpdateHandler = { [weak self] path in
-            Task { @MainActor in
-                self?.isConnected = path.status == .satisfied
-                print("📡 Conexión: \(path.status == .satisfied ? "✅ Online" : "❌ Offline")")
+            let connected = path.status == .satisfied
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                let wasConnected = self.isConnected
+
+                // Only update state and trigger actions if the connection status actually changed
+                guard wasConnected != connected else { return }
+
+                self.isConnected = connected
+                print("📡 Red: \(connected ? "✅ Online" : "❌ Offline")")
+
+                // If we just regained connection, trigger processing of pending operations
+                if connected && !wasConnected {
+                    print(
+                        "🔁 Conexión restaurada - procesando operaciones pendientes..."
+                    )
+                    await self.onConnectionRestored?()
+                }
             }
         }
         monitor.start(queue: monitorQueue)
     }
-    
+
     // MARK: - Queue Operations
-    
-    /// Añade una operación a la cola
+
     func enqueue(
         action: PendingOperation.Action,
         mangaID: Int,
         mangaTitle: String,
         mangaData: MangaSyncData
     ) {
+        // If an operation of the same type for the same manga already exists, remove it to avoid duplicates
+        let existing = getPendingOperations().filter {
+            $0.mangaID == mangaID && $0.action == action
+        }
+        existing.forEach { modelContext.delete($0) }
+
         let operation = PendingOperation(
             action: action,
             mangaID: mangaID,
             mangaTitle: mangaTitle,
             mangaData: mangaData
         )
-        
+
         modelContext.insert(operation)
         try? modelContext.save()
-        
         updatePendingCount()
-        
-        print("📝 Operación encolada: \(action.rawValue.uppercased()) - \(mangaTitle)")
+
+        print(
+            "📝 Encolado: \(action.rawValue.uppercased()) - \(mangaTitle) (\(pendingOperationsCount) pendientes)"
+        )
     }
-    
-    /// Obtiene todas las operaciones pendientes
+
     func getPendingOperations() -> [PendingOperation] {
         let descriptor = FetchDescriptor<PendingOperation>(
             sortBy: [SortDescriptor(\.timestamp)]
         )
         return (try? modelContext.fetch(descriptor)) ?? []
     }
-    
-    /// Elimina una operación de la cola
+
     func dequeue(_ operation: PendingOperation) {
         modelContext.delete(operation)
         try? modelContext.save()
         updatePendingCount()
     }
-    
-    /// Limpia todas las operaciones completadas
-    func clearCompleted() {
-        let operations = getPendingOperations()
-        for operation in operations {
-            modelContext.delete(operation)
-        }
+
+    func clearAll() {
+        getPendingOperations().forEach { modelContext.delete($0) }
         try? modelContext.save()
         updatePendingCount()
     }
-    
-    /// Actualiza el contador de operaciones pendientes
+
     private func updatePendingCount() {
         pendingOperationsCount = getPendingOperations().count
     }
-    
+
     // MARK: - Processing
-    
-    /// Procesa todas las operaciones pendientes
+
     func processQueue(
         using repository: RemoteMangaCollectionRepository
     ) async -> ProcessingResult {
         guard isConnected else {
-            print("⚠️ Sin conexión - operaciones en cola: \(pendingOperationsCount)")
-            return ProcessingResult(processed: 0, failed: 0, total: pendingOperationsCount)
+            return ProcessingResult(
+                processed: 0,
+                failed: 0,
+                total: pendingOperationsCount
+            )
         }
-        
+
+        guard !isProcessingQueue else {
+            print("⚠️ Queue ya siendo procesada")
+            return ProcessingResult(
+                processed: 0,
+                failed: 0,
+                total: pendingOperationsCount
+            )
+        }
+
         let operations = getPendingOperations()
         guard !operations.isEmpty else {
-            print("✅ No hay operaciones pendientes")
             return ProcessingResult(processed: 0, failed: 0, total: 0)
         }
-        
+
+        isProcessingQueue = true
+        defer { isProcessingQueue = false }
+
         print("🔄 Procesando \(operations.count) operaciones pendientes...")
-        
-        var processedCount = 0
-        var failedCount = 0
-        
+
+        var processed = 0
+        var failed = 0
+
         for operation in operations {
             do {
                 try await processOperation(operation, using: repository)
                 dequeue(operation)
-                processedCount += 1
-                print("✅ \(operation.action.rawValue.uppercased()): \(operation.mangaTitle)")
+                processed += 1
+                print(
+                    "✅ \(operation.action.rawValue.uppercased()): \(operation.mangaTitle)"
+                )
             } catch {
                 operation.markAsFailed()
-                failedCount += 1
-                print("❌ Error procesando \(operation.mangaTitle): \(error)")
-                
-                // Si falla más de 3 veces, eliminar
+                failed += 1
+                print(
+                    "❌ Error: \(operation.mangaTitle) - \(error.localizedDescription)"
+                )
+
                 if operation.retryCount > 3 {
-                    print("⚠️ Operación descartada tras \(operation.retryCount) intentos")
+                    print(
+                        "⚠️ Descartada tras \(operation.retryCount) intentos: \(operation.mangaTitle)"
+                    )
                     dequeue(operation)
                 }
             }
         }
-        
+
         try? modelContext.save()
         updatePendingCount()
-        
-        print("📊 Procesadas: \(processedCount) | Fallidas: \(failedCount)")
-        
+
+        if processed > 0 || failed > 0 {
+            print(
+                "📊 Procesadas: \(processed) | Fallidas: \(failed) | Pendientes: \(pendingOperationsCount)"
+            )
+        }
+
         return ProcessingResult(
-            processed: processedCount,
-            failed: failedCount,
+            processed: processed,
+            failed: failed,
             total: operations.count
         )
     }
-    
-    /// Procesa una operación individual
+
     private func processOperation(
         _ operation: PendingOperation,
         using repository: RemoteMangaCollectionRepository
@@ -158,13 +204,12 @@ final class OfflineOperationsManager: Observable {
         guard let mangaData = operation.getMangaData() else {
             throw OfflineError.invalidData
         }
-        
+
         switch operation.action {
         case .add, .update:
             try await repository.add(mangaData: mangaData)
-            
+
         case .delete:
-            // Para delete solo necesitamos el mangaID
             let userManga = UserManga(
                 mangaID: mangaData.mangaID,
                 title: mangaData.title,
@@ -178,7 +223,15 @@ final class OfflineOperationsManager: Observable {
             try await repository.remove(userManga)
         }
     }
-    
+
+    // MARK: - Lifecycle
+
+    func stopMonitoring() {
+        monitor.cancel()
+        onConnectionRestored = nil
+        print("🛑 El monitor de red se ha detenido")
+    }
+
     deinit {
         monitor.cancel()
     }
@@ -190,7 +243,7 @@ struct ProcessingResult {
     let processed: Int
     let failed: Int
     let total: Int
-    
+
     var hasFailures: Bool { failed > 0 }
     var allProcessed: Bool { processed == total }
 }
@@ -199,4 +252,3 @@ enum OfflineError: Error {
     case invalidData
     case noConnection
 }
-

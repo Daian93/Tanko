@@ -1,0 +1,31 @@
+//
+//  LocalDatabaseCleaner.swift
+//  Tanko
+//
+//  Created by Diana Rammal Sansón on 11/2/26.
+//
+
+import SwiftData
+
+@MainActor
+enum LocalDatabaseCleaner {
+
+    static func clear(context: ModelContext) async {
+        do {
+            // Clear UserManga objects
+            let mangaFetch = FetchDescriptor<UserManga>()
+            let allMangas = try context.fetch(mangaFetch)
+            allMangas.forEach { context.delete($0) }
+
+            // Clear PendingOperation objects too
+            let pendingFetch = FetchDescriptor<PendingOperation>()
+            let allPending = try context.fetch(pendingFetch)
+            allPending.forEach { context.delete($0) }
+
+            try context.save()
+            print("🧹 Base de datos local limpiada")
+        } catch {
+            print("❌ Error limpiando base de datos local:", error)
+        }
+    }
+}

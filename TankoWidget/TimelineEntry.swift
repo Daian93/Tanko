@@ -33,7 +33,7 @@ extension ReadingManga {
         readingVolume: 1,
         totalVolumes: nil
     )
-    
+
     static let centuryBoysTest = ReadingManga(
         id: 3,
         title: "20th Century Boys",
@@ -43,7 +43,7 @@ extension ReadingManga {
         readingVolume: 8,
         totalVolumes: 22
     )
-    
+
     static let YokohamaKaidashiKikouTest = ReadingManga(
         id: 4,
         title: "Yokohama Kaidashi Kikou",
@@ -56,5 +56,8 @@ extension ReadingManga {
 }
 
 extension MangaEntry {
-    static let test = MangaEntry(date: .now, mangas: [.monsterTest, .berserkTest])
+    static let test = MangaEntry(
+        date: .now,
+        mangas: [.monsterTest, .berserkTest]
+    )
 }

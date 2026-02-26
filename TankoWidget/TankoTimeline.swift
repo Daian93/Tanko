@@ -56,7 +56,8 @@ struct TankoTimeline: TimelineProvider {
                 return
             }
 
-            for minuteOffset in stride(from: 0, to: 720, by: intervalInMinutes) {
+            for minuteOffset in stride(from: 0, to: 720, by: intervalInMinutes)
+            {
 
                 let entryDate =
                     Calendar.current.date(
@@ -89,7 +90,6 @@ struct TankoTimeline: TimelineProvider {
                 entries.append(entry)
             }
 
-            
             let timeline = Timeline(entries: entries, policy: .atEnd)
 
             completion(timeline)

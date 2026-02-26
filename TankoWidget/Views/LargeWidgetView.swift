@@ -13,11 +13,35 @@ struct LargeWidgetView: View {
     var body: some View {
         if mangas.isEmpty {
             EmptyStateView()
+        } else if mangas.count == 1 {
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    MangaCardWidget(manga: mangas[0])
+                    Spacer()
+                }
+                Spacer()
+            }
+            .padding(WidgetTheme.Spacing.cardPadding)
+        } else if mangas.count == 2 {
+            VStack(spacing: WidgetTheme.Spacing.cardPadding) {
+                ForEach(mangas) { manga in
+                    MangaCardWidget(manga: manga)
+                }
+            }
+            .padding(WidgetTheme.Spacing.cardPadding)
         } else {
             LazyVGrid(
                 columns: [
-                    GridItem(.flexible(), spacing: WidgetTheme.Spacing.cardPadding),
-                    GridItem(.flexible(), spacing: WidgetTheme.Spacing.cardPadding)
+                    GridItem(
+                        .flexible(),
+                        spacing: WidgetTheme.Spacing.cardPadding
+                    ),
+                    GridItem(
+                        .flexible(),
+                        spacing: WidgetTheme.Spacing.cardPadding
+                    ),
                 ],
                 spacing: WidgetTheme.Spacing.cardPadding
             ) {

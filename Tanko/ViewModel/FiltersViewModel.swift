@@ -8,7 +8,8 @@
 import Foundation
 import Observation
 
-@Observable @MainActor
+@Observable
+@MainActor
 final class FiltersViewModel {
     let availableGenres: [Genre] = Genre.allCases
     let availableThemes: [Theme] = Theme.allCases
@@ -55,6 +56,27 @@ final class FiltersViewModel {
         containsSearch = true
     }
 
+    // Apply the filters from a given SearchDTO (from the pills in SearchView)
+    func applyFromDTO(_ dto: CustomSearchDTO) {
+        resetAllFilters()
+        searchTitle = dto.title ?? ""
+        searchAuthorFirstName = dto.authorFirstName ?? ""
+        searchAuthorLastName = dto.authorLastName ?? ""
+        containsSearch = dto.contains
+
+        if let genres = dto.genres {
+            selectedGenres = Set(genres.compactMap { Genre(rawValue: $0) })
+        }
+        if let themes = dto.themes {
+            selectedThemes = Set(themes.compactMap { Theme(rawValue: $0) })
+        }
+        if let demographics = dto.demographics {
+            selectedDemographics = Set(
+                demographics.compactMap { Demographic(rawValue: $0) }
+            )
+        }
+    }
+
     var activeFiltersCount: Int {
         var count = 0
         if !searchTitle.isEmpty { count += 1 }
@@ -66,4 +88,29 @@ final class FiltersViewModel {
         return count
     }
 
+    // MARK: - Toggle Actions
+
+    func toggleGenre(_ genre: Genre) {
+        if selectedGenres.contains(genre) {
+            selectedGenres.remove(genre)
+        } else {
+            selectedGenres.insert(genre)
+        }
+    }
+
+    func toggleTheme(_ theme: Theme) {
+        if selectedThemes.contains(theme) {
+            selectedThemes.remove(theme)
+        } else {
+            selectedThemes.insert(theme)
+        }
+    }
+
+    func toggleDemographic(_ demo: Demographic) {
+        if selectedDemographics.contains(demo) {
+            selectedDemographics.remove(demo)
+        } else {
+            selectedDemographics.insert(demo)
+        }
+    }
 }

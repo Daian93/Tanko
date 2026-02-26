@@ -7,13 +7,15 @@
 
 import SwiftUI
 
-enum MangaViewState {
+enum MangaViewState: Equatable {
     case loading
     case loaded
     case empty
+    case error(String)
 }
 
-@Observable @MainActor
+@Observable
+@MainActor
 final class MangaViewModel {
     let repository: NetworkRepository
 
@@ -83,7 +85,7 @@ final class MangaViewModel {
             errorMsg = error.localizedDescription
             showError = true
         }
-        
+
         isLoadingPage = false
     }
 
