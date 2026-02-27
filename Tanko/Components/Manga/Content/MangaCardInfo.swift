@@ -26,7 +26,7 @@ struct MangaCardInfo: View {
                 Text(manga.formattedScore)
             }
             .font(.subheadline)
-            .foregroundColor(.yellow)
+            .foregroundStyle(.yellow)
         }
         .padding(12)
     }

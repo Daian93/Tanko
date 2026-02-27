@@ -144,7 +144,7 @@ struct MultiSelectionRow: View {
                 Spacer()
                 if isSelected {
                     Image(systemName: "checkmark")
-                        .foregroundColor(.tankoPrimary)
+                        .foregroundStyle(.tankoPrimary)
                 }
             }
         }
