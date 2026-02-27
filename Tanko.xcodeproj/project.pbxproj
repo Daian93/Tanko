@@ -324,6 +324,8 @@
 		841355232F52161F00B0A288 /* mac_widgets.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mac_widgets.png; sourceTree = "<group>"; };
 		841355242F52161F00B0A288 /* smallAndMedium_clear_widget.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = smallAndMedium_clear_widget.PNG; sourceTree = "<group>"; };
 		841355252F52161F00B0A288 /* smallAndMedium_dark_widget.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = smallAndMedium_dark_widget.PNG; sourceTree = "<group>"; };
+		8413555D2F52226E00B0A288 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		8413555F2F5222FA00B0A288 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		846127B52F3EF29F0075B2E4 /* SearchViewiPad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewiPad.swift; sourceTree = "<group>"; };
 		846127B72F3EFF890075B2E4 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		846127BD2F3F7C550075B2E4 /* TankoWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TankoWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1059,6 +1061,8 @@
 			children = (
 				84EF4A2E2EFAE00400EE4B89 /* Tanko */,
 				846128D72F436CB40075B2E4 /* TankoWidget */,
+				8413555F2F5222FA00B0A288 /* README.md */,
+				8413555D2F52226E00B0A288 /* LICENSE */,
 				846127BE2F3F7C550075B2E4 /* Frameworks */,
 				84EF4A1E2EFAC07C00EE4B89 /* Products */,
 			);
