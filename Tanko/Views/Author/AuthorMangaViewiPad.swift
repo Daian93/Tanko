@@ -28,8 +28,11 @@ struct AuthorMangaViewiPad: View {
                     portraitLayout(geo: geo)
                 }
             }
-            .background(.background)
+            .background(.tankoBackground)
             .navigationBarTitleDisplayModeCompatible(.inline)
+            #if os(macOS)
+                .toolbarBackground(.tankoBackground, for: .windowToolbar)
+            #endif
             .task { await viewModel.loadInitial() }
         }
     }

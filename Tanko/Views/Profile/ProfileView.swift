@@ -21,6 +21,7 @@ struct ProfileView: View {
         NavigationStack {
             #if os(macOS)
                 macContent(settings: _settings)
+                    .toolbarBackground(.tankoBackground, for: .windowToolbar)
             #else
                 iosContent(settings: _settings)
             #endif
@@ -176,6 +177,7 @@ extension ProfileView {
             .background(.tankoBackground)
             .frame(maxWidth: .infinity)
         }
+        .background(.tankoBackground)
     }
 
     // MARK: - Mac Card Helper

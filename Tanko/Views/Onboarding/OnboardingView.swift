@@ -28,20 +28,44 @@ struct OnboardingView: View {
         ZStack {
             OnboardingBackground()
 
-            VStack(spacing: 0) {
-                Spacer()
+            #if os(macOS)
+                GeometryReader { geo in
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            Spacer()
 
-                OnboardingLogo(isAnimating: isAnimating)
+                            OnboardingLogo(isAnimating: isAnimating)
 
-                Spacer()
-                Spacer()
+                            Spacer()
+                            Spacer()
 
-                OnboardingActions(
-                    onLogin: { activeSheet = .login },
-                    onRegister: { activeSheet = .register },
-                    onGuest: { session.continueAsGuest() }
-                )
-            }
+                            OnboardingActions(
+                                onLogin: { activeSheet = .login },
+                                onRegister: { activeSheet = .register },
+                                onGuest: { session.continueAsGuest() }
+                            )
+                        }
+                        .frame(minHeight: geo.size.height)
+                        .frame(maxWidth: .infinity)
+                    }
+                    .scrollBounceBehavior(.basedOnSize)
+                }
+            #else
+                VStack(spacing: 0) {
+                    Spacer()
+
+                    OnboardingLogo(isAnimating: isAnimating)
+
+                    Spacer()
+                    Spacer()
+
+                    OnboardingActions(
+                        onLogin: { activeSheet = .login },
+                        onRegister: { activeSheet = .register },
+                        onGuest: { session.continueAsGuest() }
+                    )
+                }
+            #endif
         }
         .onAppear {
             isAnimating = true

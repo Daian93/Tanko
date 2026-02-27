@@ -60,6 +60,8 @@ struct SearchResultsListiPad: View {
     let namespace: Namespace.ID
     let onLoadMore: (Manga) -> Void
 
+    @Environment(UserMangaCollectionViewModel.self) private var collectionVM
+
     var body: some View {
         List {
             ForEach(Array(results.enumerated()), id: \.element.id) {
@@ -73,6 +75,9 @@ struct SearchResultsListiPad: View {
                     MangaRow(
                         manga: manga,
                         namespace: namespace,
+                        isInCollection: collectionVM.isInCollection(
+                            mangaID: manga.id
+                        ),
                         showBackground: false
                     )
                 }

@@ -78,6 +78,9 @@ struct MangaDetailView: View {
         }
         .navigationTitle(manga.title)
         .background(.tankoBackground)
+        #if os(macOS)
+            .toolbarBackground(.tankoBackground, for: .windowToolbar)
+        #endif
         .navigationBarTitleDisplayModeCompatible(.inline)
         .toolbar {
             ToolbarItem(
