@@ -441,6 +441,79 @@ The active language is switched at runtime from the **Profile** tab using `AppSe
 
 ---
 
+## 🔭 Roadmap
+
+The following improvements are planned for future versions of Tanko:
+
+### 🧪 Testing with Swift Testing
+
+Unit and integration tests using Apple's modern **Swift Testing** framework (`@Test`, `@Suite`, `#expect`), covering:
+
+- **ViewModels** — `MangaViewModel`, `SearchViewModel`, `UserMangaCollectionViewModel`: state transitions, pagination logic, filter building and offline queue behaviour.
+- **Sync logic** — `MangaCollectionSyncService` merge scenarios (local wins, remote wins, new on each side).
+- **Network layer** — mock implementations of `NetworkRepository` to test request building, error mapping and typed-throws paths.
+- **Keychain & Session** — `KeychainService` read/write/delete cycle and `SessionManager` restore-session flow.
+
+```swift
+// Example: Swift Testing style
+@Suite("SearchViewModel")
+struct SearchViewModelTests {
+    @Test("Debounced search resets results on empty query")
+    func emptyQueryResetsState() async { … }
+
+    @Test("Advanced filter builds correct DTO")
+    func advancedFilterDTO() { … }
+}
+```
+
+---
+
+### ♿ Accessibility improvements
+
+Making Tanko fully usable for everyone:
+
+- **`accessibilityLabel` & `accessibilityHint`** on all interactive elements (bookmark buttons, filter chips, collection stats cards).
+- **`accessibilityValue`** on reading-progress controls to expose the current/total volume count to VoiceOver.
+- **Dynamic Type** — verify all text scales correctly up to the *Accessibility XXL* size category; replace fixed `frame` sizes with flexible alternatives where needed.
+- **Reduce Motion** — honour `@Environment(\.accessibilityReduceMotion)` to disable the cover hero transition and carousel animations.
+- **VoiceOver navigation order** — use `accessibilitySortPriority` and `accessibilityElement(children:)` to give a logical reading order to composite cards.
+- **Sufficient colour contrast** audit of the custom palette (primary red on surface backgrounds) in both light and dark modes.
+
+---
+
+### ⌚ watchOS
+
+A companion **watchOS** app showing the user's active reading list at a glance:
+
+- Glanceable list of in-progress manga with current volume badge.
+- **Complication** (WidgetKit / ClockKit) mirroring the small widget.
+- Read-only view — collection edits stay on iPhone/iPad/Mac.
+- Shared data via the existing App Group JSON written by `WidgetDataManager`.
+
+---
+
+### 🥽 visionOS
+
+A spatial adaptation of Tanko for **Apple Vision Pro**:
+
+- **Ornament-based** navigation — tab bar replaced with a window ornament.
+- Manga covers rendered as floating `RealityView` panels in a volumetric window for an immersive browsing experience.
+- `NavigationSplitView` with a sidebar for filters and a detail column for manga info.
+- Hover effects (`hoverEffect(.highlight)`) on manga cards.
+
+---
+
+### 📺 tvOS
+
+A **tvOS** version optimised for the living room:
+
+- Focus-engine-driven grid of manga cards navigable with the Siri Remote.
+- `CardButtonStyle` for cover artwork with parallax effect.
+- Full-screen detail view with synopsis and author info.
+- Collection management via a simple remote-friendly form.
+
+---
+
 ## 👤 Author
 
 **Diana Rammal Sansón**  
