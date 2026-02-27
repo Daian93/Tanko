@@ -11,8 +11,8 @@ protocol NetworkRepository: Sendable, NetworkInteractor {
     
     // MARK: - Auth
     
-    func createUser(email: String, password: String) async throws
-    func login(email: String, password: String) async throws -> String
+    func createUser(email: String, password: String) async throws(NetworkError)
+    func login(email: String, password: String) async throws(NetworkError) -> String
     func renew(token: String) async throws(NetworkError) -> String
     
     // MARK: - Manga list
@@ -46,8 +46,8 @@ protocol NetworkRepository: Sendable, NetworkInteractor {
     
     // MARK: - Collection
     
-    func getUserCollection(token: String) async throws -> [UserMangaCollectionDTO]
-    func addUserMangaToCollection(_ manga: UserMangaCollectionRequest, token: String) async throws
-    func removeUserMangaFromCollection(mangaID: Int, token: String) async throws
-    func getMangaFromCollection(mangaID: Int, token: String) async throws -> UserMangaCollectionDTO
+    func getUserCollection(token: String) async throws(NetworkError) -> [UserMangaCollectionDTO]
+    func addUserMangaToCollection(_ manga: UserMangaCollectionRequest, token: String) async throws(NetworkError)
+    func removeUserMangaFromCollection(mangaID: Int, token: String) async throws(NetworkError)
+    func getMangaFromCollection(mangaID: Int, token: String) async throws(NetworkError) -> UserMangaCollectionDTO
 }

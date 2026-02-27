@@ -101,15 +101,15 @@ struct NetworkTest: NetworkRepository {
         try await getMangas(page: page, per: per)
     }
     
-    func getUserCollection(token: String) async throws -> [UserMangaCollectionDTO] {
+    func getUserCollection(token: String) async throws(NetworkError) -> [UserMangaCollectionDTO] {
         []
     }
 
-    func addUserMangaToCollection(_ manga: UserMangaCollectionRequest, token: String) async throws {}
+    func addUserMangaToCollection(_ manga: UserMangaCollectionRequest, token: String) async throws(NetworkError) {}
 
-    func removeUserMangaFromCollection(mangaID: Int, token: String) async throws {}
+    func removeUserMangaFromCollection(mangaID: Int, token: String) async throws(NetworkError) {}
     
-    func getMangaFromCollection(mangaID: Int, token: String) async throws -> UserMangaCollectionDTO {
+    func getMangaFromCollection(mangaID: Int, token: String) async throws(NetworkError) -> UserMangaCollectionDTO {
         UserMangaCollectionDTO(
             id: UUID(),
             manga: .testDTO,

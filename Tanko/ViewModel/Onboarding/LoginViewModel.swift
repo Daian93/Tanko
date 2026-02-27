@@ -54,8 +54,10 @@ final class LoginViewModel {
                 await LocalDatabaseCleaner.clear(context: context)
             }
 
+        } catch let networkError as NetworkError {
+            self.error = networkError.asAuthError
         } catch {
-            self.error = AuthError(from: error)
+            self.error = .unknown
         }
     }
 }
