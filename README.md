@@ -11,9 +11,9 @@ Final Project — Autumn 2025
 
 [![Swift](https://img.shields.io/badge/Swift-6.0-orange?logo=swift)](https://swift.org)
 [![Xcode](https://img.shields.io/badge/Xcode-16+-blue?logo=xcode)](https://developer.apple.com/xcode/)
-[![iOS](https://img.shields.io/badge/iOS-17+-black?logo=apple)](https://developer.apple.com/ios/)
-[![iPadOS](https://img.shields.io/badge/iPadOS-17+-black?logo=apple)](https://developer.apple.com/ipados/)
-[![macOS](https://img.shields.io/badge/macOS-14+-black?logo=apple)](https://developer.apple.com/macos/)
+[![iOS](https://img.shields.io/badge/iOS-26.1+-black?logo=apple)](https://developer.apple.com/ios/)
+[![iPadOS](https://img.shields.io/badge/iPadOS-26.1+-black?logo=apple)](https://developer.apple.com/ipados/)
+[![macOS](https://img.shields.io/badge/macOS-15.6+-black?logo=apple)](https://developer.apple.com/macos/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 </div>
@@ -176,6 +176,7 @@ Final Project — Autumn 2025
   - 0–5 manga → refresh every 4 h.
   - 6–20 manga → every 1 h.
   - 20+ manga → every 30 min.
+- **Widget deep link** — tapping a manga cover in any widget size opens the app directly on the **Edit Manga** screen for that title via the URL scheme `tanko://edit/<mangaId>`, handled by `NavigationRouter`.
 - Widget data is shared with the main app via an **App Group** (`group.com.dianars.Tanko`) using a JSON file written by `WidgetDataManager`; covers are pre-fetched from the network so they appear immediately.
 - **Dark, Default and Monochrome** app icons created with **Icon Composer**.
 - **Localisation** — all UI strings are translated to **English** and **Spanish** via `Localizable.xcstrings`; the active language is switchable at runtime from the Profile tab.
@@ -212,6 +213,18 @@ Tanko follows **MVVM (Model–View–ViewModel)** with a clean, layered structur
 │  SwiftData (UserManga · PendingOperation)           │
 └─────────────────────────────────────────────────────┘
 ```
+
+### SwiftUI Property Wrappers
+
+| Wrapper | Role in Tanko | Typical example |
+|---|---|---|
+| `@State` | **Local, ephemeral view state** — always `private`, owned by the view itself, survives redraws. Used for transient UI flags (sheet visibility, scroll position, animation triggers…). | `@State private var isAddingToCollection = false` |
+| `@Observable` | **ViewModel & service layer** — replaces `ObservableObject`/`@Published` with zero boilerplate. Every stored property is automatically tracked; combined with `@MainActor` to keep all mutations on the main thread. | `@Observable @MainActor final class MangaViewModel` |
+| `Binding` / `$` | **Two-way data flow** — passes a writable reference from parent to child so the child can mutate the parent's state. Used with `TextField`, `Toggle`, `Stepper` and custom sheet bindings throughout the app. | `Toggle("Complete", isOn: $vm.isComplete)` |
+| `@Bindable` | **ViewModel bindings from the parent** — when a `@Observable` ViewModel is passed *into* a view (not owned by it), `@Bindable` enables the `$` syntax to create bindings to its properties without making it `@State`. | `@Bindable var vm: UserMangaDetailViewModel` |
+| `@Environment` | **Dependency injection** — services and context objects (`SessionManager`, `AppSettings`, `MangaViewModel`, `UserMangaCollectionViewModel`, `NavigationRouter`, `\.modelContext`) are injected at the root and consumed anywhere in the hierarchy without prop-drilling. | `@Environment(SessionManager.self) var session` |
+
+---
 
 ### Key patterns
 
@@ -296,7 +309,7 @@ TankoWidget/
 | Technology | Usage |
 |---|---|
 | **Swift 6** | Primary language, strict concurrency |
-| **SwiftUI** | 100 % declarative UI across all platforms |
+| **SwiftUI** | 100 % declarative UI across all platforms (iOS/iPadOS 26.1+, macOS 15.6+) |
 | **SwiftData** | Local persistence (`UserManga`, `PendingOperation`) |
 | **WidgetKit** | Home screen / lock screen widgets (small, medium, large) |
 | **Observation framework** (`@Observable`) | Reactive state management without Combine boilerplate |
@@ -390,6 +403,7 @@ This guarantees that no data is lost when switching devices or upgrading from gu
 The app uses a **centralised `NavigationRouter`** singleton (`@Observable @MainActor`) to handle:
 
 - **Deep links** (`tanko://manga/<id>`) — navigates to the correct tab and pushes the manga detail.
+- **Widget deep link** (`tanko://edit/<mangaId>`) — tapping any manga cover in the widget opens the app directly on the **Edit Manga** screen for that title; the `NavigationRouter` resolves the URL, switches to the Collection tab and pushes `UserMangaDetailView`.
 - **Cross-tab navigation** — tapping a genre/theme/demographic pill in the manga detail switches to the Search tab and pre-applies the filter.
 - **Author navigation** — tapping an author pill navigates to the author's manga grid/carousel.
 - **`NavigationPath`** is used for each tab's navigation stack, allowing programmatic push/pop.
