@@ -15,6 +15,10 @@ struct OnboardingView: View {
     @State private var activeSheet: Sheet?
     @State private var isAnimating = false
 
+    #if os(iOS)
+        private var isIPad: Bool { UIDevice.current.userInterfaceIdiom == .pad }
+    #endif
+
     enum Sheet: Identifiable {
         case login, register
         var id: Int { hashValue }
@@ -24,20 +28,44 @@ struct OnboardingView: View {
         ZStack {
             OnboardingBackground()
 
-            VStack(spacing: 0) {
-                Spacer()
+            #if os(macOS)
+                GeometryReader { geo in
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            Spacer()
 
-                OnboardingLogo(isAnimating: isAnimating)
+                            OnboardingLogo(isAnimating: isAnimating)
 
-                Spacer()
-                Spacer()
+                            Spacer()
+                            Spacer()
 
-                OnboardingActions(
-                    onLogin: { activeSheet = .login },
-                    onRegister: { activeSheet = .register },
-                    onGuest: { session.continueAsGuest() }
-                )
-            }
+                            OnboardingActions(
+                                onLogin: { activeSheet = .login },
+                                onRegister: { activeSheet = .register },
+                                onGuest: { session.continueAsGuest() }
+                            )
+                        }
+                        .frame(minHeight: geo.size.height)
+                        .frame(maxWidth: .infinity)
+                    }
+                    .scrollBounceBehavior(.basedOnSize)
+                }
+            #else
+                VStack(spacing: 0) {
+                    Spacer()
+
+                    OnboardingLogo(isAnimating: isAnimating)
+
+                    Spacer()
+                    Spacer()
+
+                    OnboardingActions(
+                        onLogin: { activeSheet = .login },
+                        onRegister: { activeSheet = .register },
+                        onGuest: { session.continueAsGuest() }
+                    )
+                }
+            #endif
         }
         .onAppear {
             isAnimating = true
@@ -47,7 +75,9 @@ struct OnboardingView: View {
             case .login:
                 LoginView(session: session, context: context)
                     #if os(iOS)
-                        .presentationDetents([.medium, .large])
+                        .presentationDetents(
+                            isIPad ? [.large] : [.medium, .large]
+                        )
                         .presentationDragIndicator(.visible)
                     #endif
                     #if os(macOS)
@@ -55,9 +85,11 @@ struct OnboardingView: View {
                         .frame(minHeight: 500, idealHeight: 550, maxHeight: 600)
                     #endif
             case .register:
-                RegisterView(session: session)
+                RegisterView(session: session, context: context)
                     #if os(iOS)
-                        .presentationDetents([.medium, .large])
+                        .presentationDetents(
+                            isIPad ? [.large] : [.medium, .large]
+                        )
                         .presentationDragIndicator(.visible)
                     #endif
                     #if os(macOS)

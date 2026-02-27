@@ -9,7 +9,8 @@ import SwiftUI
 
 struct ExpandableText: View {
     let title: LocalizedStringKey
-    let text: String
+    let text: String?
+    let fallback: LocalizedStringKey
     let lineLimit: Int
     let minCharCount: Int
 
@@ -17,18 +18,22 @@ struct ExpandableText: View {
 
     init(
         title: LocalizedStringKey,
-        text: String,
+        text: String?,
+        fallback: LocalizedStringKey = "text.not.available",
         lineLimit: Int = 4,
         minCharCount: Int = 200
     ) {
         self.title = title
         self.text = text
+        self.fallback = fallback
         self.lineLimit = lineLimit
         self.minCharCount = minCharCount
     }
 
+    private var isEmpty: Bool { text == nil || text?.isEmpty == true }
+
     private var shouldShowToggle: Bool {
-        text.count > minCharCount
+        !isEmpty && (text?.count ?? 0) > minCharCount
     }
 
     var body: some View {
@@ -38,12 +43,19 @@ struct ExpandableText: View {
                 .fontWeight(.semibold)
 
             VStack(alignment: .leading) {
-                Text(text)
-                    .font(.body)
-                    .multilineTextAlignment(.leading)
-                    .lineLimit(isExpanded ? nil : lineLimit)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                if isEmpty {
+                    Text(fallback)
+                        .font(.body)
+                        .foregroundStyle(.tankoSecondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
+                    Text(text!)
+                        .font(.body)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(isExpanded ? nil : lineLimit)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
             }
             .overlay(alignment: .bottom) {
                 if !isExpanded && shouldShowToggle {
@@ -65,12 +77,17 @@ struct ExpandableText: View {
                     }
                 } label: {
                     HStack(spacing: 4) {
-                        Text(isExpanded ? "section.showLess" : "section.showMore")
-                            .font(.caption)
-                            .fontWeight(.semibold)
+                        Text(
+                            isExpanded ? "section.showLess" : "section.showMore"
+                        )
+                        .font(.caption)
+                        .fontWeight(.semibold)
 
-                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                            .font(.caption2)
+                        Image(
+                            systemName: isExpanded
+                                ? "chevron.up" : "chevron.down"
+                        )
+                        .font(.caption2)
                     }
                 }
                 .buttonStyle(.plain)
@@ -86,7 +103,10 @@ struct ExpandableText: View {
         VStack(spacing: 20) {
             ExpandableText(
                 title: "section.synopsis",
-                text: String(repeating: "Este es un texto largo de prueba. ", count: 20)
+                text: String(
+                    repeating: "Este es un texto largo de prueba. ",
+                    count: 20
+                )
             )
             ExpandableText(
                 title: "section.background",

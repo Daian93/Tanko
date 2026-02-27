@@ -13,11 +13,11 @@ struct ReadingProgressEditor: View {
     @Binding var readingVolume: Int
     let maxVolume: Int
     @FocusState.Binding var isTextFieldFocused: Bool
-    
+
     var body: some View {
         HStack(spacing: 12) {
             Spacer()
-            
+
             // Button -
             Button {
                 isTextFieldFocused = false
@@ -25,24 +25,24 @@ struct ReadingProgressEditor: View {
             } label: {
                 Image(systemName: "minus.circle.fill")
                     #if os(macOS)
-                    .font(.system(size: 24))
+                        .font(.system(size: 24))
                     #else
-                    .font(.system(size: 32))
+                        .font(.system(size: 32))
                     #endif
                     .foregroundStyle(readingVolume > 0 ? Color.red : Color.gray)
             }
             .buttonStyle(.plain)
             .disabled(readingVolume <= 0)
-            
+
             // TextField with number formatting and keyboard type
             TextField(
                 "",
                 value: $readingVolume,
                 format: .number,
-                prompt: Text("0").foregroundColor(.tankoSecondary)
+                prompt: Text("0").foregroundStyle(.tankoSecondary)
             )
             #if os(iOS)
-            .keyboardTypeCompatible(.numberPad)
+                .keyboardTypeCompatible(.numberPad)
             #endif
             .multilineTextAlignment(.center)
             .font(.title2.bold())
@@ -56,17 +56,17 @@ struct ReadingProgressEditor: View {
                 readingVolume = min(max(newValue, 0), maxVolume)
             }
             #if os(iOS)
-            .toolbar {
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button("reading.done") {
-                        isTextFieldFocused = false
+                .toolbar {
+                    ToolbarItemGroup(placement: .keyboard) {
+                        Spacer()
+                        Button("reading.done") {
+                            isTextFieldFocused = false
+                        }
+                        .fontWeight(.semibold)
                     }
-                    .fontWeight(.semibold)
                 }
-            }
             #endif
-            
+
             // Button +
             Button {
                 isTextFieldFocused = false
@@ -74,26 +74,28 @@ struct ReadingProgressEditor: View {
             } label: {
                 Image(systemName: "plus.circle.fill")
                     #if os(macOS)
-                    .font(.system(size: 24))
+                        .font(.system(size: 24))
                     #else
-                    .font(.system(size: 32))
+                        .font(.system(size: 32))
                     #endif
-                    .foregroundStyle(readingVolume < maxVolume ? Color.green : Color.gray)
+                    .foregroundStyle(
+                        readingVolume < maxVolume ? Color.green : Color.gray
+                    )
             }
             .buttonStyle(.plain)
             .disabled(readingVolume >= maxVolume)
-            
+
             Spacer()
         }
         .padding(.vertical, 8)
     }
-    
+
     // MARK: - Helper Methods
     private func incrementReading() {
         guard readingVolume < maxVolume else { return }
         readingVolume += 1
     }
-    
+
     private func decrementReading() {
         guard readingVolume > 0 else { return }
         readingVolume -= 1

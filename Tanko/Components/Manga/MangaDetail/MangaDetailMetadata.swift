@@ -35,7 +35,7 @@ struct MangaDetailMetadata: View {
 
             // Publication year
             MetadataSection(title: "section.published") {
-                Text(manga.publicationYear)
+                publicationYearText
                     .font(.subheadline)
                     .foregroundStyle(.textSecondary)
             }
@@ -50,7 +50,8 @@ struct MangaDetailMetadata: View {
                 if !manga.genres.isEmpty {
                     FlowLayout(spacing: pillSpacing) {
                         ForEach(manga.genres) { genre in
-                            FilterablePill(text: genre.localized, color: .blue) {
+                            FilterablePill(text: genre.localized, color: .blue)
+                            {
                                 router.navigateToSearch(
                                     filter: CustomSearchDTO(
                                         genres: [genre.rawValue],
@@ -75,8 +76,10 @@ struct MangaDetailMetadata: View {
                 MetadataSection(title: themeSectionTitle) {
                     FlowLayout(spacing: pillSpacing) {
                         ForEach(manga.themes) { theme in
-                            FilterablePill(text: theme.localized, color: .purple)
-                            {
+                            FilterablePill(
+                                text: theme.localized,
+                                color: .purple
+                            ) {
                                 router.navigateToSearch(
                                     filter: CustomSearchDTO(
                                         themes: [theme.rawValue],
@@ -140,6 +143,18 @@ struct MangaDetailMetadata: View {
         manga.demographics.count == 1
             ? "section.demographics.one"
             : "section.demographics.other"
+    }
+    
+    // Publication year text logic
+    @ViewBuilder
+    private var publicationYearText: some View {
+        if let endYear = manga.publicationEndYear {
+            Text("\(manga.publicationStartYear) - \(endYear)")
+        } else if manga.isOngoing {
+            Text("\(manga.publicationStartYear) - \(Text("date.present"))")
+        } else {
+            Text("\(manga.publicationStartYear) - ?")
+        }
     }
 }
 

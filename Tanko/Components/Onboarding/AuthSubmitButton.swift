@@ -39,6 +39,9 @@ struct AuthSubmitButton: View {
         }
         .disabled(!isFormValid || isLoading)
         .padding(.top, 2)
+        #if os(macOS)
+            .buttonStyle(.plain)
+        #endif
     }
 }
 
@@ -50,5 +53,5 @@ struct AuthSubmitButton: View {
         maxWidth: .infinity,
         action: {}
     )
-        .padding()
+    .padding()
 }

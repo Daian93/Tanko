@@ -19,7 +19,7 @@ struct OnboardingLogo: View {
                     .scaleEffect(isAnimating ? 1.1 : 1.0)
                     .animation(
                         .easeInOut(duration: 2.0)
-                        .repeatForever(autoreverses: true),
+                            .repeatForever(autoreverses: true),
                         value: isAnimating
                     )
 
@@ -33,7 +33,7 @@ struct OnboardingLogo: View {
                     .rotationEffect(.degrees(isAnimating ? 5 : -5))
                     .animation(
                         .easeInOut(duration: 2.0)
-                        .repeatForever(autoreverses: true),
+                            .repeatForever(autoreverses: true),
                         value: isAnimating
                     )
             }
@@ -50,6 +50,8 @@ struct OnboardingLogo: View {
                     .fontWeight(.medium)
                     .foregroundStyle(.white.opacity(0.9))
                     .multilineTextAlignment(.center)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
                     .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
             }
         }

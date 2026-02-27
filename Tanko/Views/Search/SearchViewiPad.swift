@@ -65,8 +65,11 @@ struct SearchViewiPad: View {
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+            }
+            .listRowBackground(Color.clear)
 
-                if filtersVM.hasActiveFilters {
+            if filtersVM.hasActiveFilters {
+                Section {
                     Button(role: .destructive) {
                         filtersVM.resetAllFilters()
                         viewModel.applyCurrentFilters(filtersVM: filtersVM)
@@ -79,6 +82,7 @@ struct SearchViewiPad: View {
                     }
                     .buttonStyle(.bordered)
                 }
+                .listRowBackground(Color.clear)
             }
         }
         #if os(iOS)

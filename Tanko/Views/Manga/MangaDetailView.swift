@@ -43,7 +43,8 @@ struct MangaDetailView: View {
                 // MARK: Synopsis
                 ExpandableText(
                     title: "section.synopsis",
-                    text: manga.synopsis
+                    text: manga.synopsis.isEmpty ? nil : manga.synopsis,
+                    fallback: "synopsis.not.available"
                 )
 
                 Spacer(minLength: 20)
@@ -51,7 +52,8 @@ struct MangaDetailView: View {
                 // MARK: Background
                 ExpandableText(
                     title: "section.background",
-                    text: manga.background ?? "-"
+                    text: manga.background,
+                    fallback: "background.not.available"
                 )
 
                 // MARK: MyAnimeList Link
@@ -76,6 +78,9 @@ struct MangaDetailView: View {
         }
         .navigationTitle(manga.title)
         .background(.tankoBackground)
+        #if os(macOS)
+            .toolbarBackground(.tankoBackground, for: .windowToolbar)
+        #endif
         .navigationBarTitleDisplayModeCompatible(.inline)
         .toolbar {
             ToolbarItem(

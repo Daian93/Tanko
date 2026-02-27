@@ -32,6 +32,7 @@ final class LoginViewModel {
     func login() async {
         guard isFormValid else { return }
         isLoading = true
+        defer { isLoading = false }
 
         do {
             try await session.login(email: email, password: password)
@@ -54,16 +55,9 @@ final class LoginViewModel {
             }
 
         } catch let networkError as NetworkError {
-            switch networkError {
-            case .status(401): self.error = .invalidCredentials
-            case .noInternet: self.error = .noInternet
-            case .timedOut: self.error = .timedOut
-            default: self.error = .unknown
-            }
+            self.error = networkError.asAuthError
         } catch {
             self.error = .unknown
         }
-
-        isLoading = false
     }
 }

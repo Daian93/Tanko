@@ -41,16 +41,13 @@ struct ContentViewiPad: View {
 
                         ScrollView {
                             VStack(spacing: 32) {
+                                #if os(macOS)
                                 Text("tab.mangas")
                                     .font(.system(size: 30, weight: .bold))
-                                    .frame(
-                                        maxWidth: .infinity,
-                                        alignment: .leading
-                                    )
-                                    #if os(macOS)
-                                        .padding(.horizontal)
-                                        .padding(.top)
-                                    #endif
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.horizontal)
+                                    .padding(.top)
+                                #endif
 
                                 if !bestMangaViewModel.mangas.isEmpty {
                                     VStack(alignment: .leading, spacing: 12) {
@@ -124,7 +121,6 @@ struct ContentViewiPad: View {
                 }
             }
             .navigationTitle("tab.mangas")
-            .navigationBarTitleDisplayModeCompatible(.inline)
             .background(.tankoBackground)
             .navigationDestination(for: Manga.self) { manga in
                 MangaDetailView(manga: manga, namespace: nil)

@@ -63,6 +63,12 @@ struct RootView: View {
                 userCollectionVM?.invalidate()
                 showLoadingOverlay = true
                 buildViewModel()
+                if let vm = userCollectionVM {
+                    await vm.synchronize()
+                }
+                withAnimation {
+                    showLoadingOverlay = false
+                }
             }
         }
         .onChange(of: session.didLogout) { _, didLogout in

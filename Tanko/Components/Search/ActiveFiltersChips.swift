@@ -19,7 +19,7 @@ struct ActiveFiltersChips: View {
             HStack(spacing: 8) {
                 Text("active.filters")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.tankoSecondary)
 
                 ForEach(Array(filtersVM.selectedGenres), id: \.self) { genre in
                     FilterChip(title: genre.localized, color: .green) {

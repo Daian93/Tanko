@@ -19,6 +19,19 @@ extension URLSession {
                 throw NetworkError.nonHTTPResponse
             }
             return (data, httpResponse)
+        } catch let networkError as NetworkError {
+            throw networkError
+        } catch let urlError as URLError {
+            switch urlError.code {
+            case .notConnectedToInternet, .networkConnectionLost:
+                throw NetworkError.noInternet
+            case .timedOut:
+                throw NetworkError.timedOut
+            case .cancelled:
+                throw NetworkError.cancelled
+            default:
+                throw NetworkError.general(urlError)
+            }
         } catch {
             throw NetworkError.general(error)
         }

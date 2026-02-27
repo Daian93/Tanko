@@ -14,7 +14,7 @@ struct Network: NetworkRepository {
     private let appToken = "sLGH38NhEJ0_anlIWwhsz1-LarClEohiAHQqayF0FY"
 
     // MARK: - Auth
-    func createUser(email: String, password: String) async throws {
+    func createUser(email: String, password: String) async throws(NetworkError) {
         let body = UsersCreate(email: email, password: password)
         var request = URLRequest.post(url: .createUser, body: body)
 
@@ -24,7 +24,7 @@ struct Network: NetworkRepository {
         try await postJSON(request, status: 201)
     }
 
-    func login(email: String, password: String) async throws -> String {
+    func login(email: String, password: String) async throws(NetworkError) -> String {
         let credentials = "\(email):\(password)"
         guard let data = credentials.data(using: .utf8) else {
             throw NetworkError.invalidData
@@ -206,7 +206,7 @@ struct Network: NetworkRepository {
         ).toMangaPage
     }
 
-    func getUserCollection(token: String) async throws
+    func getUserCollection(token: String) async throws(NetworkError)
         -> [UserMangaCollectionDTO]
     {
         var request = URLRequest.get(url: .collectionManga)
@@ -217,20 +217,20 @@ struct Network: NetworkRepository {
     func addUserMangaToCollection(
         _ manga: UserMangaCollectionRequest,
         token: String
-    ) async throws {
+    ) async throws(NetworkError) {
         var request = URLRequest.post(url: .collectionManga, body: manga)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         _ = try await postJSON(request, type: EmptyResponse.self)
     }
 
-    func removeUserMangaFromCollection(mangaID: Int, token: String) async throws
+    func removeUserMangaFromCollection(mangaID: Int, token: String) async throws(NetworkError)
     {
         var request = URLRequest.delete(url: .collectionMangaID(mangaID))
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         _ = try await deleteJSON(request)
     }
 
-    func getMangaFromCollection(mangaID: Int, token: String) async throws
+    func getMangaFromCollection(mangaID: Int, token: String) async throws(NetworkError)
         -> UserMangaCollectionDTO
     {
         var request = URLRequest.get(url: .collectionMangaID(mangaID))

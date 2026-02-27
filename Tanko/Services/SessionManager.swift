@@ -39,7 +39,7 @@ final class SessionManager {
         email: String,
         password: String,
         onCompletion: (() async -> Void)? = nil
-    ) async throws {
+    ) async throws(NetworkError) {
         let jwt = try await network.login(email: email, password: password)
 
         self.token = jwt
@@ -66,7 +66,7 @@ final class SessionManager {
         }
     }
 
-    func register(email: String, password: String) async throws {
+    func register(email: String, password: String) async throws(NetworkError) {
         try await network.createUser(email: email, password: password)
     }
 

@@ -49,7 +49,7 @@ extension NetworkInteractor {
         }
     }
     
-    func deleteJSON(_ request: URLRequest, status: Int = 200) async throws {
+    func deleteJSON(_ request: URLRequest, status: Int = 200) async throws(NetworkError) {
         let (_, httpResponse) = try await URLSession.shared.getData(for: request)
         
         if httpResponse.statusCode != status {
@@ -57,7 +57,7 @@ extension NetworkInteractor {
         }
     }
     
-    func deleteJSON<JSON>(_ request: URLRequest, type: JSON.Type) async throws -> JSON where JSON: Codable {
+    func deleteJSON<JSON>(_ request: URLRequest, type: JSON.Type) async throws(NetworkError) -> JSON where JSON: Codable {
         let (data, httpResponse) = try await URLSession.shared.getData(for: request)
         
         guard httpResponse.statusCode == 200 else {
