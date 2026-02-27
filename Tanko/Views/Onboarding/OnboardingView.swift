@@ -61,7 +61,7 @@ struct OnboardingView: View {
                         .frame(minHeight: 500, idealHeight: 550, maxHeight: 600)
                     #endif
             case .register:
-                RegisterView(session: session)
+                RegisterView(session: session, context: context)
                     #if os(iOS)
                         .presentationDetents(
                             isIPad ? [.large] : [.medium, .large]

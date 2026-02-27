@@ -5,17 +5,21 @@
 //  Created by Diana Rammal Sansón on 9/2/26.
 //
 
+import SwiftData
 import SwiftUI
 
 struct RegisterView: View {
     @Environment(SessionManager.self) private var session
     @Environment(\.dismiss) private var dismiss
     @Environment(AppSettings.self) private var settings
+    @Environment(\.modelContext) private var context
 
     @State private var vm: RegisterViewModel
 
-    init(session: SessionManager) {
-        self.vm = RegisterViewModel(session: session)
+    init(session: SessionManager, context: ModelContext) {
+        _vm = State(
+            wrappedValue: RegisterViewModel(session: session, context: context)
+        )
     }
 
     var body: some View {
@@ -91,6 +95,9 @@ struct RegisterView: View {
 }
 
 #Preview {
-    RegisterView(session: SessionManager())
-        .withPreviewEnvironment()
+    RegisterView(
+        session: SessionManager(),
+        context: PreviewHelper.container.mainContext
+    )
+    .withPreviewEnvironment()
 }
