@@ -10,7 +10,7 @@
 Final Project — Autumn 2025
 
 [![Swift](https://img.shields.io/badge/Swift-6.0-orange?logo=swift)](https://swift.org)
-[![Xcode](https://img.shields.io/badge/Xcode-16+-blue?logo=xcode)](https://developer.apple.com/xcode/)
+[![Xcode](https://img.shields.io/badge/Xcode-26.2-blue?logo=xcode)](https://developer.apple.com/xcode/)
 [![iOS](https://img.shields.io/badge/iOS-26.1+-black?logo=apple)](https://developer.apple.com/ios/)
 [![iPadOS](https://img.shields.io/badge/iPadOS-26.1+-black?logo=apple)](https://developer.apple.com/ipados/)
 [![macOS](https://img.shields.io/badge/macOS-15.6+-black?logo=apple)](https://developer.apple.com/macos/)
